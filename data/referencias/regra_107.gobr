@@ -1,0 +1,28 @@
+
+# Regras para Higicop
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa higicop":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Empresa Customizavel: 15 dias para inativos":
+    da carteira("empresa higicop")
+    quando inativos para o vendedor
+    frequencia quinzenal()
+    preferencia do vendedor
+
+parametros "Regra Padrao da Empresa Customizavel: 15 dias para ativos":
+    da carteira("empresa higicop")
+    quando ativos para o vendedor
+    frequencia quinzenal()
+    preferencia do vendedor
+    
+
+parametros "Regra Padrao da Empresa Customizavel: 15 dias para clientes sem vendas":
+    da carteira("empresa higicop")
+    quando sem vendas
+    frequencia quinzenal()
+

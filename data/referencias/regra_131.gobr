@@ -1,0 +1,84 @@
+
+# Regras para Labtech
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas ativados
+
+time "time campo":
+    vendedores todosdecampo ativados
+
+parametros "Labtech: Não agendar inadimplentes":
+    do time("time televendas","time campo")
+    quando inadimplentes
+    nao agendar
+
+parametros "Labtech: Não agendar 'Administração pública em geral' e 'Segurança e ordem pública'":
+    do time("time televendas","time campo")
+    quando cnae é igual("8411600","8424800")
+    nao agendar
+
+parametros "Labtech: Frequência de 7 dias para clientes sem crédito":
+    do time("time televendas","time campo")
+    quando nao tem crédito
+    frequencia de 7 dias
+
+############################
+## TIME TELEVENDAS
+
+parametros "Labtech: Frequência de 7 dias para clientes ativos - Modelo 1 - Televendas":
+    do time("time televendas")
+    quando ativos para o vendedor e cnae é igual("8630501","8610101","8630502","7500100","8610102","8630503","8640201","8690901","8630501")
+    frequencia de 7 dias
+
+parametros "Labtech: Frequência de 14 dias para clientes inativos - Modelo 1 - Televendas":
+    do time("time televendas")
+    quando cnae é igual("8630501","8610101","8630502","7500100","8610102","8630503","8640201","8690901","8630501")
+    frequencia de 14 dias
+
+parametros "Labtech: Frequência de 21 dias para clientes ativos - Modelo 2 - Televendas":
+    do time("time televendas")
+    quando ativos para o vendedor e cnae é igual("8533300","8532500","4645101","3250705","4773300")
+    frequencia de 21 dias
+
+parametros "Labtech: Frequência de 30 dias para clientes inativos - Modelo 2 - Televendas":
+    do time("time televendas")
+    quando cnae é igual("8533300","8532500","4645101","3250705","4773300")
+    frequencia de 30 dias
+
+parametros "Labtech: Frequência de 30 dias - Modelo 3 - Televendas":
+    do time("time televendas")
+    frequencia de 30 dias
+
+############################
+## TIME CAMPO
+
+parametros "Labtech: Frequência de 7 dias para clientes ativos - Modelo 1 - Externos":
+    do time("time campo")
+    quando ativos para o vendedor e cnae é igual("8630501","8610101","8630502","7500100","8610102","8630503","8640201","8690901","8630501")
+    frequencia de 7 dias
+    preferencia na segunda e na quarta e na sexta
+
+parametros "Labtech: Frequência de 14 dias para clientes inativos - Modelo 1 - Externos":
+    do time("time campo")
+    quando cnae é igual("8630501","8610101","8630502","7500100","8610102","8630503","8640201","8690901","8630501")
+    frequencia de 14 dias
+    preferencia na segunda e na quarta e na sexta
+
+parametros "Labtech: Frequência de 21 dias para clientes ativos - Modelo 2 - Externos":
+    do time("time campo")
+    quando ativos para o vendedor e cnae é igual("8533300","8532500","4645101","3250705","4773300")
+    frequencia de 21 dias
+    preferencia na segunda e na quarta e na sexta
+
+parametros "Labtech: Frequência de 30 dias para clientes inativos - Modelo 2 - Externos":
+    do time("time campo")
+    quando cnae é igual("8533300","8532500","4645101","3250705","4773300")
+    frequencia de 30 dias
+    preferencia na segunda e na quarta e na sexta
+
+parametros "Labtech: Frequência de 30 dias - Modelo 3 - Externos":
+    do time("time campo")
+    frequencia de 30 dias
+    preferencia na segunda e na quarta e na sexta
+    

@@ -1,0 +1,40 @@
+
+
+# Regras para Recife Doces
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Empresa Customizavel: semanal para clientes ativos e adimplentes":
+    da carteira("empresa toda")
+    quando ativos para o vendedor
+    frequencia semanal()
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customizavel: 21 dias para clientes ativos e inadimplentes":
+    da carteira("empresa toda")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 21 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customizavel: 30 dias para clientes inativos e adimplentes":
+    da carteira("empresa toda")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customizavel: nao agendar inativos e inadimplentes":
+    da carteira("empresa toda")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Empresa Customizavel: 30 dias para clientes sem vendas":
+    da carteira("empresa toda")
+    quando sem vendas
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    

@@ -1,0 +1,40 @@
+
+# Regras para Makro Services
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Empresa Customizavel: mensal para inativos com cnae do erp que inicia com ("03","47","27")":
+    da carteira("empresa toda")
+    quando inativos para o vendedor e cnae do erp inicia com("03","47","27")
+    frequencia mensal()
+    preferencia do vendedor
+
+parametros "Regra Padrao da Empresa Customizavel: 15 dias para inativos":
+    da carteira("empresa toda")
+    quando inativos para o vendedor
+    frequencia quinzenal()
+    preferencia do vendedor
+
+parametros "Regra Padrao da Empresa Customizavel: mensal para ativos":
+    da carteira("empresa toda")
+    quando ativos para o vendedor
+    frequencia mensal()
+    preferencia do vendedor
+
+parametros "Regra Padrao da Empresa Customizavel: 15 dias para inativos":
+    da carteira("empresa toda")
+    quando inativos para o vendedor
+    frequencia quinzenal()
+    preferencia do vendedor
+    
+parametros "Regra Padrao da Empresa Customizavel: mensal para clientes sem venda":
+    da carteira("empresa toda")
+    quando sem vendas
+    frequencia mensal()
+    preferencia do vendedor
+    

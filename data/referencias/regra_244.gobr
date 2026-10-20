@@ -1,0 +1,52 @@
+
+# Solicitação: https://govendas-team.atlassian.net/browse/CS-34
+version 1.0
+
+time "televendas":
+    vendedores todos ativados
+
+## Regras de não agendamento
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando é o cliente filial
+    nao agendar
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+## Regras de agendamento
+
+parametros "Prospect: Cliente potencial":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 14 dias
+
+parametros "Ativado: Fez um pedido e ainda não comprou mais":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 7 dias
+
+parametros "Freq. histórica para Ativo: compra regularmente":
+    do time("televendas")
+    quando ativos para o vendedor
+        e frequencia historica menor que 8 dias
+    frequencia do historico ou no minimo de 5 dias e no maximo de 7 dias
+
+parametros "Estimular a regularidade de compra":
+    do time("televendas")
+    quando recencia de positivacao do vendedor entre 8 dias e 30 dias
+    frequencia de 14 dias
+
+parametros "Em ruptura: risco de ficar inativo":
+    do time("televendas")
+    quando recencia de positivacao do vendedor entre 31 dias e 60 dias
+    frequencia de 7 dias
+
+parametros "Inativo: reativar cliente sem compra":
+    do time("televendas")
+    quando fora da recencia de positivacao do vendedor em 60 dias
+    frequencia de 14 dias
+

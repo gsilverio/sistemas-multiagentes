@@ -1,0 +1,36 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/9077670213
+version 1.0
+
+# Definição dos times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+# Parâmetros de planejamento
+
+parametros "Não agendar Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar cidade de Fortaleza e com compra em 60d":
+    do time("televendas")
+    quando nome da cidade igual("FORTALEZA")
+        e recencia de positivacao em 60 dias
+    nao agendar
+
+parametros "Freq. de 40d para Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 40 dias
+
+parametros "Freq. de 15d para Ativos Adimplentes":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 15 dias
+
+parametros "Freq. de 20d para Inativos Adimplentes":
+    do time("televendas")
+    frequencia de 20 dias
+

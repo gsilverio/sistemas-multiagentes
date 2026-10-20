@@ -1,0 +1,69 @@
+
+# Card: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6912506739
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas
+
+## Parâmetros de não agendamento:
+
+parametros "Hospidrogas: Não agendar ramos de atividade específicos":
+    do time("televendas")
+    quando ramo de atividade diferente("2","3","4","5","6","7","8","10","11","12","14","15","17","18","19")
+    nao agendar
+
+## Parâmetros de agendamento para Prospects:
+
+parametros "Hospidrogas: Freq. 30d para prospects e ramos de atividade igual 2, 7, 11, 12, 14 ou 19":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa e ramo de atividade igual("2","7","11","12","14","19")
+    frequencia de 30 dias
+
+## Parâmetros de agendamento para Ativos:
+
+parametros "Hospidrogas: Freq. 30d para ativos e ramos de atividade igual 3, 4, 6, 8, 15 ou 18":
+    do time("televendas")
+    quando ativos para o vendedor e ramo de atividade igual("3","4","6","8","15","18")
+    frequencia de 30 dias
+
+parametros "Hospidrogas: Freq. 15d para ativos e ramos de atividade igual 7 ou 17":
+    do time("televendas")
+    quando ativos para o vendedor e ramo de atividade igual("7","17")
+    frequencia de 15 dias
+
+parametros "Hospidrogas: Freq. 7d para ativos e ramos de atividade igual 10, 11, 14 ou 19":
+    do time("televendas")
+    quando ativos para o vendedor e ramo de atividade igual("10","11","14","19")
+    frequencia de 7 dias
+
+parametros "Hospidrogas: Freq. 5d para ativos e ramos de atividade igual 2 ou 12":
+    do time("televendas")
+    quando ativos para o vendedor e ramo de atividade igual("2","12")
+    frequencia de 5 dias
+
+## Parâmetros de agendamento para Inativos:
+
+parametros "Hospidrogas: Freq. 30d para inativos e ramos de atividade igual 3, 4, 6, 8, 15 ou 18":
+    do time("televendas")
+    quando ramo de atividade igual("3","4","6","8","15","18")
+    frequencia de 30 dias
+
+parametros "Hospidrogas: Freq. 20d para inativos e ramos de atividade igual 17":
+    do time("televendas")
+    quando ramo de atividade igual("17")
+    frequencia de 20 dias
+
+parametros "Hospidrogas: Freq. 15d para inativos e ramos de atividade igual 10":
+    do time("televendas")
+    quando ramo de atividade igual("10")
+    frequencia de 15 dias
+
+parametros "Hospidrogas: Freq. 10d para inativos e ramos de atividade igual 11 ou 19":
+    do time("televendas")
+    quando ramo de atividade igual("11","19")
+    frequencia de 10 dias
+
+parametros "Hospidrogas: Freq. 5d para inativos e ramos de atividade igual 2, 7, 12 ou 14":
+    do time("televendas")
+    frequencia de 5 dias
+    

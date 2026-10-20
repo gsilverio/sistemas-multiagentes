@@ -1,0 +1,51 @@
+
+### Regras para Br Distribuidora
+### Última atualização: 2026-02-02
+### Solicitação: https://govendas-team.atlassian.net/browse/IMP-380
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+parametros "Nunca fez pedido com o vendedor (prospect)":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 7 dias
+
+
+parametros "Tirou o primeiro pedido com o vendedor":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 7 dias
+
+
+parametros "Teve pedido entre 0 e 7 dias":
+    do time("televendas")
+    quando recencia de positivacao em 7 dias
+    frequencia de 14 dias
+
+parametros "Teve pedido entre 7 e 30 dias":
+    do time("televendas")
+    quando recencia de positivacao entre 7 dias e 30 dias
+    frequencia de 14 dias
+
+
+parametros "Teve pedido entre 30 e 60 dias":
+    do time("televendas")
+    quando recencia de positivacao entre 30 dias e 60 dias
+    frequencia de 14 dias
+
+
+parametros "Teve pedido entre 60 e 90 dias":
+    do time("televendas")
+    quando recencia de positivacao entre 60 dias e 90 dias
+    frequencia de 7 dias
+
+parametros "Teve pedido há 90 dias ou mais":
+    do time("televendas")
+    frequencia de 7 dias 
+    

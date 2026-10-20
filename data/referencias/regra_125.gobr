@@ -1,0 +1,29 @@
+
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Cavalo Marinho: 7 dias para clientes ativos":
+    da carteira("empresa toda")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Cavalo Marinho: 15 dias para clientes inativos adimplentes":
+    da carteira("empresa toda")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 15 dias
+
+parametros "Regra Padrao da Cavalo Marinho: nao agendar clientes inativos inadimplentes":
+    da carteira("empresa toda")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+    
+parametros "Regra Padrao da Cavalo Marinho: 20 dias para clientes prospects":
+    da carteira("empresa toda")
+    quando sem venda
+    frequencia de 20 dias
+

@@ -1,0 +1,113 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-563862934854
+version 1.0
+
+#
+## Definição de times
+
+time "felipe":
+    vendedores todostelevendas ativados menos("503", "518", "519", "521", "623", "624", "626")
+
+time "paola_1":
+    vendedores porid("519")
+
+time "paola_2":
+    vendedores porid("503", "518", "521", "623", "624", "626")
+
+time "temporario_2meses":
+    vendedores porid("521", "623", "624")
+
+#
+## Regras de bloqueios
+
+parametros "Nao agendar - clientes baixados na receita":
+    do time("felipe", "paola_1", "paola_2", "temporario_2meses")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Nao agendar - clientes com rota futura em 7 dias":
+    do time("paola_1", "paola_2")
+    quando data da rota futura em 7 dias
+    nao agendar
+
+parametros "Nao agendar - clientes com recencia de positivacao em 7 dias":
+    do time("paola_1", "paola_2")
+    quando recencia de positivacao em 7 dias
+    nao agendar
+
+parametros "Clientes com compra em 30 dias":
+    do time("felipe")
+    quando recencia de positivacao em 30 dias
+    nao agendar
+
+#
+## Regras de parametrização
+
+parametros "Cobertura de rota de visita exatamente 14 dias depois":
+    do time("temporario_2meses")
+    quando data da rota ha 14 dias atras
+        e com 5% de credito
+    frequencia de 1 dia
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes com compra entre 30 e 90 dias":
+    do time("felipe")
+    quando recencia de positivacao entre 30 dias e 90 dias
+    frequencia de 15 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes sem compra em 90 dias":
+    do time("felipe")
+    frequencia de 10 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes com rota ha 7 dias ou mais":
+    do time("paola_1", "paola_2")
+    quando data da rota em 7 dias
+        e com 5% de credito
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes com compra entre 7 e 30 dias":
+    do time("paola_1", "paola_2")
+    quando recencia de positivacao global entre 7 dias e 30 dias
+        e com 5% de credito
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+#
+## Regras complementares
+
+parametros "Clientes com compra entre 31 e 60 dias":
+    do time("paola_1", "paola_2")
+    quando recencia de positivacao global entre 31 dias e 60 dias
+        e com 5% de credito
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes com compra entre 61 e 89 dias":
+    do time("paola_1", "paola_2")
+    quando recencia de positivacao global entre 61 dias e 89 dias
+        e com 5% de credito
+    frequencia de 7 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes com compra entre 90 e 179 dias":
+    do time("paola_1", "paola_2")
+    quando recencia de positivacao global entre 90 dias e 179 dias
+        e com 5% de credito
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes sem compra em 180 dias":
+    do time("paola_1", "paola_2")
+    quando com 5% de credito
+    frequencia de 21 dias
+    preferencia nos dias uteis e no sabado
+
+## Regra catch all
+
+parametros "Clientes que hoje não se enquadraram nas regras padrão":
+    do time("felipe", "paola_1", "paola_2", "temporario_2meses")
+    nao agendar
+    

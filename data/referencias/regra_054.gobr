@@ -1,0 +1,24 @@
+
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para clientes sem venda":
+    da carteira("empresa toda")
+    quando sem venda
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Empresa Customizavel: 30 dias para adimplentes":
+    da carteira("empresa toda")
+    quando adimplentes
+    frequencia de 30 dias
+
+parametros "Regra Padrao da Empresa Customizavel: Não agendar inadimplentes":
+    da carteira("empresa toda")
+    quando inadimplentes
+    nao agendar
+    

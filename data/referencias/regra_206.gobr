@@ -1,0 +1,84 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8921981387
+version 1.0
+
+#
+## Definição de times:
+
+time "ativo_inativo":
+    vendedores todostelevendas ativados menos("135")
+
+time "prospeccao":
+    vendedores porid("135")
+
+#
+## Definição de carteiras:
+
+carteira livre "0_90":
+    clientes carteirafixa("ativo_inativo")
+    quando recencia de positivacao global em 90 dias
+
+carteira livre "90_180":
+    clientes carteirafixa("ativo_inativo")
+    quando recencia de positivacao global entre 91 dias e 180 dias
+
+#
+## Parâmetros de planejamento
+
+parametros "Não agendar filiais":
+    do time("ativo_inativo", "prospeccao")
+    quando e o cliente filial
+    nao agendar
+
+parametros "Não agendar inadimplentes":
+    do time("ativo_inativo", "prospeccao")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar Prospects":
+    do time("ativo_inativo")
+    quando no ciclo de vida prospect com a empresa
+    nao agendar
+
+parametros "Com pedido nos últimos 90d dos segmentos POSTO DE MOLAS, EMPRESA ÔNIBUS, AUTO PEÇAS e MINERAÇÃO.":
+    da carteira("0_90")
+    quando ramo de atividade igual("1", "2", "4", "12")
+    frequencia de 7 dias
+
+parametros "Com pedido nos últimos 90d do segmento TRANSPORTADORA.":
+    da carteira("0_90")
+    quando ramo de atividade igual("3")
+    frequencia de 15 dias
+
+parametros "Com pedido nos últimos 90d de segmentos não especificados":
+    da carteira("0_90")
+    frequencia de 28 dias
+
+parametros "Com pedido entre 90d e 180d (clientes em risco) dos segmentos POSTO DE MOLAS, EMPRESA ÔNIBUS, AUTO PEÇAS e MINERAÇÃO.":
+    da carteira("90_180")
+    quando ramo de atividade igual("1", "2", "4", "12")
+    frequencia de 7 dias
+
+parametros "Com pedido entre 90d e 180d (clientes em risco) do segmento TRANSPORTADORA.":
+    da carteira("90_180")
+    quando ramo de atividade igual("3")
+    frequencia de 15 dias
+
+parametros "Com pedido entre 90d e 180d (clientes em risco) de segmentos não especificados":
+    da carteira("90_180")
+    frequencia de 28 dias 
+
+parametros "Leads e Prospects dos segmentos POSTO DE MOLAS, EMPRESA ÔNIBUS, AUTO PEÇAS e MINERAÇÃO.":
+    do time("prospeccao")
+    quando ramo de atividade igual("1", "2", "4", "12")
+    frequencia de 7 dias
+
+parametros "Leads e Prospects do segmento TRANSPORTADORA.":
+    do time("prospeccao")
+    quando ramo de atividade igual("3")
+    frequencia de 15 dias
+
+parametros "Leads e Prospects de segmentos não especificados.":
+    do time("prospeccao")
+    frequencia de 28 dias
+    

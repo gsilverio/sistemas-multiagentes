@@ -1,0 +1,56 @@
+
+### Solicitação: https://gogeo.proofhub.com/bappswift/#app/todos/project-9548242112/list-270761555428
+version 1.0
+
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+# BLOQUEIO INICIAL
+############################################################
+
+parametros "Não agendar clientes baixados na receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+
+# PARAMETRIZAÇÃO
+
+parametros "Não agendar clientes com data da rota na semana":
+    do time ("televendas")
+    quando data da rota na semana
+    não agendar
+
+parametros "Clients ativos":
+    do time("televendas")
+    quando recencia de positivacao em 60 dias
+    frequencia de 14 dias 
+
+parametros "Risco de inatividade":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+    frequencia de 7 dias
+
+parametros "Inativos 90 dias":
+    do time("televendas")
+    quando recencia de positivacao em 120 dias
+    frequencia de 14 dias
+
+parametros "Inativos 120 dias":
+    do time("televendas")
+    quando recencia de positivacao em 150 dias
+    frequencia de 21 dias
+
+parametros "Inativos 150 dias":
+    do time("televendas")
+    quando recencia de positivacao em 180 dias
+    frequencia de 28 dias
+
+## REGRA PARA NÃO MAPEADOS
+
+parametros "Clientes não mapeados nas regras":
+    do time("televendas")
+    nao agendar
+    

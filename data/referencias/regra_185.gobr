@@ -1,0 +1,37 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7375203530
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de não agendamento
+
+parametros "Não agendar Pessoa Física":
+    do time("televendas")
+    quando pessoa fisica
+    nao agendar
+    
+parametros "Não agendar baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+## Regras de agendamento
+
+parametros "Freq. de 14d para Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Freq. de 7d para Ativos":
+    do time("televendas")
+    quando no ciclo de vida ativo com a empresa
+    frequencia de 7 dias
+
+parametros "Freq. de 14 dias para Inativos":
+    do time("televendas")
+    frequencia de 14 dias
+    

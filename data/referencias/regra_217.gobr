@@ -1,0 +1,23 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8930536103
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+#
+## Regras de planejamento
+
+parametros "Fazer relacionamento com o cliente":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 7 dias
+
+parametros "Manter a regularidade de compra":
+    do time("televendas")
+    quando recencia de positivacao entre 7 dias e 30 dias
+    frequencia do historico ou no minimo de 14 dias e no maximo de 28 dias
+    

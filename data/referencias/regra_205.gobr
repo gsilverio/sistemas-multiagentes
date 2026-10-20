@@ -1,0 +1,74 @@
+
+#### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8227063283
+version 1.0
+
+
+### Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+### Definição de carteiras para rotas
+
+carteira livre "rota_quinta_segunda":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual("PONTA GROSSA")
+
+carteira livre "rota_terca":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual("ARAPOTI","GUAMIRANGA","IMBITUVA","IPIRANGA","ITARARe","IVAI","JAGUARIAIVA","PIRAI DO SUL","PRUDENTOPOLIS","SENGES","WENCESLAU BRAZ","SANTO ANTONIO DA PLATINA")
+
+carteira livre "rota_quarta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual("CACADOR","CANDIDO DE ABREU","CANOINHAS","IMBAU","LAPA","ORTIGUEIRA","PORTO AMAZONAS","PORTO UNIAO","RESERVA","SAO JOAO DO TRIUNFO","SAO MATEUS DO SUL","TELEMACO BORBA","TIBAGI","TRES BARRAS","UNIAO DA VITORIA","VENTANIA")
+
+carteira livre "rota_sexta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual("CARAMBEI","CASTRO","CURITIBA","GUARAPUAVA","IMBITUVA","IPIRANGA","IRATI","IVAI","PALMEIRA","PITANGA","PRUDENTOPOLIS","REBOUCAS","RIO AZUL","TEIXEIRA SOARES","TURVO","ADRINOPOLIS","AGUDOS DO SUL","ALMIRANTE TAMANDARE","ARAUCARIA","BALSA NOVA","BOCAIUVA DO SUL","CAMPINA GRANDE DO SUL","CAMPO DO TENENTE","CAMPO LARGO","CAMPO MAGRO","CERRO AZUL","COLOMBO","CONTENDA","DOUTOR ULYSSES","FAZENDA RIO GRANDE","ITAPERUCU","LAPA","MANDIRITUBA","PIEN","PINHAIS","PIRAQUARA","QUATRO BARRAS","RIO BRANCO DO SUL","RIO NEGRO","SAO JOSE DOS PINHAIS","QUITANDINHA","TIJUCAS DO SUL","TUNAS DO PARANA")
+
+
+### Definição de parâmetros
+
+## POR PERFIL
+
+parametros "Freq. de 28d para Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 28 dias
+
+parametros "Freq. de 14d para Inativos":
+    do time("televendas")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia de 14 dias
+
+## POR ROTA
+
+# Quinta ou Segunda
+
+parametros "Cliente ativo na rota de hoje (Quinta ou Segunda)":
+    da carteira("rota_quinta_segunda")
+    frequencia semanal()
+    preferencia na quinta e na segunda
+
+# Terça
+
+parametros "Cliente ativo na rota de hoje (Terça)":
+    da carteira("rota_terca")
+    frequencia semanal()
+    preferencia na terca
+
+# Quarta
+
+parametros "Cliente ativo na rota de hoje (Quarta)":
+    da carteira("rota_quarta")
+    frequencia semanal()
+    preferencia na quarta
+
+# Sexta
+
+parametros "Cliente ativo na rota de hoje (Sexta)":
+    da carteira("rota_sexta")
+    frequencia semanal()
+    preferencia na sexta
+    

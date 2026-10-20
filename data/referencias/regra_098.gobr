@@ -1,0 +1,10 @@
+
+version 1.0
+
+time "todos":
+    vendedores todos ativados
+
+parametros "Teste CCN 11: 1d para todos os clientes":
+    do time("todos")
+    frequencia de 1 dias
+    

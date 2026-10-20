@@ -1,0 +1,41 @@
+
+### Copiado da contas SIM Lubrificantes
+### Solicitação: 
+version 1.0
+
+## Definição de times
+
+time "felipe":
+    vendedores todostelevendas ativados menos("518", "519", "521", "626", "503", "624", "623")
+
+## Regras de planejamento
+
+parametros "Cobertura de rota de visita exatamente 7 dias depois":
+    do time("felipe")
+    quando data da rota ha 7 dias atras
+    frequencia de 1 dia
+    fixo
+    
+parametros "Não agendar clientes com compra em 30 dias (Ativos)":
+    do time("felipe")
+    quando recencia de positivacao global em 30 dias
+    nao agendar
+ 
+parametros "Freq. de 60d para clientes que nunca compraram (Prospects)":
+    do time("felipe")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 60 dias
+
+parametros "Freq. de 15d para clientes com compra entre 30 e 90 dias (Ativos)":
+    do time("felipe")
+    quando recencia de positivacao global entre 30 dias e 90 dias
+    frequencia de 15 dias
+
+parametros "Freq. de 10d para clientes sem compra em 90 dias (Inativos)":
+    do time("felipe")
+    frequencia de 10 dias
+
+parametros "Nao agendar clientes nao cobertos pelas regras":
+    do time("felipe")
+    nao agendar
+    

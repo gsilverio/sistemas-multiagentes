@@ -1,0 +1,38 @@
+
+# Regras dinâmicas MSJ
+# Última atualização: 2024-07-04
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7568331692
+version 1.0
+
+# Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+# Parâmetros de agendamento
+
+parametros "Freq. de 7d para Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Freq. de 7d para Ativos Adimplentes":
+    do time("televendas")
+    quando ativos para o vendedor
+        e adimplentes
+    frequencia de 7 dias
+
+parametros "Freq. de 14d para Ativos Inadimplentes":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 14 dias     
+
+parametros "Freq. de 7d para Inativos Adimplentes":
+    do time("televendas")
+    quando adimplentes
+    frequencia de 7 dias
+
+parametros "Freq. de 14d para Inativos Inadimplentes":
+    do time("televendas")
+    frequencia de 14 dias
+    

@@ -1,0 +1,48 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7655334774
+version 1.0
+
+time "empresa toda":
+    vendedores todos ativados
+
+time "time interior":
+    vendedores porid("5","9","15","16","21","31","33")
+
+time "time capital":
+    vendedores todosdecampo menos("5","9","15","16","21","31","33")
+    
+carteira "carteira capital":
+    clientes carteirafixa("time capital")
+
+carteira "carteira interior":
+    clientes carteirafixa("time interior")
+
+## REGRAS DE NÃO AGENDAMENTO EMPRESA TODA
+
+parametros "Não agendar ramo de atividade 19 (Funcionários)":
+    do time("empresa toda")
+    quando ramo de atividade igual("19")
+    não agendar
+
+## REGRAS TIME EXTERNO CAPITAL
+
+parametros "Regra Padrao da Multisul: 7 dias para ativos (Capital)":
+    da carteira("carteira capital")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+    
+parametros "Regra Padrao da Multisul: nao agendar clientes inativos (Capital)":
+    da carteira("carteira capital")
+    nao agendar
+    
+## REGRAS TIME EXTERNO INTERIOR
+
+parametros "Regra Padrao da Multisul: 14 dias para ativos (Interior)":
+    da carteira("carteira interior")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Multisul: nao agendar clientes inativos (Interior)":
+    da carteira("carteira interior")
+    nao agendar
+    

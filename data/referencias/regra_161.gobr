@@ -1,0 +1,33 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7400008313
+version 1.0
+
+## Definição de times
+
+time "todos":
+    vendedores todos ativados
+
+## Regras de agendamento
+
+parametros "Freq. de 15d para 'Ativos Curva A'":
+    do time("todos")
+    quando ativos para o vendedor
+        e curva A com a empresa
+    frequencia de 15 dias
+
+parametros "Freq. de 7d para 'Ativos Curva B'":
+    do time("todos")
+    quando ativos para o vendedor
+        e curva B com a empresa
+    frequencia de 7 dias
+
+parametros "Freq. de 15d para 'Ativos Curva C'":
+    do time("todos")
+    quando ativos para o vendedor
+        e curva C com a empresa
+    frequencia de 15 dias
+
+parametros "Freq. de 7d para 'Inativos'":
+    do time("todos")
+    frequencia de 7 dias
+    

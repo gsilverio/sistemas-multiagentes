@@ -1,0 +1,25 @@
+
+# Regras para Sodine
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao do goVendas Customizavel: Frequencia de inativos":
+    da carteira("empresa toda")
+    quando inativos para o vendedor
+    frequencia de inativos da empresa
+
+parametros "Regra Padrao do goVendas Customizavel: Frequencia de ativos":
+    da carteira("empresa toda")
+    quando ativos para o vendedor
+    frequencia de ativos da empresa
+
+parametros "Regra Padrao do goVendas Customizavel: Frequencia de clientes sem vendas":
+    da carteira("empresa toda")
+    quando sem venda
+    frequencia de inativos da empresa
+    

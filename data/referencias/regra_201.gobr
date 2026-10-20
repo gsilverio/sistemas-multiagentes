@@ -1,0 +1,75 @@
+
+#### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-561633106623
+version 1.0
+
+
+### TIMES
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+### Regras de planejamento
+
+parametros "Clientes Baixados na Receita Federal":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Clientes Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Clientes Bloqueados":
+    do time("televendas")
+    quando bloqueados
+    nao agendar
+
+parametros "Não agendar Filiais":
+    do time("televendas")
+    quando e o cliente filial
+    nao agendar
+
+parametros "Prospect: Cliente potencial":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 7 dias
+
+# Obs.: Foi necessário colocar a regra de inativos antes das demais para utilizar a precedência na regra catch-all.
+parametros "Inativo: Reativar clientes sem compra":
+    do time("televendas")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia de 28 dias
+
+parametros "Ativado: Fez um pedido e ainda não comprou mais":
+    do time("televendas")
+    quando cadastrado faz 60 dias
+        e unica compra com o vendedor
+    frequencia de 30 dias
+
+parametros "Ativo: Alta frequência de compra":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+        e frequencia historica menor que 30 dias
+    frequencia de 30 dias
+
+parametros "Ativo: Compra regularmente":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+        e frequencia historica menor que 90 dias
+    frequencia de 30 dias
+
+parametros "Ativo: Estimular a regularidade de compra":
+    do time("televendas")
+    quando recencia de positivacao entre 30 dias e 60 dias
+    frequencia de 10 dias
+
+parametros "Em ruptura: Risco de ficar inativo":
+    do time("televendas")
+    quando recencia de positivacao entre 61 dias e 90 dias
+    frequencia de 14 dias
+
+parametros "Clientes que hoje não se enquararam nas regras padrão":
+    do time("televendas")
+    nao agendar
+    

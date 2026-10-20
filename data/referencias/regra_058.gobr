@@ -1,0 +1,49 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+
+time "time campo":
+    vendedores todosdecampo
+
+carteira "televendas":
+    clientes carteirafixa("time televendas")
+
+carteira "campo":
+    clientes carteirafixa("time campo")
+
+
+##############################
+#	REGRAS
+#
+
+parametros "Regra Padrao da Otima Atacado: 14 dias para clientes inadimplentes (televendas)":
+    da carteira("televendas")
+    quando inadimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Otima Atacado: Frequência de atendimento baseada no histórico de vendas, ou até de 14 dias (televendas)":
+    da carteira("televendas")
+    frequencia do historico ou no maximo de 14 dias
+
+parametros "Regra Padrao da Otima Atacado: 7 dias para clientes adimplentes":
+    da carteira("campo")
+    quando adimplentes
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Otima Atacado: 14 dias para clientes ativos inadimplentes":
+    da carteira("campo")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao dda Otima Atacado: 60 dias para clientes inativos inadimplentes":
+    da carteira("campo")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 60 dias
+
+parametros "Regra Padrao dda Otima Atacado: 14 dias para clientes sem venda (campo)":
+    da carteira("campo")
+    quando sem venda
+    frequencia de 14 dias
+    

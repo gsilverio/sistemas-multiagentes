@@ -1,0 +1,45 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8092583463
+version 1.0
+
+## Definição de times
+
+time "todos os vendedores":
+    vendedores todos
+    
+## Regras de agendamento
+
+parametros "Ramo distribuidor sem vendas em 60 dias":
+    do time("todos os vendedores")
+    quando ativos para o vendedor
+           e ramo de atividade igual("DISTRIBUIDOR")
+           e fora da recencia de positivacao em 60 dias
+    frequencia quinzenal()
+
+parametros "Compra com regularidade":
+    do time("todos os vendedores")
+    quando fora da recencia de positivacao global em 10 dias
+        e frequencia historica menor que 7 dias
+    frequencia de 21 dias
+    
+parametros "Não agendar ramo distribuidor com vendas em 60 dias":
+    do time("todos os vendedores")
+    quando ativos para o vendedor
+           e ramo de atividade igual("DISTRIBUIDOR")
+    nao agendar
+    
+parametros "Ativos e sem vendas em 30 dias":
+    do time("todos os vendedores")
+    quando ativos para o vendedor
+           e fora da recencia de positivacao em 30 dias
+    frequencia quinzenal()
+    
+parametros "Não agendar ativos com vendas em 30 dias":
+    do time("todos os vendedores")
+    quando ativos para o vendedor
+    nao agendar
+    
+parametros "Clientes inativos e prospects":
+    do time("todos os vendedores")
+    frequencia mensal()
+    

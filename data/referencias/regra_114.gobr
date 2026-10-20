@@ -1,0 +1,109 @@
+
+version 1.0
+
+time "time interior":
+    vendedores porid("39", "16", "40", "6", "45")
+
+time "time capital":
+    vendedores todosdecampo menos("39", "16", "40", "6", "45", "55")
+
+time "time televendas":
+    vendedores todostelevendas menos("4", "54")
+
+time "time jamile":
+    vendedores porid("4")
+    
+time "time ruptura elizangela":
+    vendedores porid("54")
+
+time "time ruptura jamile":
+    vendedores porid("55")
+
+
+#######################################################
+###               Parametros Jamile                 ###
+#######################################################
+parametros "Regra Padrao da Jamile: 15 dias para todos os clientes":
+    do time("time jamile")
+    frequencia de 15 dias
+    preferencia nos dias uteis
+    
+    
+#######################################################
+###           Parametros Ruptura Jamile             ###
+#######################################################
+parametros "Regra padrão da Jamile: Nao agendar clientes que compraram a menos de 30 dias":
+    do time ("time ruptura jamile") 
+    quando recencia de positivacao global entre 0 dia e 30 dias
+    nao agendar	
+    
+parametros "Regra padrão da Jamile: Frequencia de 14 dias para clientes a 30 dias sem comprar":
+    do time ("time ruptura jamile") 
+    frequencia de 14 dias	
+
+#######################################################
+###               Parametros elizangela             ###
+#######################################################
+parametros "Regra padrão da Elizangela: Nao agendar clientes que compraram a menos de 30 dias":
+    do time ("time ruptura elizangela") 
+    quando recencia de positivacao global entre 0 dia e 30 dias
+    nao agendar	
+
+parametros "Regra padrão da Elizangela: Nao agendar clientes bloqueados":
+    do time ("time ruptura elizangela") 
+    quando bloqueados
+    nao agendar	
+
+parametros "Regra padrão da Elizangela: Frequencia de 14 dias para clientes a 30 dias sem comprar":
+    do time ("time ruptura elizangela") 
+    frequencia de 14 dias	
+
+
+#######################################################
+###             Parametros interior                 ###
+#######################################################
+parametros "Regra Padrao da Pet Nobre - Customizavel: Nao agendar inativos inadimplentes (interior)":
+    do time("time interior")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+    
+parametros "Regra Padrao da Pet Nobre - Customizavel: 30 dias para clientes ativos ou adimplentes (interior)":
+    do time("time interior")
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+#######################################################
+###             Parametros capital                  ###
+#######################################################
+parametros "Regra Padrao da Pet Nobre - Customizavel: Nao agendar inativos inadimplentes (capital)":
+    do time("time capital")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+    
+parametros "Regra Padrao da Pet Nobre - Customizavel: 30 dias para clientes ativos inadimplentes (capital)":
+    do time("time capital")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para adimplentes (capital)":
+    do time("time capital")
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+#######################################################
+###             Parametros televendas               ###
+#######################################################
+parametros "Regra Padrao da Pet Nobre: Quinzenal para clientes ativos (televendas)":
+    do time("time televendas")
+    quando ativos para o vendedor
+    frequencia de 15 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Pet Nobre: Semanal para clientes inativos ou prospects (televendas)":
+    do time("time televendas")
+    frequencia de 7 dias
+    preferencia nos dias uteis
+
+    
+

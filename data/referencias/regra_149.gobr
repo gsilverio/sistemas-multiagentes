@@ -1,0 +1,49 @@
+
+### Regras para Goiás Clean
+### Última atualização: 2026-01-30
+### Solicitação: https://govendas-team.atlassian.net/browse/IMP-434?actionerId=712020%3Ac985ae04-03f4-486b-97aa-72c78537465b&sourceType=assign
+version 1.0
+
+#
+## Definição de time
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+#
+## Definição das regras
+
+parametros "Ativos com compra em 7 dias":
+    do time("televendas")
+    quando recencia de positivacao em 7 dias
+    nao agendar
+
+parametros "Clientes Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Ativos com compra entre 7d e 30d":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Ativos com compra entre 30d e 60d":
+    do time("televendas")
+    quando recencia de positivacao em 60 dias
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Ativos com compra entre 60d e 90d":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Clientes inativos":
+    do time("televendas")
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+    

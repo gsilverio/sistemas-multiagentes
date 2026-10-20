@@ -1,0 +1,62 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7884237730
+version 1.0
+
+## Definição de times:
+
+time "televendas":
+    vendedores todostelevendas
+
+## Regras de não agendamento:
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar Baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+## Regras de agendamento:
+
+parametros "Freq. de 30d para 'Prospect: Cliente potencial'":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 30 dias
+
+parametros "Freq. de 21d para 'Ativado: fez um pedido e ainda não comprou mais'":
+    do time("televendas")
+    quando unica compra com a empresa
+        e recencia de positivacao global em 45 dias
+        e cadastrado faz 120 dias
+    frequencia de 21 dias
+
+parametros "Freq. de 14d para 'Ativo: Alta frequência de compra'":
+    do time("televendas")
+    quando recencia de positivacao global em 45 dias
+        e frequencia historica menor que 30 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 30d para 'Ativo: compra regularmente'":
+    do time("televendas")
+    quando recencia de positivacao global em 120 dias
+        e frequencia historica menor que 120 dias
+    frequencia de 30 dias
+
+parametros "Freq. de 30d para 'Ativo: estimular a regularidade de compra'":
+    do time("televendas")
+    quando recencia de positivacao global entre 45 dias e 70 dias
+    frequencia de 30 dias
+
+parametros "Freq. de 21d para 'Em ruptura: risco de ficar inativo'":
+    do time("televendas")
+    quando recencia de positivacao global entre 71 dias e 120 dias
+    frequencia de 21 dias
+
+parametros "Freq. de 30d para 'Inativo: reativar cliente sem compra'":
+    do time("televendas")
+    quando fora da recencia de positivacao global em 120 dias
+    frequencia de 30 dias
+    

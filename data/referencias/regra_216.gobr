@@ -1,0 +1,106 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8458171940#__recording_8487336984
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Definição de carteiras por ramo de atividade
+
+carteira livre "construtora":
+    clientes carteirafixa("televendas")
+    quando ramo de atividade igual("10207004","10301009","10101016","10301016","10207001","10301010","10207002","10301011","10207003","10301015","10205001","10205002","10204002")
+
+carteira livre "matcon":
+    clientes carteirafixa("televendas")
+    quando ramo de atividade igual("10103004","10202002","10201004","10201006","10201009","10201003","10201011","10201005","10201002","10201001","10101013","10103003","10102004","10202005","10201007","10205003","10301001","10101019","10301019","10301002","10301007","10301004","10101006","10301006")
+
+carteira livre "demais_segment":
+    clientes carteirafixa("televendas")
+    quando ramo de atividade diferente("10207004","10301009","10101016","10301016","10207001","10301010","10207002","10301011","10207003","10301015","10205001","10205002","10204002","10103004","10202002","10201004","10201006","10201009","10201003","10201011","10201005","10201002","10201001","10101013","10103003","10102004","10202005","10201007","10205003","10301001","10101019","10301019","10301002","10301007","10301004","10101006","10301006")
+
+## Definição de parâmetros
+
+parametros "Ative um novo cliente em sua carteira! (Todos os segmentos)":
+    da carteira("construtora","matcon","demais_segment")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 7 dias
+
+parametros "Estabeleça relacionamento com seu novo cliente! (Construtoras)":
+    da carteira("construtora")
+    quando unica compra com o vendedor
+    frequencia de 14 dias
+
+parametros "Estabeleça relacionamento com seu novo cliente! (Exceto Construtoras)":
+    da carteira("matcon","demais_segment")
+    quando unica compra com o vendedor
+    frequencia de 7 dias
+
+parametros "Cliente que compra com regularidade! (Exceto Construtoras)":
+    da carteira("matcon","demais_segment")
+    quando recencia de positivacao entre 7 dias e 30 dias
+    frequencia do historico ou no minimo de 7 dias e no maximo de 30 dias
+
+parametros "Cliente que compra com regularidade! (Construtoras com venda em 30d)":
+    da carteira("construtora")
+    quando recencia de positivacao em 30 dias
+    frequencia de 7 dias
+
+parametros "Cliente que compra com regularidade! (Construtoras sem venda em 30d)":
+    da carteira("construtora")
+    quando fora da recencia de positivacao em 30 dias
+    frequencia de 14 dias
+
+parametros "Estimule a regularidade de compra do seu cliente! (Matcon)":
+    da carteira("matcon")
+    quando recencia de positivacao global entre 30 dias e 60 dias
+    frequencia de 7 dias
+
+parametros "Estimule a regularidade de compra do seu cliente! (Exceto Matcon)":
+    da carteira("construtora","demais_segment")
+    quando recencia de positivacao global entre 30 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Atenção!!! Cliente caminhando para inatividade! (Matcon)":
+    da carteira("matcon")
+    quando recencia de positivacao global entre 60 dias e 89 dias
+    frequencia de 7 dias
+
+parametros "Atenção!!! Cliente caminhando para inatividade! (Construtoras)":
+    da carteira("construtora")
+    quando recencia de positivacao global entre 60 dias e 89 dias
+    frequencia de 14 dias
+
+parametros "Atenção!!! Cliente caminhando para inatividade! (Exceto Matcon e Construtoras)":
+    da carteira("demais_segment")
+    quando recencia de positivacao global entre 60 dias e 89 dias
+    frequencia de 21 dias
+
+parametros "Resgate este cliente inativo! (Matcon)":
+    da carteira("matcon")
+    quando recencia de positivacao global entre 90 dias e 179 dias
+    frequencia de 7 dias
+
+parametros "Resgate este cliente inativo! (Construtoras)":
+    da carteira("construtora")
+    quando recencia de positivacao global entre 90 dias e 179 dias
+    frequencia de 21 dias
+
+parametros "Resgate este cliente inativo! (Exceto Matcon e Construtoras)":
+    da carteira("demais_segment")
+    quando recencia de positivacao global entre 90 dias e 179 dias
+    frequencia de 14 dias
+
+
+parametros "Requalifique e resgate este cliente! (Exceto Construtoras)":
+    da carteira("matcon","demais_segment")
+    quando fora da recencia de positivacao global em 180 dias
+    frequencia de 14 dias
+
+parametros "Requalifique e resgate este cliente! (Construtoras)":
+    da carteira("construtora")
+    quando fora da recencia de positivacao global em 180 dias
+    frequencia de 28 dias
+    

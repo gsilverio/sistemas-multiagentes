@@ -1,0 +1,129 @@
+
+# Regras padrão
+version 1.0
+
+time "todos":
+    vendedores todos ativados menos ("10","5","3")
+    
+# time "Larissa":
+#    vendedores porid ("12")
+    
+time "Yara":
+    vendedores porid ("10")
+
+time "Lúcia":
+    vendedores porid ("5")
+    
+time "Wanderson":
+    vendedores porid ("3")
+
+# Regras da Yara
+
+parametros "Dispomed: Frequência de 3 dias para clientes curva A (Yara)":
+    do time("Yara")
+    quando curva A com a empresa
+    frequência de 3 dias
+    
+parametros "Dispomed: Frequência de 7 dias para clientes curva B (Yara)":
+    do time("Yara")
+    quando curva B com a empresa
+    frequência de 7 dias
+    
+parametros "Dispomed: Frequência de 14 dias para clientes curva C (Yara)":
+    do time("Yara")
+    quando curva C com a empresa
+    frequência de 14 dias
+    
+parametros "Dispomed: Frequência de 14 dias para clientes sem classificação de curva (Yara)":
+    do time("Yara")
+    frequência de 14 dias
+    
+# Regras da Lúcia
+
+parametros "Dispomed: Frequência de 2 dias para clientes curva A (Lúcia)":
+    do time("Lúcia")
+    quando curva A com a empresa
+    frequência de 2 dias
+    
+parametros "Dispomed: Frequência de 7 dias para clientes curva B (Lúcia)":
+    do time("Lúcia")
+    quando curva B com a empresa
+    frequência de 7 dias
+    
+parametros "Dispomed: Frequência de 14 dias para clientes curva C (Lúcia)":
+    do time("Lúcia")
+    quando curva C com a empresa
+    frequência de 14 dias
+    
+parametros "Dispomed: Frequência de 7 dias para clientes sem classificação de curva (Lúcia)":
+    do time("Lúcia")
+    frequência de 7 dias
+    
+# Regras do Wanderson
+
+parametros "Dispomed: Frequência de 4 dias para clientes curva A (Wanderson)":
+    do time("Wanderson")
+    quando curva A com a empresa
+    frequência de 4 dias
+    
+parametros "Dispomed: Frequência de 7 dias para clientes curva B (Wanderson)":
+    do time("Wanderson")
+    quando curva B com a empresa
+    frequência de 7 dias
+    
+parametros "Dispomed: Frequência de 9 dias para clientes curva C (Wanderson)":
+    do time("Wanderson")
+    quando curva C com a empresa
+    frequência de 9 dias
+
+parametros "Dispomed: Frequência de 14 dias para clientes sem classificação de curva (Wanderson)":
+    do time("Wanderson")
+    frequência de 14 dias
+
+# Código dentro de Ramo de atividades
+# 001 Hospital/Home Care/OS
+# 002 Clínicas
+# 003 Distribuidora
+# 004 Farmácia/Drogaria
+# 005 ORGAO Público
+# 006 REPRESENTANTES (MEI)
+# 100 FORNECEDOR DE USO E CONSUMO
+
+
+parametros "Regra Padrão da Dispomed: Não liguar para inadimplente":
+    do time("todos")
+    quando inadimplentes
+    nao agendar
+
+parametros "Regra Padrão da Dispomed: Frequência de 14 dias para Hospitais e Clínicas":
+    do time("todos")
+    quando ramo de atividade igual("001","002")
+    frequencia de 14 dias
+
+parametros "Regra Padrão da Dispomed: Frequência de 7 dias para Distribuidora":
+    do time("todos")
+    quando ramo de atividade igual("003")
+    frequencia de 7 dias
+    
+parametros "Regra Padrão da Dispomed: Frequência de 21 dias para Farmácias":
+    do time("todos")
+    quando ramo de atividade igual("004")
+    frequencia de 21 dias
+
+parametros "Regra Padrão da Dispomed: Não liguar para Fornecedor de uso e consumo, Orgão público e Representantes":
+    do time("todos")
+    quando ramo de atividade igual("005","006","100")
+    nao agendar
+
+###############
+## Regras padrão
+
+parametros "Regra Padrão da Dispomed: Frequência semanal para clientes ativos":
+    do time("todos")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Regra Padrao do goVendas: Frequência quinzenal para clientes inativos":
+    do time("todos")
+    frequencia de 15 dias
+    

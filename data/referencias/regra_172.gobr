@@ -1,0 +1,32 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7780508981
+version 1.0
+
+## Definição de times:
+
+time "televendas":
+    vendedores todostelevendas
+
+## Regras de não agendamento:
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando é o cliente filial
+    nao agendar
+
+## Regras de agendamento:
+
+parametros "Ativo:'Freq. de 7 dias'":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Inativo:'Freq. de 14 dias'":
+    do time("televendas")
+    frequencia de 14 dias
+    

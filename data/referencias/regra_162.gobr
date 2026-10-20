@@ -1,0 +1,42 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8100811506
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todos ativados
+
+## Parâmetros de não agendamento
+
+parametros "Não agendar 'CPF'":
+    do time("televendas")
+    quando pessoa fisica
+    nao agendar
+
+parametros "Não agendar 'Inadimplentes'":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+## Parâmetros de agendamento
+
+parametros "Freq. de 14d para 'Sem histórico de compra'":
+    do time("televendas")
+    quando prospect
+    frequencia de 14 dias
+
+parametros "Freq. de 14d para 'Inativos'":
+    do time("televendas")
+    quando inativos para o vendedor
+    frequencia de 14 dias
+
+parametros "Freq. de 30d para 'Mais de 45d sem compra'":
+    do time("televendas")
+    quando fora da recencia de positivacao em 45 dias
+    frequencia de 30 dias
+
+parametros "Freq. do histórico ou no mínimo de 14 dias e no máximo de 45 dias":
+    do time("televendas")
+    frequencia do historico ou no minimo de 14 dias e no maximo de 45 dias
+    

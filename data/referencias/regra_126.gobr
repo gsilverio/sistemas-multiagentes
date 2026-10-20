@@ -1,0 +1,74 @@
+
+version 1.0
+
+time "ruptura global":
+    vendedores porid("73","196","254","313")
+
+time "time televendas":
+    vendedores todostelevendas ativados menos("73","196","254","313")
+
+time "campo":
+    vendedores todosdecampo ativados
+
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+
+carteira "carteira campo":
+    clientes carteirafixa("campo")
+
+### Regras time ruptura global 
+
+parametros "Regra Padrao da Femac: 14 dias para clientes com mais de 31 dias sem compra com a empresa (ruptura global)":
+    do time("ruptura global")
+    quando inatividade global maior que 31 dias
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Femac: Não agendar cliente que compraram a menos de 31 dias (ruptura global)":
+    do time("ruptura global")
+    não agendar
+
+### Regras time televendas 
+
+parametros "Regra Padrao da Femac: 14 dias para ativos adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Femac: 21 dias para ativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 21 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Femac: 30 dias para inativos adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 30 dias
+    preferencia nos dias uteis
+        
+parametros "Regra Padrao da Femac: Nao agendar inativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Femac: 30 dias para clientes sem venda (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 30 dias
+    preferencia nos dias uteis
+
+
+## regras time externo
+parametros "Regra Padrao da Femac - Frequencia de 7 dias para clientes ativos (campo)":
+    da carteira("carteira campo")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+    fixo
+
+parametros "Regra Padrao da Femac - Frequencia de 15 dias para clientes inativos (campo)":
+    da carteira("carteira campo")
+    frequencia de 15 dias
+    fixo
+    

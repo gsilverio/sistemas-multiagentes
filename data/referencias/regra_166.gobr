@@ -1,0 +1,44 @@
+
+# Card da última aplicação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6549423950
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+    
+# Regras de não agendamento:
+
+parametros "Nordil PB: Não agendar clientes DH com crédito igual ou menor que R$0,00 (televendas)":
+    da carteira("carteira televendas")
+    quando nao tem credito e tipo de cobranca igual("DH")
+    nao agendar
+
+parametros "Nordil PB: Não agendar clientes BK com crédito menor que R$200,00 (televendas)":
+    da carteira("carteira televendas")
+    quando com menos de R$ 199 de credito disponivel e tipo de cobranca igual("BK")
+    nao agendar
+
+parametros "Nordil PB: Não agendar clientes inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inadimplentes
+    nao agendar
+
+# Regras de agendamento:
+
+parametros "Nordil PB: Frequência de 7d para clientes ativos/adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Nordil PB: Frequência de 14d para clientes inativos/adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor
+    frequencia de 14 dias
+
+parametros "Nordil PB: Frequência de 14d para clientes sem venda (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 14 dias
+    

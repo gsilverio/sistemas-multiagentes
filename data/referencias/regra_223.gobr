@@ -1,0 +1,41 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/SUP-255?atlOrigin=eyJpIjoiODEwYWQ2NDViMTRiNDNmMWE5OWZlZTY2YWU1OTQxZjYiLCJwIjoiaiJ9
+version 1.0
+
+#
+## Definição de times
+
+time "ativacao":
+    vendedores porid("970","967","973","974")
+
+time "generalista":
+    vendedores porid("511","803","510","906","507","506","606","925","904","907","536","927","964","521")
+
+time "construtora":
+    vendedores porid("956","954","958","971","520")
+
+#
+## Definição de regras
+
+parametros "Cliente com pedido nos últimos 30 dias":
+    do time("ativacao")
+    quando recencia de positivacao em 30 dias
+    frequencia de 21 dias
+
+parametros "Cliente sem pedido nos últimos 30 dias":
+    do time("ativacao")
+    frequencia de 15 dias
+
+parametros "Cliente com compra na semana corrente (Entre seg. e sex)":
+    do time("generalista")
+    quando recencia de positivacao na semana
+    nao agendar
+
+parametros "Cliente semanal - padrão":
+    do time("generalista")
+    frequencia de 7 dias
+
+parametros "Todos os clientes":
+    do time("construtora")
+    frequencia de 14 dias
+

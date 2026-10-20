@@ -1,0 +1,66 @@
+
+# Regras padrão
+version 1.0
+
+time "Gesiane":
+    vendedores porid("16")
+    
+time "campo":
+    vendedores todosdecampo
+
+time "televendas":
+    vendedores todostelevendas
+
+carteira "carteira Gesiane":
+    clientes carteirafixa("Gesiane")
+
+carteira "carteira campo":
+    clientes carteirafixa("campo")
+    
+carteira "carteira televendas":
+    clientes carteirafixa("televendas")
+    
+## Regras para a vendedora Gesiane (inativos)
+    
+parametros "Regra Padrao da Gesiane Customizavel - Frequencia de 14 dias para clientes inativos da Gesiane":
+    da carteira("carteira Gesiane")
+    quando inativos para o vendedor
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Gesiane Customizavel - Frequencia de 14 dias para clientes sem venda da Gesiane":
+    da carteira("carteira Gesiane")
+    quando sem venda
+    frequencia de  14 dias
+    
+parametros "Regra Padrao da Gesiane Customizavel - Frequencia de 14 dias para clientes ativos da Gesiane":
+    da carteira("carteira Gesiane")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+
+## carteira time campo 
+
+parametros "Regra Padrao da Empresa Customizavel - Nao agendar inativos inadimplentes (campo)":
+    da carteira("carteira campo")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao do goVendas Customizavel - Frequencia de 14 dias para ativos ou adimplentes (campo)":
+    da carteira("carteira campo")
+    frequencia de 14 dias
+
+## carteira time televendas
+
+parametros "Regra Padrao da Empresa Customizavel - Nao agendar inativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Empresa Customizavel - Nao agendar clientes sem venda (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    nao agendar
+
+parametros "Regra Padrao do goVendas Customizavel - Frequencia de 14 dias para ativos ou adimplentes (televendas)":
+    da carteira("carteira televendas")
+    frequencia de 14 dias
+    

@@ -1,0 +1,40 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/IMP-361?atlOrigin=eyJpIjoiMzcyNDg0NTRhNGNhNGY2NjlkYTExNzY5ZjQwOTJmZTAiLCJwIjoiaiJ9
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+#
+## Regras de planejamento
+
+parametros "Clientes ativados":
+    do time("televendas")
+    quando sem venda
+    frequencia de 14 dias
+
+parametros "Compra com regularidade":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+        e frequencia historica menor que 30 dias
+    frequencia do historico ou no minimo de 0 dias e no maximo de 30 dias
+
+parametros "Estimular a regularidade":
+    do time("televendas")
+    quando recencia de positivacao entre 30 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Clientes resgatados":
+    do time("televendas")
+    quando fora da recencia de positivacao em 60 dias
+        e frequencia historica maior que 30 dias
+    frequencia de 14 dias
+
+parametros "Resgatar inativos":
+    do time("televendas")
+    quando fora da recencia de positivacao em 60 dias
+    frequencia de 14 dias
+    

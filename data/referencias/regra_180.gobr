@@ -1,0 +1,42 @@
+
+# solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8544344380
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Parâmetros de não agendamento:
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando e o cliente filial
+    nao agendar
+
+parametros "Não agendar Suspensos, Inapto ou Baixado na Receita Federal":
+    do time("televendas")
+    quando status na receita federal definido como suspensa
+    nao agendar
+
+parametros "Não agendar Suspenso, Inaptos ou Baixado na Receita Federal":
+    do time("televendas")
+    quando status na receita federal definido como inapta
+    nao agendar
+
+parametros "Não agendar Suspenso, Inapto ou Baixados na Receita Federal":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+## Parâmetros de agendamento para ramos de atividade específicos:
+
+parametros "Freq. de 7d para ramos de atividade 84, 73, 69, 85 e 22":
+    do time("televendas")
+    quando ramo de atividade igual("84","73","69","85","22")
+    frequencia de 7 dias
+
+## Parâmetros de agendamento para demais clientes:
+
+parametros "Freq. de 30d para todos os clientes fora dos ramos de atividade 84, 73, 69, 85 e 22":
+    do time("televendas")
+    frequencia de 30 dias
+    

@@ -1,0 +1,54 @@
+
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas
+    
+time "campo":
+    vendedores todosdecampo
+
+carteira "carteira televendas":
+    clientes carteirafixa("televendas")
+
+parametros "Regra Padrao da Tripet - Customizavel: Nao agendar clientes inativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Tripet - Customizavel: 14 dias para clientes ativos (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Tripet - Customizavel: 30 dias para clientes inativos adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Tripet - Customizavel: 30 dias para clientes sem venda (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+#### Regras campo
+parametros "Regra Padrao da Tripet - Customizavel: 14 dias para clientes ativos (campo)":
+    do time("campo")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Tripet - Customizavel: 30 dias para clientes inativos (campo)":
+    do time("campo")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Tripet - Customizavel: nao agendar clientes sem venda (campo)":
+    do time("campo")
+    quando sem venda
+    nao agendar
+    
+    

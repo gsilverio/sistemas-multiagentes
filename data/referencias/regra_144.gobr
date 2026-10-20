@@ -1,0 +1,69 @@
+
+# Solicitação:https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7399971842
+version 1.0
+
+time "todos":
+    vendedores todos ativados
+
+time "fabricantes":
+    vendedores porid ("F","L","A")
+    
+time "segmentos de revendas/manutencao":
+    vendedores porid ("J")
+    
+time "consumidor final recorrente":
+    vendedores porid ("LC")
+
+time "compra exporadica":
+    vendedores porid ("LC")
+    
+time "consumidor final - grande porte":
+    vendedores porid ("A")
+
+# Regras do time "todos":
+
+parametros "Freq. de 14d para 'PROSPECT: FAZER O PRIMEIRO PEDIDO' (Todos)":
+    do time("todos")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para 'INADIMPLENTES' (Todos)":
+    do time("todos")
+    quando inadimplentes
+    frequencia de 21 dias
+
+parametros "Freq. de 28d para 'BOAS VINDAS A CLIENTE COM O PRIMEIRO PEDIDO' (Todos)":
+    do time("todos")
+    quando unica compra com a empresa
+    e cadastrado faz 30 dias
+    frequencia de 28 dias
+
+parametros "Freq. de 30d para 'COM COMPRA ENTRE 31 E 60 DIAS' (Todos)":
+    do time("todos")
+    quando recencia de positivacao entre 31 dias e 60 dias
+    frequencia de 30 dias
+
+parametros "Freq. de 10d para 'EM RUPTURA: RISCO DE INATIVIDADE' (Todos)":
+    do time("todos")
+    quando recencia de positivacao entre 61 dias e 90 dias
+    frequencia de 10 dias
+    
+parametros "Freq. de 21d 'INATIVOS: RESGATE DE CLIENTES SEM COMPRA' (Todos)":
+    do time("todos")
+    quando no ciclo de vida inativo com a empresa
+    frequencia de 21 dias
+
+# Regra específica dos times "Fabricantes" e "Segmentos de Revendas/Manutenção":
+
+parametros "Freq. de 21d para 'ATIVO: COMPRA REGULARMENTE' (Fabricantes e Segmentos de Revendas/Manutenção)":
+    do time("fabricantes","segmentos de revendas/manutencao")
+    quando recencia de positivacao em 30 dias
+    frequencia de 21 dias
+
+# Regra específica dos times "Consumidor final recorrente", "Compra exporádica" e "Consumidor final - Grande porte":
+
+parametros "Freq. de 28d para 'ATIVO: COMPRA REGULARMENTE' (Consumidor final recorrente, Compra exporádica e Consumidor final - Grande porte)":
+    do time("consumidor final recorrente", "compra exporadica","consumidor final - grande porte")
+    quando recencia de positivacao em 30 dias
+    frequencia de 28 dias
+

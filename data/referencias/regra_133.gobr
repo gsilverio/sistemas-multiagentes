@@ -1,0 +1,42 @@
+
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas
+
+time "campo":
+    vendedores todosdecampo
+
+carteira "carteira televendas":
+    clientes carteirafixa("televendas")
+
+carteira "carteira campo":
+    clientes carteirafixa("campo")
+
+## regras time interno
+parametros "Regra Padrao da Casa Cardao: nao agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Casa Cardao: 7 dias para clintes ativos":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+    
+parametros "Regra Padrao da Casa Cardao: 14 dias clintes inativos":
+    do time("televendas")
+    frequencia de 14 dias
+
+## regras time externo
+parametros "Regra Padrao da Casa Cardao - Frequencia 7 dias para clientes ativos (campo)":
+    da carteira("carteira campo")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+    fixo
+
+parametros "Regra Padrao da Casa Cardao - Frequencia de 15 dias para clientes inativos (campo)":
+    da carteira("carteira campo")
+    frequencia de 15 dias
+    fixo
+    

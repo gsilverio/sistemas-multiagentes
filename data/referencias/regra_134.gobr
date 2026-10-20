@@ -1,0 +1,15 @@
+
+version 1.0
+
+time "toda empresa":
+    vendedores todos ativados
+
+parametros "Regra padrão da Linavet: Frequencia de 15 dias para todos os clientes":
+    do time ("toda empresa")
+    frequencia de 15 dias
+
+
+    
+    
+
+    

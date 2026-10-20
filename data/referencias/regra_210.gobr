@@ -1,0 +1,47 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8057291327
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de não agendamento
+
+parametros "Não agendar Filiais":
+    do time("televendas")
+    quando e o cliente filial
+    nao agendar
+
+parametros "Não agendar Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar Bloqueados":
+    do time("televendas")
+    quando bloqueados
+    nao agendar
+
+## Regras de agendamento
+
+parametros "Freq. de 30d para 'Ativado: fez um pedido e ainda não comprou mais'":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 30 dias
+
+parametros "Freq. de 30d para 'Esquecido'":
+    do time("televendas")
+    quando recencia de positivacao entre 181 dias e 365 dias
+    frequencia de 30 dias
+
+parametros "Freq. de 30d 'Inativo: Reativar cliente sem compra'":
+    do time("televendas")
+    quando fora da recencia de positivacao em 365 dias
+    frequencia de 30 dias
+
+parametros "Freq. de 30d para 'Ativo fidelizado'":
+    do time("televendas")
+    frequencia de 30 dias
+    

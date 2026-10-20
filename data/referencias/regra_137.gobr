@@ -1,0 +1,23 @@
+
+# Card: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6921306191
+version 1.0
+
+time "empresa toda":
+    vendedores todos ativados
+
+## Regras de agendamento
+
+parametros "Fênix distribuidora: 14d para prospects":
+    do time("empresa toda")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Fênix distribuidora: 21d para ativos/adimplentes":
+    do time("empresa toda")
+    quando ativos para o vendedor
+    frequencia de 21 dias
+
+parametros "Fênix distribuidora: 14d para inativos/adimplentes":
+    do time("empresa toda")
+    frequencia de 14 dias
+    

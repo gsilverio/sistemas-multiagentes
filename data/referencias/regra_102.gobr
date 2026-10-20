@@ -1,0 +1,28 @@
+
+version 1.0
+
+time "campo":
+    vendedores todosdecampo
+
+time "televendas":
+    vendedores todostelevendas
+    
+carteira "carteira televendas":
+    clientes carteirafixa("televendas")
+
+parametros "Regra Padrao da Alianca Distribuidora - Customizavel: 30 dias para clientes inativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Alianca Distribuidora - Customizavel: 14 dias para clientes ativos ou adimplentes (televendas)":
+    da carteira("carteira televendas")
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Alianca Distribuidora - Customizavel: 30 dias para todos os clientes (campo)":
+    do time("campo")
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    

@@ -1,0 +1,76 @@
+
+### Regras para Chegatto
+### Última atualização: 2025-08-05
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8930946807
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+time "campo":
+    vendedores todosdecampo
+
+#
+## Definição de segmentações
+
+segmentacao "freq_hist_1a7":
+    clientes carteirafixa("campo")
+    quando frequencia historica entre 1 dias e 7 dias
+
+segmentacao "freq_hist_16a30":
+    clientes carteirafixa("campo")
+    quando frequencia historica entre 16 dias e 30 dias
+
+segmentacao "freq_hist_31a45":
+    clientes carteirafixa("campo")
+    quando frequencia historica entre 31 dias e 45 dias
+
+segmentacao "freq_hist_61a90":
+    clientes carteirafixa("campo")
+    quando frequencia historica entre 61 dias e 90 dias
+
+#
+## Definição de parâmetros
+
+parametros "Não agendar clientes inativos inadimplentes":
+    do time("televendas")
+    quando no ciclo de vida inativo com a empresa
+        e inadimplentes
+    nao agendar
+
+parametros "Clientes há mais de 90 dias sem compra":
+    do time("televendas")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia de 7 dias
+
+parametros "Clientes com frequência histórica de pedidos entre 1 e 7 dias, e sem compra entre 8 e 15 dias.":
+    do time("televendas")
+    quando contido na segmentacao("freq_hist_1a7")
+        e fora da recencia de positivacao entre 8 dias e 15 dias
+    frequencia de 14 dias
+
+parametros "Clientes com frequência histórica de pedidos entre 16 e 30 dias, e sem compra entre 31 e 45 dias.":
+    do time("televendas")
+    quando contido na segmentacao("freq_hist_16a30")
+        e fora da recencia de positivacao entre 31 dias e 45 dias
+    frequencia de 28 dias
+
+parametros "Clientes com frequência histórica de pedidos entre 31 e 45 dias, e sem compra entre 46 e 60 dias.":
+    do time("televendas")
+    quando contido na segmentacao("freq_hist_31a45")
+        e fora da recencia de positivacao entre 46 dias e 60 dias
+    frequencia de 21 dias
+
+parametros "Clientes com frequência histórica de pedidos entre 61 e 90 dias, e sem compra há 90 dias.":
+    do time("televendas")
+    quando contido na segmentacao("freq_hist_61a90")
+        e fora da recencia de positivacao em 90 dias
+    frequencia de 15 dias
+
+parametros "Não agendar clientes que não se enquadrem em nenhuma regra padrão":
+    do time("televendas")
+    nao agendar
+    

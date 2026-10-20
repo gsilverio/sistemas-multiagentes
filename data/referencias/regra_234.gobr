@@ -1,0 +1,56 @@
+
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao do goVendas: 3 dias para clientes em queda de faturamento":
+    da carteira("empresa toda")
+    quando queda de faturamento maior que 5%
+    frequencia de 3 dias
+
+parametros "Regra Padrao do goVendas - Customizavel: Nao agendar quem esta a mais de 1138 dias sem comprar":
+    da carteira("empresa toda")
+    quando recencia de positivacao entre 1138 dias e 9999 dias 
+    nao agendar
+
+parametros "Regra Padrao do goVendas Customizável - Teste cidade goiania":
+    da carteira("empresa toda")
+    quando nome da cidade igual("GOIANIA")
+    frequencia de inativos da empresa
+    preferencia nos dias uteis 
+        e no sabado 
+        e no domingo 
+
+parametros "Regra Padrao do goVendas Customizável - Clientes ativos":
+    da carteira("empresa toda")
+    quando ativos para o vendedor
+    frequencia de ativos da empresa
+        preferencia nos dias uteis 
+        e no sabado 
+        e no domingo 
+
+parametros "Regra Padrao do goVendas Customizável - Clientes inativos":
+    da carteira("empresa toda")
+    quando inativos para o vendedor
+    frequencia de inativos da empresa
+        preferencia nos dias uteis 
+        e no sabado 
+        e no domingo 
+
+parametros "Regra Padrao do goVendas Customizável - Clientes sem vendas":
+    da carteira("empresa toda")
+    quando sem vendas
+    frequencia de inativos da empresa
+        preferencia nos dias uteis 
+        e no sabado 
+        e no domingo 
+
+parametros "Regra Padrao - default":
+    da carteira("empresa toda")
+    frequencia de 7 dias
+    preferencia nos dias uteis
+    

@@ -1,0 +1,42 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8794187330
+version 1.0
+
+## Definição de times:
+
+time "televendas_1":
+    vendedores todostelevendas ativados menos("4504")
+
+time "televendas_2":
+    vendedores porid("4504")
+
+## Regras de agendamento:
+
+parametros "Freq. de 5d para clientes sem compra em 7d":
+    do time("televendas_1")
+    quando fora da recencia de positivacao em 7 dias
+    frequencia de 5 dias
+
+parametros "Freq. do histórico para clientes com recência de compra entre 0 e 14d":
+    do time("televendas_1")
+    quando recencia de positivação em 14 dias
+    frequencia do historico ou no maximo de 14 dias
+
+parametros "Freq. de 14d para clientes sem compra em 14d":
+    do time("televendas_1")
+    frequencia de 14 dias
+
+parametros "Freq. de 14d para clientes sem pedido":
+    do time("televendas_2")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 14 dias
+
+parametros "Freq. de 14d para clientes com compra em 30d":
+    do time("televendas_2")
+    quando recencia de positivacao em 30 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 7d para clientes sem compra em 30d":
+    do time("televendas_2")
+    frequencia de 7 dias
+    

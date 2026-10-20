@@ -1,0 +1,67 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-542775266803
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Parâmetros de não agendamento
+
+parametros "Não agendar clientes baixados na receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Não agendar 'Inadimplentes'":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar clientes recém-cadastrados em 60d":
+    do time("televendas")
+    quando cadastrado faz 60 dias
+    nao agendar
+
+parametros "Não agendar clientes com compras em 60d":
+    do time("televendas")
+    quando recencia de positivacao global em 60 dias
+    nao agendar
+
+## Parâmetros de agendamento
+
+parametros "Clientes Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Inativos Recentes":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+    frequencia de 7 dias
+
+parametros "Inativos Médio":
+    do time("televendas")
+    quando recencia de positivacao em 120 dias
+    frequencia de 7 dias
+
+parametros "Inativos Antigos":
+    do time("televendas")
+    quando recencia de positivacao em 180 dias
+    frequencia de 14 dias
+
+parametros "Requalificação de Inativos":
+    do time("televendas")
+    quando recencia de positivacao em 360 dias
+    frequencia de 21 dias
+
+parametros "Requalificar o cliente do zero":
+    do time("televendas")
+    frequencia de 28 dias
+    

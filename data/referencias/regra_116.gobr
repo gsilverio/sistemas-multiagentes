@@ -1,0 +1,56 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7800816311
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas
+
+time "campo":
+    vendedores todosdecampo
+
+## Regras de não agendamento
+
+parametros "Não agendar filiais":
+    do time("televendas","campo")
+    quando e o cliente filial
+    nao agendar
+
+## Regras de agendamento
+
+# Time televendas
+
+parametros "Freq. de 7d para todos os clientes (televendas)":
+    do time("televendas")
+    frequencia de 7 dias
+    preferencia nos dias uteis e no sabado
+    sem choque no time("campo")
+
+# Time Campo
+
+parametros "Freq. de 7d para Ativos Adimplentes (campo)":
+    do time("campo")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 7 dias
+
+parametros "Freq. de 14d para Ativos Inadimplentes (campo)":
+    do time("campo")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    
+parametros "Freq. de 30d para Inativos Adimplentes (campo)":
+    do time("campo")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 30 dias
+
+parametros "Freq. de 60d para Inativos Inadimplentes (campo)":
+    do time("campo")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 60 dias
+
+parametros "Freq. de 7d para sem vendas (campo)":
+    do time("campo")
+    quando sem venda
+    frequencia de 7 dias
+    

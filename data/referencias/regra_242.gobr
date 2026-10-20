@@ -1,0 +1,53 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/CS-27?atlOrigin=eyJpIjoiNzEwM2I1YzgzMTBiNDdlOTllMWJlYzMwMGJmY2E5MDciLCJwIjoiaiJ9
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Parâmetros de planejamento
+
+parametros "Freq. hist. de 0 a 30d - sem compra em 20d":
+    do time("televendas")
+    quando frequencia historica entre 0 dias e 30 dias
+        e recencia de positivacao entre 20 dias e 30 dias
+    frequencia de 21 dias
+
+parametros "Freq. hist. de 31 a 60d - sem compra em 29d":
+    do time("televendas")
+    quando frequencia historica entre 31 dias e 60 dias
+        e recencia de positivacao entre 29 dias e 44 dias
+    frequencia de 21 dias
+
+parametros "Freq. hist. de 31 a 60d - sem compra em 44d":
+    do time("televendas")
+    quando frequencia historica entre 31 dias e 60 dias
+        e recencia de positivacao entre 44 dias e 60 dias
+    frequencia de 21 dias
+
+parametros "Freq. hist. de 61 a 90d - sem compra em 60d":
+    do time("televendas")
+    quando frequencia historica entre 61 dias e 90 dias
+        e recencia de positivacao entre 61 dias e 90 dias
+    frequencia de 15 dias
+
+parametros "Freq. hist. de 61 a 90d - sem compra em 90d":
+    do time("televendas")
+    quando frequencia historica entre 61 dias e 90 dias
+        e recencia de positivacao entre 90 dias e 180 dias
+    frequencia de 21 dias
+
+parametros "Freq. hist. de 91 a 180d - sem compra em 44d":
+    do time("televendas")
+    quando frequencia historica entre 91 dias e 180 dias
+        e recencia de positivacao entre 44 dias e 120 dias
+    frequencia de 21 dias
+
+parametros "Freq. hist. de 91 a 180d - sem compra em 120d":
+    do time("televendas")
+    quando frequencia historica entre 91 dias e 180 dias
+        e recencia de positivacao entre 120 dias e 180 dias
+    frequencia de 15 dias
+    

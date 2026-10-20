@@ -1,0 +1,43 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/CS-49?atlOrigin=eyJpIjoiNTk3ODk5NThhYmExNDg2Mjk4Y2QyNGZlYzNjN2Y3NmYiLCJwIjoiaiJ9
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+#
+## Regras de planejamento
+
+parametros "Ative este cliente!":
+    do time("televendas")
+    quando sem venda
+        e pessoa juridica
+    frequencia de 21 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Faça seu pós-vendas!":
+    do time("televendas")
+    quando recencia de positivacao em 20 dias
+        e pessoa juridica
+    frequencia de 3 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Mantenha o cliente engajado!":
+    do time("televendas")
+    quando recencia de positivacao entre 20 dias e 33 dias
+        e pessoa juridica
+    frequencia do historico mais 2 dias ou no minimo de 20 dias e no maximo de 33 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Não agendar clientes sem compra em 33 dias":
+    do time("televendas")
+    quando pessoa juridica
+    nao agendar
+
+parametros "Não agendar se não for PJ":
+    do time("televendas")
+    nao agendar
+    

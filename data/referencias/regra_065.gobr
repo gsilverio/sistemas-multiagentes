@@ -1,0 +1,27 @@
+
+# Regras para Evermax
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+
+carteira "televendas":
+    clientes carteirafixa("time televendas")
+
+parametros "Regra Padrao da Empresa Customizavel: quinzenal para clientes que compram até 30 dias":
+    da carteira("televendas")
+    quando atividade de 30 dias
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customizavel: mensal para clientes que não compram a mais de 30 dias":
+    da carteira("televendas")
+    quando inatividade de 30 dias
+    frequencia de 28 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customizavel: mensal para clientes que nunca comprou":
+    da carteira("televendas")
+    frequencia de 28 dias
+    preferencia nos dias uteis
+    

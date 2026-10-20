@@ -1,0 +1,42 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8771136870
+version 1.0
+
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+## Parâmetros de atendimento
+
+parametros "Não agendar baixados na Receita Federal":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar com compra em 25d":
+    do time("televendas")
+    quando recencia de positivacao global em 25 dias
+    nao agendar
+
+parametros "Ative essa oportunidade - Cliente nunca tirou pedido com o vendedor":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 21 dias
+
+parametros "Cliente com pedido com a empresa entre 25 e 60 dias":
+    do time("televendas")
+    quando recencia de positivacao global entre 26 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Cliente com pedido com a empresa entre 60 e 90 dias":
+    do time("televendas")
+    quando recencia de positivacao global entre 61 dias e 90 dias
+    frequencia de 7 dias
+
+parametros "Atenda esse cliente inativo há mais de 90 dias":
+    do time("televendas")
+    frequencia de 21 dias
+    

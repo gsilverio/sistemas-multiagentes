@@ -1,0 +1,107 @@
+
+version 1.0
+
+#########################################################
+# Definicao de times
+#
+
+time "time campo interior":
+    vendedores porid("18", "212", "300", "376", "395", "421", "43", "449", "486", "488", "489", "490", "6", "68")
+
+time "time campo capital":
+    vendedores todosdecampo menos ("18", "212", "300", "376", "395", "421", "43", "449", "486", "488", "489", "490", "6", "68")
+#    vendedores porid("113", "128", "137", "141", "164", "170", "176", "176", "183", "207", "259", "264", "264", "264", "307", "345", "351", "355", "359", "377", "378", "381", "382", "384", "400", "403", "41", "426", "430", "431", "436", "439", "441", "442", "447", "468", "477", "481", "482", "486", "488", "489", "491", "492", "493", "495", "498", "499", "50", "86", "9")
+    
+time "time televendas":
+    vendedores todostelevendas
+
+#########################################################
+# Definicao de carteiras
+#
+
+carteira "carteira fixa time interior":
+    clientes carteirafixa("time campo interior")
+    
+carteira "carteira fixa time campo capital":
+    clientes carteirafixa("time campo capital")
+    
+carteira "carteira fixa time televendas":
+    clientes carteirafixa("time televendas")
+    
+#########################################################
+# Definicao de parametros "carteira fixa time televendas"
+#
+
+parametros "Regra Padrao da Empresa Customizavel - Semanal para ativos adimplentes (time televendas)":
+    da carteira("carteira fixa time televendas")
+    quando ativos para o vendedor e adimplentes
+    frequencia semanal()
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customizavel - 14 dias para ativos inadimplentes (time televendas)":
+    da carteira("carteira fixa time televendas")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customizavel - 30 dias para inativos (time televendas)":
+    da carteira("carteira fixa time televendas")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customizavel - 30 dias pra clientes sem vendas (time televendas)":
+    da carteira("carteira fixa time televendas")
+    quando sem vendas
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+#########################################################
+# Definicao de parametros "carteira fixa time campo capital"
+#
+
+parametros "Regra Padrao da Empresa Customizavel - semanal para ativos adimplentes (time campo capital)":
+    da carteira("carteira fixa time campo capital")
+    quando ativos para o vendedor e adimplentes
+    frequencia semanal()
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customizavel - 14 dias para ativos inadimplentes (time campo capital)":
+    da carteira("carteira fixa time campo capital")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customizavel - 30 dias para inativos (time campo capital)":
+    da carteira("carteira fixa time campo capital")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customizavel - 30 dias pra clientes sem vendas (time campo capital)":
+    da carteira("carteira fixa time campo capital")
+    quando sem vendas
+    frequencia de 30 dias
+    preferencia nos dias uteis
+#########################################################
+# Definicao de parametros "carteira fixa time campo interior"
+#
+
+parametros "Regra Padrao da Empresa Customizavel - 14 dias para ativos (time campo interior)":
+    da carteira("carteira fixa time interior")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customizavel - 30 dias para inativos (time campo interior)":
+    da carteira("carteira fixa time interior")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customizavel - 30 dias pra clientes sem vendas (time campo interior)":
+    da carteira("carteira fixa time interior")
+    quando sem vendas
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    

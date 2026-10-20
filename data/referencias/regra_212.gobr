@@ -1,0 +1,62 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-541817668361
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+#
+## Parâmetros de planejamento
+
+parametros "Não agendar clientes que tem rota em 7 dias à frente.":
+    do time("televendas")
+    quando data da rota futura nos proximos 7 dias
+    nao agendar
+
+parametros "Não agendar clientes que compraram com o televendas em 14d.":
+    do time("televendas")
+    quando recencia de positivacao global em 14 dias
+    nao agendar
+
+parametros "Mantenha a regularidade de compra do cliente que teve pedido detectado nos últimos 30d e foi visitado na semana anterior!":
+    do time("televendas")
+    quando data da rota ha 7 dias atras
+        e tem visita da empresa na semana anterior
+        e recencia de positivacao global entre 14 dias e 30 dias
+    frequencia de 7 dias
+
+parametros "Garanta regularidade de compra e relacionamento com este cliente! Seu último pedido foi entre 30d e 60d atrás.":
+    do time("televendas")
+    quando data da rota ha 7 dias atras
+        e tem visita da empresa na semana anterior
+        e recencia de positivacao global entre 31 dias e 60 dias
+    frequencia de 20 dias
+
+parametros "Ative este cliente! (Nunca tirou pedido)":
+    do time("televendas")
+    quando sem venda
+    frequencia de 14 dias
+
+parametros "Ative este cliente!":
+    do time("televendas")
+    quando recencia de positivacao global no ano passado
+        e recencia de positivacao global entre 180 dias e 360 dias
+    frequencia de 14 dias
+
+parametros "Cliente caminhando para INATIVIDADE! Seu último pedido foi entre 60d e 90d atrás.":
+    do time("televendas")
+    quando recencia de positivacao global entre 61 dias e 90 dias
+    frequencia de 7 dias
+
+parametros "Resgaste este cliente! Seu último pedido foi entre 90d e 180d atrás.":
+    do time("televendas")
+    quando recencia de positivacao global entre 91 dias e 180 dias
+    frequencia de 7 dias
+
+parametros "Atendimento ao cliente que não se enquadrou nas demais regras.":
+    do time("televendas")
+    frequencia de 7 dias
+    

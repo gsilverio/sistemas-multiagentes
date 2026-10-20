@@ -1,0 +1,85 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/SUP-402
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de não agendamento
+
+parametros "Não agendar PF":
+    do time("televendas")
+    quando pessoa fisica
+    nao agendar
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Não agendar baixadas na receita federal":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar clientes com compra em 30d":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    nao agendar
+
+## Regras de agendamento
+
+parametros "Ativação de um novo cliente em potencial - Conceito: Quando o cliente ainda não comprou com o vendedor":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+        e cadastrado faz 30 dias
+    frequencia de 7 dias
+
+parametros "Requalificar lead - Conceito: Requalificar o lead cadastrado na empresa que nunca tirou ou não tira orçamento há mais de 1 ano":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 21 dias
+
+parametros "Boas vindas a um novo cliente ativado - Conceito: Quando o cliente tirou o primeiro orçamento com o vendedor":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 7 dias
+
+parametros "Cliente com bom histórico de compra - Conceito: Quando o cliente tem alta recência de compra com a empresa (CURVA A)":
+    do time("televendas")
+    quando fora da recencia de positivacao global entre 30 dias e 45 dias
+        e curva A com a empresa
+    frequencia de 14 dias
+
+parametros "Cliente com bom histórico de compra - Conceito: Quando o cliente tem alta recência de compra com a empresa (CURVA B)":
+    do time("televendas")
+    quando fora da recencia de positivacao global entre 30 dias e 45 dias
+        e curva B com a empresa
+    frequencia de 28 dias
+
+parametros "Cliente com bom histórico de compra - Conceito: Quando o cliente tem alta recência de compra com a empresa (CURVA C)":
+    do time("televendas")
+    quando fora da recencia de positivacao global entre 30 dias e 45 dias
+    frequencia de 45 dias
+
+parametros "Estimular regularidade de compra - Conceito: Quando o cliente está há mais de 45 dias sem orçamento":
+    do time("televendas")
+    quando fora da recencia de positivacao global entre 46 dias e 60 dias
+    frequencia de 28 dias
+
+parametros "Atenção!!! Cliente com RISCO de ficar inativo - Conceito: Quando o cliente está há mais de 60 dias sem orçamento":
+    do time("televendas")
+    quando fora da recencia de positivacao global entre 61 dias e 90 dias
+    frequencia de 21 dias
+
+parametros "Atenção!!! Seu cliente corre RISCO de ativação por outro RCA - Conceito: Quando o cliente está há mais de 90 dias sem orçamento":
+    do time("televendas")
+    frequencia de 14 dias
+    

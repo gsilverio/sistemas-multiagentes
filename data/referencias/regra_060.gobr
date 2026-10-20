@@ -1,0 +1,33 @@
+
+# Regras padrão
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas
+
+time "campo":
+    vendedores todosdecampo
+
+## regras time interno
+parametros "Regra Padrao do goVendas: Frequencia semanal para clientes ativos":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Regra Padrao do goVendas: Frequencia quinzenal para clientes inativos":
+    do time("televendas")
+    frequencia de 15 dias
+    
+## regras time externo
+
+parametros "Regra Padrao do goVendas: Frequencia de 7 dias para clientes ativos (campo)":
+    do time("campo")
+	quando ativos para o vendedor
+	frequencia de 7 dias
+	fixo
+
+parametros "Regra Padrao do goVendas: Frequencia de 14 dias para clientes inativos (campo)":
+    do time("campo")
+	frequencia de 15 dias
+	fixo
+

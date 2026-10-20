@@ -1,0 +1,66 @@
+
+# Solicitação: https://gogeo.proofhub.com/bappswift/#app/todos/project-9580562790/list-270894162472/task-521050479772
+version 1.0
+
+## Definição de times:
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de planejamento:
+
+parametros "Não agendar Baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar bloqueados":
+    do time("televendas")
+    quando bloqueados
+    nao agendar
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando e o cliente filial
+    nao agendar
+
+parametros "Ativação de novos":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 7 dias
+
+parametros "Fazer relacionamento com o cliente":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 14 dias
+
+parametros "Manter contato com o cliente que comprou no mês":
+    do time("televendas")
+    quando recencia de positivacao no mes
+        e frequencia historica entre 90 dias e 120 dias
+    frequencia de 14 dias
+
+parametros "Manter a regularidade de compra":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia de 14 dias
+
+parametros "Atuar para o cliente não ficar inativo":
+    do time("televendas")
+    quando recencia de positivacao em 89 dias
+    frequencia de 7 dias
+
+parametros "Resgatar cliente inativo":
+    do time("televendas")
+    quando recencia de positivacao em 120 dias
+    frequencia de 3 dias
+
+parametros "Não mapeados nas regras":
+    do time("televendas")
+    nao agendar
+    

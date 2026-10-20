@@ -1,0 +1,236 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8523125964
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas
+
+## Definição de carteiras
+
+carteira "rotas_dias_variaveis":
+    clientes carteirafixa("televendas")
+    quando codigo da rota igual("8","9","10","11")
+
+carteira "rotas 3 e 4":
+    clientes carteirafixa("televendas")
+    quando codigo da rota igual("3","4")
+
+carteira "rota 5":
+    clientes carteirafixa("televendas")
+    quando codigo da rota igual("5")
+
+carteira "rota 6":
+    clientes carteirafixa("televendas")
+    quando codigo da rota igual("6")
+
+carteira "rota 7":
+    clientes carteirafixa("televendas")
+    quando codigo da rota igual("7")
+
+## Parâmetros de não agendamento
+
+parametros "Não agendar CPF":
+    do time("televendas")
+    quando pessoa fisica
+    nao agendar
+
+parametros "Não agendar Filiais":
+    do time("televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Não agendar Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+    
+parametros "Não agendar com visita recente":
+    da carteira("rotas_dias_variaveis", "rotas 3 e 4", "rota 5", "rota 6", "rota 7")
+    quando recencia de visita em 3 dias
+    nao agendar
+
+## Parâmetros de agendamento para rotas em dias variáveis (seg a sex)
+
+parametros "Rotas 008, 009, 010 e 011 - Primeira compra":
+    da carteira("rotas_dias_variaveis")
+    quando sem venda do vendedor
+    frequencia semanal()
+
+parametros "Rotas 008, 009, 010 e 011 - Compra regularmente":
+    da carteira("rotas_dias_variaveis")
+    quando recencia de positivacao do vendedor em 21 dias
+    frequencia semanal()
+
+parametros "Rotas 008, 009, 010 e 011 - Estimular a regularidade de compra":
+    da carteira("rotas_dias_variaveis")
+    quando recencia de positivacao entre 21 dias e 41 dias
+    frequencia semanal()
+
+parametros "Rotas 008, 009, 010 e 011 - Risco de inatividade":
+    da carteira("rotas_dias_variaveis")
+    quando recencia de positivacao entre 41 dias e 90 dias
+    frequencia semanal()
+
+parametros "Rotas 008, 009, 010 e 011 - Cliente sem compra há mais de 90d":
+    da carteira("rotas_dias_variaveis")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia semanal()
+
+## Parâmetros de agendamento para rotas fixas em dias específicos
+
+# Segunda (Rotas 003 e 004)
+
+parametros "Rotas 003 e 004 - Primeira compra":
+    da carteira("rotas 3 e 4")
+    quando sem venda do vendedor
+    frequencia semanal()
+    preferencia na segunda
+    fixo
+
+parametros "Rotas 003 e 004 - Compra regularmente":
+    da carteira("rotas 3 e 4")
+    quando recencia de positivacao do vendedor em 21 dias
+    frequencia semanal()
+    preferencia na segunda
+    fixo
+
+parametros "Rotas 003 e 004 - Estimular a regularidade de compra":
+    da carteira("rotas 3 e 4")
+    quando recencia de positivacao entre 21 dias e 41 dias
+    frequencia semanal()
+    preferencia na segunda
+    fixo
+
+parametros "Rotas 003 e 004 - Risco de inatividade":
+    da carteira("rotas 3 e 4")
+    quando recencia de positivacao entre 41 dias e 90 dias
+    frequencia semanal()
+    preferencia na segunda
+    fixo
+
+parametros "Rotas 003 e 004 - Cliente sem compra há mais de 90d":
+    da carteira("rotas 3 e 4")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia semanal()
+    preferencia na segunda
+    fixo
+
+# Terça (Rota 005)
+
+parametros "Rota 005 - Primeira compra":
+    da carteira("rota 5")
+    quando sem venda do vendedor
+    frequencia semanal()
+    preferencia na terca
+    fixo
+
+parametros "Rota 005 - Compra regularmente":
+    da carteira("rota 5")
+    quando recencia de positivacao do vendedor em 21 dias
+    frequencia semanal()
+    preferencia na terca
+    fixo
+
+parametros "Rota 005 - Estimular a regularidade de compra":
+    da carteira("rota 5")
+    quando recencia de positivacao entre 21 dias e 41 dias
+    frequencia semanal()
+    preferencia na terca
+    fixo
+
+parametros "Rota 005 - Risco de inatividade":
+    da carteira("rota 5")
+    quando recencia de positivacao entre 41 dias e 90 dias
+    frequencia semanal()
+    preferencia na terca
+    fixo
+
+parametros "Rota 005 - Cliente sem compra há mais de 90d":
+    da carteira("rota 5")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia semanal()
+    preferencia na terca
+    fixo
+
+# Quarta (Rota 006)
+
+parametros "Rota 006 - Primeira compra":
+    da carteira("rota 6")
+    quando sem venda do vendedor
+    frequencia semanal()
+    preferencia na quarta
+    fixo
+
+parametros "Rota 006 - Compra regularmente":
+    da carteira("rota 6")
+    quando recencia de positivacao do vendedor em 21 dias
+    frequencia semanal()
+    preferencia na quarta
+    fixo
+
+parametros "Rota 006 - Estimular a regularidade de compra":
+    da carteira("rota 6")
+    quando recencia de positivacao entre 21 dias e 41 dias
+    frequencia semanal()
+    preferencia na quarta
+    fixo
+
+parametros "Rota 006 - Risco de inatividade":
+    da carteira("rota 6")
+    quando recencia de positivacao entre 41 dias e 90 dias
+    frequencia semanal()
+    preferencia na quarta
+    fixo
+
+parametros "Rota 006 - Cliente sem compra há mais de 90d":
+    da carteira("rota 6")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia semanal()
+    preferencia na quarta
+    fixo
+
+# Sexta (Rota 007)
+
+parametros "Rota 007 - Primeira compra":
+    da carteira("rota 7")
+    quando sem venda do vendedor
+    frequencia semanal()
+    preferencia na sexta
+    fixo
+
+parametros "Rota 007 - Compra regularmente":
+    da carteira("rota 7")
+    quando recencia de positivacao do vendedor em 21 dias
+    frequencia semanal()
+    preferencia na sexta
+    fixo
+
+parametros "Rota 007 - Estimular a regularidade de compra":
+    da carteira("rota 7")
+    quando recencia de positivacao entre 21 dias e 41 dias
+    frequencia semanal()
+    preferencia na sexta
+    fixo
+
+parametros "Rota 007 - Risco de inatividade":
+    da carteira("rota 7")
+    quando recencia de positivacao entre 41 dias e 90 dias
+    frequencia semanal()
+    preferencia na sexta
+    fixo
+
+parametros "Rota 007 - Cliente sem compra há mais de 90d":
+    da carteira("rota 7")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia semanal()
+    preferencia na sexta
+    fixo
+    
+# Sem rota mapeada
+
+parametros "CLIENTES SEM ROTAS ASSOCIADAS":
+    do time("televendas")
+    frequencia semanal()
+    

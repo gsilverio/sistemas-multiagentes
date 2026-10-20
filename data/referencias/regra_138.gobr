@@ -1,0 +1,18 @@
+
+# Regras padrão
+version 1.0
+
+time "todos vendedores":
+    vendedores todos ativados
+
+## regras time interno
+
+parametros "American Farma: Não agendar clientes inadimplentes (televendas)":
+    do time("todos vendedores")
+    quando inadimplentes
+    nao agendar
+
+parametros "American Farma: Freq. 7d para clientes ativos/inativos/prospects adimplentes (televendas)":
+    do time("todos vendedores")
+    frequencia de 7 dias
+    

@@ -1,0 +1,43 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8480381781
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Parâmetros de atendimento
+
+parametros "Ative essa oportunidade":
+    do time("televendas")
+    quando sem venda da empresa
+    frequencia de 7 dias
+
+parametros "Cliente ativado! Crie relacionamento com seu cliente!":
+    do time("televendas")
+    quando recencia de positivacao global em 30 dias
+        e unica compra com a empresa
+    frequencia de 14 dias
+
+parametros "Clientes que compram mensalmente (clientes regulares)":
+    do time("televendas")
+    quando frequencia historica de 30 dias
+        e recencia de positivacao global em 120 dias
+    frequencia de 28 dias
+
+parametros "Recência de atendimento igual a recência de compra (clientes que compram mês sim, mês não)":
+    do time("televendas")
+    quando recencia de positivacao do vendedor entre 20 dias e 30 dias
+    frequencia do historico ou no maximo de 60 dias
+
+parametros "Mantenha seu cliente ativo! Ele está há 120 dias sem comprar com a empresa":
+    do time("televendas")
+    quando fora da recencia de positivacao global em 120 dias
+    frequencia de 14 dias
+
+parametros "Resgate seu cliente inativo! Ele está há mais de 180 dias sem comprar com a empresa":
+    do time("televendas")
+    quando fora da recencia de positivacao global em 180 dias
+    frequencia de 28 dias
+    

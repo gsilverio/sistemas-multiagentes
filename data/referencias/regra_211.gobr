@@ -1,0 +1,22 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/CS-31?atlOrigin=eyJpIjoiMDE0NGQzNWZlMjllNDdjMzg4ZmEyYjc2MjlkNTJlNTgiLCJwIjoiaiJ9
+version 1.0
+
+#
+## Definição de times
+
+time "ativacao":
+    vendedores porid("965","945")
+
+#
+## Definição de regras
+
+parametros "Cliente com pedido nos últimos 30 dias":
+    do time("ativacao")
+    quando recencia de positivacao em 30 dias
+    frequencia de 21 dias
+
+parametros "Cliente sem pedido nos últimos 30 dias":
+    do time("ativacao")
+    frequencia de 15 dias
+    

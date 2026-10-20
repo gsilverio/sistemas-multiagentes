@@ -1,0 +1,54 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8076916168
+version 1.0
+
+## Definição de times:
+
+time "televendas":
+    vendedores todostelevendas
+
+## Regras de não agendamento:
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar bloqueados":
+    do time("televendas")
+    quando bloqueados
+    nao agendar
+
+## Regras de agendamento:
+
+parametros "Freq. de 30d para 'Prospect: Cliente potencial'":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 30 dias
+
+parametros "Freq. de 30d para 'Ativado: fez um pedido e ainda não comprou mais'":
+    do time("televendas")
+    quando unica compra com a empresa e recencia de positivacao em 40 dias
+    frequencia de 30 dias
+
+parametros "Freq. de 90d para 'Ativo: compra regularmente'":
+    do time("televendas")
+    quando ativos para o vendedor
+        e frequencia historica menor que 21 dias
+    frequencia de 90 dias
+
+parametros "Freq. de 30d para 'Ativo: estimular a regularidade de compra'":
+    do time("televendas")
+    quando recencia de positivacao global entre 31 dias e 59 dias
+    frequencia de 30 dias
+
+parametros "Freq. de 21d para 'Em ruptura: risco de ficar inativo'":
+    do time("televendas")
+    quando recencia de positivacao global entre 60 dias e 89 dias
+    frequencia de 21 dias
+
+parametros "Freq. de 45d para 'Inativo: reativar cliente sem compra'":
+    do time("televendas")
+    quando fora da recencia de positivacao global em 90 dias
+    frequencia de 45 dias
+    

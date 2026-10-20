@@ -1,0 +1,114 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8827004263
+version 1.0
+
+#
+## Definição de times
+
+time "time televendas":
+    vendedores todostelevendas ativados
+
+#
+## Definição de carteiras
+
+carteira "carteira_segunda":
+    clientes carteirafixa("time televendas")
+    quando codigo da rota igual("24","523","524","525","526")
+
+carteira "carteira_terca":
+    clientes carteirafixa("time televendas")
+    quando codigo da rota igual("3","4","17","500","512","514","515")
+  
+carteira "carteira_quarta":
+    clientes carteirafixa("time televendas")
+    quando codigo da rota igual("502","530","531")
+   
+carteira "carteira_quinta":
+    clientes carteirafixa("time televendas")
+    quando codigo da rota igual("20","501","504","505","506","508","513","516","527","528")
+
+carteira "carteira_sexta":
+    clientes carteirafixa("time televendas")
+    quando codigo da rota igual("5","19","510","511","521")
+   
+carteira "carteira_curitiba":
+    clientes carteirafixa("time televendas")
+    quando codigo da rota igual("10","11")
+
+#
+## Parâmetros de atendimento
+
+parametros "Não agendar Clientes Filiais":
+    do time("time televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Clientes Ativos (segunda)":
+    da carteira("carteira_segunda")
+    quando ativos para o vendedor
+    frequencia semanal()
+    preferencia na segunda
+    fixo
+
+parametros "Clientes Inativos (segunda)":
+    da carteira("carteira_segunda")
+    frequencia de 28 dias
+    preferencia na segunda
+    fixo
+
+parametros "Clientes Ativos (terça)":
+    da carteira("carteira_terca")
+    quando ativos para o vendedor
+    frequencia semanal()
+    preferencia na terça   
+    fixo
+
+parametros "Clientes Inativos (terça)":
+    da carteira("carteira_terca")
+    frequencia de 28 dias
+    preferencia na terça
+    fixo
+
+parametros "Clientes Ativos (quarta)":
+    da carteira("carteira_quarta")
+    quando ativos para o vendedor
+    frequencia semanal()
+    preferencia na quarta
+    fixo
+
+parametros "Clientes Inativos (quarta)":
+    da carteira("carteira_quarta")
+    frequencia de 28 dias
+    preferencia na quarta
+    fixo
+
+parametros "Clientes Ativos (quinta)":
+    da carteira("carteira_quinta")
+    quando ativos para o vendedor
+    frequencia semanal()
+    preferencia na quinta
+    fixo
+
+parametros "Clientes Inativos (quinta)":
+    da carteira("carteira_quinta")
+    frequencia de 28 dias
+    preferencia na quinta
+    fixo
+
+parametros "Clientes Ativos (sexta)":
+    da carteira("carteira_sexta")
+    quando ativos para o vendedor
+    frequencia semanal()
+    preferencia na sexta
+    fixo
+    
+parametros "Clientes Inativos (sexta)":
+    da carteira("carteira_sexta")
+    frequencia de 28 dias
+    preferencia na sexta
+    fixo
+
+parametros "Clientes sem dia específico":
+    da carteira("carteira_curitiba")
+    frequencia semanal()
+    

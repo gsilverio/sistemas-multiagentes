@@ -1,0 +1,104 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/IMP-501?atlOrigin=eyJpIjoiODhiOGM5MmUzYjI5NDIzZTk4YTgwMDM3MTllNTAxMDEiLCJwIjoiaiJ9
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+carteira livre "cidades_todo_dia":
+    clientes carteirafixa("televendas")
+    quando uf do estado igual("RJ")
+        e nome da cidade igual(
+            "BARRA MANSA","VOLTA REDONDA","RESENDE","QUEIMADOS","ITATIAIA",
+            "SÃO JOÃO DE MERITI","NOVA IGUAÇU","MESQUITA","BELFORD ROXO","PORTO REAL"
+        )
+
+carteira livre "bairros_todo_dia":
+    clientes carteirafixa("televendas")
+    quando uf do estado igual("RJ")
+        e nome da cidade igual("RIO DE JANEIRO")
+        e nome do bairro igual("CENTRO","Centro","centro","PAVUNA","Pavuna","BOLCO A - PAVUNA")
+
+carteira livre "cidades_seg_qua_sex":
+    clientes carteirafixa("televendas")
+    quando uf do estado igual("RJ")
+        e nome da cidade igual("ITAGUAI","SEROPEDICA","VISCONDE DE MAUA")
+
+carteira livre "bairros_seg_qua_sex":
+    clientes carteirafixa("televendas")
+    quando uf do estado igual("RJ")
+        e nome da cidade igual("RIO DE JANEIRO")
+        e nome do bairro igual(
+            "SANTA CRUZ","SANTA CRUZ CONJUNTO ALVORADA","SANTA CRUZ/ SAO FERNANDO","SANTA CRUZ/ URUCÂNIA",
+            "SANTA CRUZ/ VITOR DUMAS","SANTA CRUZ/JESUÍTAS","STA CRUZ","Santa Cruz","DANTA CRUZ","REALENGO",
+            "Realengo","LETÍCIA CAMPO GRANDE","INHOAIBA CAMPO GRANDE","CAMPO GRANDE MENDANHA","CAMPO GRANDE",
+            "CAMPO  GRANDE","CAMPO   GRANDE","Campo Grande","CAMPO GRADE","JARDIM BANGU","BANGUA","BANGU",
+            "Bangu","TAQUARA JACAREPAGUA","JACAREPAGUA TAQUARA","JACAREPAGUA  TAQUARA","JACAREPAGUA TANQUE",
+            "JACAREPAGUA PRACA SECA","JACAREPAGUA  PRACA  SECA","JACAREPAGUÁ GARDÊNIA","JACAREPAGUÁ COLONIA",
+            "JACAREPAGUÁ","Jacarepaguá","JACAREPAGUA","Jacarepagua","FREGUESIA JACAREPAGUÁ","Freguesia (Jacarepaguá)",
+            "Freguesia Jacarepagua","COLÔNIA JACAREPAGUÁ","SEPETIBA","Sepetiba","CONJUNTO NOVA SEPETIBA","GARDENIA NAZUL",
+            "GARDENIA AZUL","ENGENHO NOVO","COSMOS NOVA JERSEY","COSMOS","Cosmos","COSMO","COSME VELHO","Cosme Velho",
+            "TAQUARA JPA","TAQUARA JACAREPAGUA","TAQUARA COLÔNIA","TAQUARA COLONIA","TAQUARA BOIUNA","TAQUARA","Taquara",
+            "taquara","JACAREPAGUA TAQUARA","JACAREPAGUA  TAQUARA","CURICICA TAQUARA","TIJUCA","Tijuca","BARRA DA TIJUCA",
+            "MEIER","MEIER 2","MADUREIRA","Madureira","IRAJA","Coelho Neto - IRAJA","VILA DA PENHA","PENHA CIRCULAR",
+            "Penha Circular","PENHA","ILHA DO GOVERNADOR","GARDENIA NAZUL","GARDÊNIA AZUL","GARDENIA AZUL","CACHAMBI"
+        )
+
+carteira livre "cidades_rj_ter_qui":
+    clientes carteirafixa("televendas")
+    quando uf do estado igual("RJ")
+        e nome da cidade igual(
+            "BARRA DO PIRAI","BARRA DO PIRAÍ","VASSOURAS","MIGUEL PEREIRA","VALENCA","VALENÇA","PATY DO ALFERES",
+            "RIO CLARO","MANGARATIBA","PARATI","PIRAI","PIRAÍ","BANANAL","MENDES","TRES RIOS","TRÊS RIOS",
+            "PONTAL","PARACAMBI"
+        )
+
+carteira livre "bairros_rj_ter_qui":
+    clientes carteirafixa("televendas")
+    quando uf do estado igual("RJ")
+        e nome da cidade igual("RIO DE JANEIRO", "ANGRA DOS REIS")
+        e nome do bairro igual(
+            "GUARATIBA","Guaratiba","PRAIA BRAVA PEREQUE","PQ MAMBUCABA PEREQUE","PEREQUE MAMBUCABA",
+            "PEREQUÊ","PEREQUE","PARQUE PEREQUÊ MAMBUCABA","PARQUE PEREQUE"
+        )
+
+carteira livre "cidades_sp_ter_qui":
+    clientes carteirafixa("televendas")
+    quando uf do estado igual("SP")
+        e nome da cidade igual("SAO PAULO")
+
+parametros "Não agendar baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Rota todos os dias (com venda recente)":
+    da carteira("cidades_todo_dia","bairros_todo_dia")
+    quando recencia de positivacao em 1 dias
+    frequencia semanal()
+
+parametros "Rota todos os dias":
+    da carteira("cidades_todo_dia","bairros_todo_dia")
+    frequencia de 2 dias
+
+parametros "Rota segunda, quarta e sexta":
+    da carteira("cidades_seg_qua_sex","bairros_seg_qua_sex")
+    quando fora da recencia de positivacao na semana
+    frequencia semanal()
+    preferencia
+        normal na segunda e
+        normal na quarta e
+        normal na sexta
+
+parametros "Rota terça e quinta":
+    da carteira("cidades_rj_ter_qui","bairros_rj_ter_qui","cidades_sp_ter_qui")
+    quando fora da recencia de positivacao na semana
+    frequencia semanal()
+    preferencia
+        normal na terca e
+        normal na quinta
+
+parametros "Não agendar clientes fora das regras padrão":
+    do time("televendas")
+    nao agendar
+    

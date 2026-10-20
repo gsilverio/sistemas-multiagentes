@@ -1,0 +1,125 @@
+
+# <Regras padrão da Binatti Itapema>
+# <Atualizado em: 2024-09-25>
+# <Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7757929010>
+version 1.0
+
+#### Definição de times
+
+time "todos":
+    vendedores todostelevendas ativados
+
+#### Regras de agendamento
+
+### Planejamento para dias específicos
+
+## <fixo>
+
+# <seg>
+
+parametros "Rota fixa de segunda-feira":
+    do time("todos")
+    quando nome da cidade igual("BALNEARIO BARRA DO S","BELA VISTA","CAMPO ALEGRE","CANOINHAS","CORUPA","ITAIOPOLIS","MAFRA","MAJOR VIEIRA","MONTE CASTELO",
+                                "PAPANDUVA","PORTO UNIAO","RIO NEGRINHO","SAO BENTO DO SUL","TRES BARRAS")
+    frequencia semanal()
+    preferencia na segunda
+    fixo
+
+# <ter>
+
+parametros "Rota fixa de terça-feira":
+    do time("todos")
+    quando nome da cidade igual("APIUNA","ASCURRA","BENEDITO NOVO","BLUMENAU","DOUTOR PEDRINHO","GASPAR","IBIRAMA","INDAIAL","POMERODE","PRESIDENTE GETULIO","RIO DOS CEDROS","TIMBO")
+    frequencia semanal()
+    preferencia na terca
+    fixo
+
+# <qua>
+
+parametros "Rota fixa de quarta-feira":
+    do time("todos")
+    quando nome da cidade igual("ARARANGUA","BIGUACU","BRACO DO NORTE","CAPIVARI DE BAIXO","COCAL DO SUL","CRICIUMA","FLORIANOPOLIS","FORQUILHINHA","GRAVATAL","ICARA",
+                                "IMBITUBA","JAGUARUMA","LAGUNA","LUIZ ALVES","MORRO DA FUMACA","ORLEANS","PALHOCA","PAULO LOPES","PEDRAS GRANDES","PESCARIA BRAVA",
+                                "PRAIA GRANDE","SANGAO","SANTA ROSA DO SUL","SAO JOAO DO SUL","SAO JOSE","SAO LUDGERO","SOMBRIO","TUBARAO","URUSSANGA")
+    frequencia semanal()
+    preferencia na quarta
+    fixo
+
+# <qui>
+
+parametros "Rota fixa de quinta-feira":
+    do time("todos")
+    quando nome da cidade igual("ARAQUARI","MASSARANDUBA","PIRABEIRABA","SAO JOAO DO ITAPERIU")
+    frequencia semanal()
+    preferencia na quinta
+    fixo
+
+## <dinâmico>
+
+# <seg, ter ou sex>
+
+parametros "Rota dinâmica de segunda, terça ou sexta":
+    do time("todos")
+    quando nome da cidade igual("BRUSQUE")
+    frequencia semanal()
+    preferencia na segunda e na terca e na sexta
+
+# <ter ou sex>
+
+parametros "Rota dinâmica para terça ou sexta":
+    do time("todos")
+    quando nome da cidade igual("NOVA TRENTO")
+    frequencia semanal()
+    preferencia na terca e na sexta
+
+# <seg ou qui>
+
+parametros "Rota dinâmica de segunda ou quinta":
+    do time("todos")
+    quando nome da cidade igual("GUARAMIRIM","JARAGUA DO SUL","JOINVILLE","SCHROEDER")
+    frequencia semanal()
+    preferencia na segunda e na quinta
+
+# <ter ou qui>
+
+parametros "Rota dinâmica de terça ou quinta":
+    do time("todos")
+    quando nome da cidade igual("BARRA VELHA","NAVEGANTES","PENHA","BALNEARIO PICARRAS")
+    frequencia semanal()
+    preferencia na terca e na quinta
+
+### Planejamento para dias variados
+
+parametros "Rota dinâmica para dias variados":
+    do time("todos")
+    quando nome da cidade igual("BALNEARIO CAMBORIU","CAMBORIU","CANELINHA","ITAJAI","ITAPEMA","PORTO BELO","SAO JOAO BATISTA","TIJUCAS")
+    frequencia semanal()
+
+### Planejamento para clientes não passados nas rotas
+
+parametros "Freq. de 30d para 'Prospects'":
+    do time("todos")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 30 dias
+
+parametros "Freq. de 14d para 'Ativos - Curva A'":
+    do time("todos")
+    quando ativos para o vendedor
+        e curva A com a empresa
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para 'Ativos - Curva B'":
+    do time("todos")
+    quando ativos para o vendedor
+        e curva B com a empresa
+    frequencia de 21 dias
+
+parametros "Freq. de 28d para 'Ativos - Curva C'":
+    do time("todos")
+    quando ativos para o vendedor
+    frequencia de 28 dias
+
+parametros "Freq. de 30d para 'Inativos'":
+    do time("todos")
+    frequencia de 30 dias
+    

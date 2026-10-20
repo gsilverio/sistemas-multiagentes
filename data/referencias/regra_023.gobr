@@ -1,0 +1,66 @@
+
+version 1.0
+
+
+time "time televendas gyn":
+    vendedores todostelevendas dos supervisores("5178")
+
+time "time televendas df":
+    vendedores todostelevendas
+    
+time "time campo df":
+    vendedores todosdecampo
+
+carteira "carteira televendas gyn":
+    clientes carteirafixa("time televendas gyn")
+
+carteira "carteira televendas df":
+    clientes carteirafixa("time televendas df")
+
+## Parametros televendas GYN
+parametros "Regra Padrao da BSB Vet (GYN): 7 dias para clientes sem venda (televendas)":
+    da carteira("carteira televendas gyn")
+    quando sem vendas
+    frequencia de 7 dias
+
+parametros "Regra Padrao da BSB Vet (GYN): 14 para todos os clientes (televendas)":
+    da carteira("carteira televendas gyn")
+    frequencia de 14 dias
+
+## Parametros televendas DF
+
+parametros "Regra Padrao da BSB Vet: 7 dias para clientes adimplentes (televendas)":
+    da carteira("carteira televendas df")
+    quando adimplentes
+    frequencia de 7 dias
+
+parametros "Regra Padrao da BSB Vet: 14 dias para ativos inadimplentes (televendas)":
+    da carteira("carteira televendas df")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da BSB Vet: nao agendar inativos inadimplentes (televendas)":
+    da carteira("carteira televendas df")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+    
+parametros "Regra Padrao da BSB Vet: 7 dias para clientes sem venda (televendas)":
+    da carteira("carteira televendas df")
+    quando sem vendas
+    frequencia de 7 dias
+    
+    
+## Parametros vendas externas DF
+
+parametros "Regra Padrao da BSB Vet: Frequencia de 7 dias para clientes ativos (campo)":
+	do time("time campo df")
+	quando ativos para o vendedor
+	frequencia de 7 dias
+	fixo
+
+parametros "Regra Padrao da BSB Vet: Frequencia de 15 dias para clientes inativos (campo)":
+	do time("time campo df")
+	frequencia de 15 dias
+	fixo
+    
+

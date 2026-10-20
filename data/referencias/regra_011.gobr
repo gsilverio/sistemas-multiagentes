@@ -1,0 +1,57 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+    
+time "time campo":
+    vendedores todosdecampo
+    
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+    
+carteira "carteira campo":
+    clientes carteirafixa("time campo")
+    
+parametros "Regra Padrao da VetVida Customizavel: Nao agendar clientes ativos (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor
+    nao agendar
+    
+parametros "Regra Padrao da VetVida Customizavel: 14 dias para clientes inativos (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da VetVida Customizavel: 14 dias para clientes sem venda (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+### Time campo
+
+parametros "Regra Padrao da VetVida Customizavel: Nao agendar clientes inativos inadimplentes (campo)":
+    da carteira("carteira campo")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+    
+parametros "Regra Padrao da VetVida Customizavel: 14 dias para clientes ativos (campo)":
+    da carteira("carteira campo")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da VetVida Customizavel: 14 dias para clientes inativos adimplentes (campo)":
+    da carteira("carteira campo")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da VetVida Customizavel: 14 dias para clientes sem venda (campo)":
+    da carteira("carteira campo")
+    quando sem venda
+    frequencia de 14 dias
+    preferencia nos dias uteis
+

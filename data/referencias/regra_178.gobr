@@ -1,0 +1,74 @@
+
+### Solicitação: https://govendas-team.atlassian.net/jira/software/c/projects/CS/boards/356?selectedIssue=CS-94
+version 1.0
+
+## Definição de times
+
+time "televendas_1":
+    vendedores todostelevendas ativados
+
+time "televendas_2":
+    vendedores porid("48")
+
+
+# BLOQUEIO INICIAL
+############################################################
+
+parametros "Não agendar clientes baixados na receita":
+    do time("televendas_1")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Clientes que nunca compraram com a empresa":
+    do time("televendas_2")
+    quando cadastrado faz 7 dias
+    nao agendar
+
+parametros "Não agendar clientes com compra recente":
+    do time("televendas_1")
+    quando recencia de positivacao em 39 dias
+    nao agendar
+
+# PARAMETRIZAÇÕES
+############################################################
+
+parametros "Tentativa final":
+    do time("televendas_2")
+    quando cadastrado faz 60 dias
+    frequencia de 30 dias
+
+parametros "Lead frio":
+    do time("televendas_2")
+    quando cadastrado faz 30 dias
+    frequencia de 20 dias
+
+parametros "Lead morno":
+    do time("televendas_2")
+    quando cadastrado faz 15 dias
+    frequencia de 15 dias
+
+parametros "Follow-up":
+    do time("televendas_2")
+    quando cadastrado faz 8 dias
+    frequencia de 15 dias
+
+parametros "Estimular recompra":
+    do time("televendas_1")
+    quando recencia de positivacao entre 40 dias e 89 dias
+    frequencia de 15 dias
+
+parametros "Reativação moderada":
+    do time("televendas_1")
+    quando recencia de positivacao entre 90 dias e 119 dias
+    frequencia de 7 dias
+
+parametros "Reativação intensa":
+    do time("televendas_1")
+    quando recencia de positivacao entre 120 dias e 359 dias
+    frequencia de 7 dias
+
+parametros "Resgate crítico":
+    do time("televendas_1")
+    quando fora da recencia de positivacao em 359 dias
+    frequencia de 7 dias
+    

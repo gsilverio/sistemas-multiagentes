@@ -1,0 +1,63 @@
+
+# Última atualização: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6755764186
+version 1.0
+
+time "Televendas":
+    vendedores todos ativados
+
+# Regras do time "Televendas":
+
+parametros "Ases: Freq. de 21d para 'PROSPECT: FAZER O PRIMEIRO PEDIDO'":
+    do time("Televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequência de 21 dias
+
+parametros "Ases: Freq. de 10d para 'ATIVADO: BOAS VINDAS AO CLIENTE COM O PRIMEIRO PEDIDO'":
+    do time("Televendas")
+    quando unica compra com a empresa
+        e cadastrado faz 30 dias
+    frequência de 10 dias
+
+parametros "Ases: Freq. de 7d para 'EM RUPTURA: RISCO DE INATIVIDADE'":
+    do time("Televendas")
+    quando adimplentes
+        e recencia de positivacao entre 61 dias e 90 dias
+    frequência de 7 dias
+
+parametros "Ases: Freq. de 14d 'INATIVOS: RESGATE DE CLIENTES SEM COMPRA'":
+    do time("Televendas")
+    quando adimplentes
+        e no ciclo de vida inativo com a empresa
+    frequência de 14 dias
+
+parametros "Ases: Freq. do histórico para 'ATIVO: COMPRA REGULARMENTE Curva A (com compra no mês)'":
+	do time("Televendas")
+	quando curva A com a empresa
+	    e tem venda no mês
+	frequencia do historico ou no maximo de 30 dias
+
+parametros "Ases: Freq. de 7d para 'ATIVO: COMPRA REGULARMENTE Curva A (sem compra no mês)'":
+	do time("Televendas")
+	quando curva A com a empresa
+	frequencia de 7 dias
+
+parametros "Ases: Freq. do histórico para 'ATIVO: COMPRA REGULARMENTE Curva B (com compra no mês)'":
+	do time("Televendas")
+	quando curva B com a empresa
+	    e tem venda no mês
+	frequencia do historico ou no maximo de 30 dias
+
+parametros "Ases: Freq. de 14d para 'ATIVO: COMPRA REGULARMENTE Curva B (sem compra no mês)'":
+	do time("Televendas")
+	quando curva B com a empresa
+	frequencia de 14 dias
+
+parametros "Ases: Freq. do histórico para 'ATIVO: COMPRA REGULARMENTE Curva C (com compra no mês)'":
+	do time("Televendas")
+	quando tem venda no mês
+	frequencia do historico ou no maximo de 30 dias
+
+parametros "Ases: Freq. de 21d para 'ATIVO: COMPRA REGULARMENTE Curva C (sem compra no mês)'":
+	do time("Televendas")
+	frequencia de 21 dias
+    

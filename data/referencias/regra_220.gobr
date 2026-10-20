@@ -1,0 +1,46 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/9025688415
+version 1.0
+
+
+time "carteira regional":
+    vendedores porid("99", "645", "693", "729")
+
+time "carteira reativacao":
+    vendedores porid("744", "738")
+
+time "carteira direta":
+    vendedores porid("568", "712")
+
+
+parametros "Não agendar clientes com compra na empresa nos últimos 30 dias - Carteira Regional":
+    do time("carteira regional")
+    quando recencia de positivacao global em 30 dias
+    nao agendar
+
+parametros "Regra Padrao da Girobem: Frequênicia de 7 dias para clientes sem comprar entre 30 e 150 dias - Carteira Regional":
+    do time("carteira regional")
+    frequencia de 7 dias
+
+
+## TIME REATIVACAO ##
+parametros "Regra Padrao da Girobem: 14 dias para clientes com mais de 150 dias sem compra  - Carteira Reativação":
+    do time("carteira reativacao")
+    quando inatividade global maior que 149 dias
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Girobem: 14 dias para clientes sem compra  - Carteira Reativação":
+    do time("carteira reativacao")
+    quando sem venda
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Girobem: Não agendar clientes com menos de 150 dias sem compra  - Carteira Reativação":
+    do time("carteira reativacao")
+    nao agendar
+
+
+## TIME CARTEIRA DIRETA ##
+parametros "Regra Padrao da Girobem: 7 dias para todos os clientes - Carteira Direta":
+    do time("carteira direta")
+    frequencia de 7 dias
+    

@@ -1,0 +1,58 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7846202946
+version 1.0
+
+# Definição dos times:
+
+time "ruptura_global":
+    vendedores porid("8506","8507","8508","8509","8512")
+
+time "carteira":
+    vendedores porid("602","607","8406")
+    
+# Regras do time "ruptura_global":
+
+parametros "Freq. de 14d para 'Sem venda há mais de 30d'":
+    do time("ruptura_global")
+    quando adimplentes
+        e nao tem venda em 30 dias
+        e ramo de atividade igual("6","7","8","10","28","32","33","37","38","40","41","42")
+    frequencia de 14 dias
+
+parametros "Freq. de 14d para 'Sem venda há mais de 45d'":
+    do time("ruptura_global")
+    quando adimplentes
+        e fora da recencia de positivacao em 45 dias
+        e ramo de atividade igual("1","2","3","4","11","12","13","14","15","16","17","18","19","20","21","22",
+                                    "23","24","25","26","27","29","30","31","34","35","36","39","50","99")
+    frequencia de 14 dias
+
+# Regras do time "carteira":
+
+parametros "Freq. de 14d para curva A e com compra em 90 dias":
+    do time("carteira")
+    quando recencia de positivacao em 90 dias
+        e curva A com a empresa
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para curva B e com compra em 90 dias":
+    do time("carteira")
+    quando recencia de positivacao em 90 dias
+        e curva B com a empresa
+    frequencia de 21 dias
+
+parametros "Freq. de 28d para curva C e com compra em 90 dias":
+    do time("carteira")
+    quando recencia de positivacao em 90 dias
+        e curva C com a empresa
+    frequencia de 28 dias
+
+parametros "Freq. de 21d para sem classificação de curva e com compra em 90 dias":
+    do time("carteira")
+    quando recencia de positivacao em 90 dias
+    frequencia de 21 dias
+
+parametros "Freq. de 21d para sem compra há mais de 90 dias":
+    do time("carteira")
+    frequencia de 21 dias
+    

@@ -1,0 +1,61 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+
+time "time interior":
+    vendedores porid("27", "35", "34")
+
+time "time capital":
+    vendedores todosdecampo menos ("27", "35", "34")
+    
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+    
+carteira "carteira interior":
+    clientes carteirafixa("time interior")
+
+carteira "carteira capital":
+    clientes carteirafixa("time capital")
+
+parametros "Regra Padrao da NB Distribuidora Customizavel: 14 dias para adimplentes":
+    da carteira("carteira televendas")
+    quando adimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da NB Distribuidora: 30 dias para ativos inadimplentes":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+
+parametros "Regra Padrao da NB Distribuidora: 30 dias para clientes sem venda":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 30 dias
+    
+parametros "Regra Padrao da NB Distribuidora: nao agendar inativos inadimplentes":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+### Regras vendedores de campo capital
+parametros "Regra Padrao da NB Distribuidora Customizavel: 30 dias para clientes sem venda (capital)":
+    da carteira("carteira capital")
+    quando sem venda
+    frequencia de 30 dias
+
+parametros "Regra Padrao da NB Distribuidora Customizavel: 30 dias para clientes inadimplentes (capital)":
+    da carteira("carteira capital")
+    quando inadimplentes
+    frequencia de 30 dias
+    
+parametros "Regra Padrao da NB Distribuidora Customizavel: 14 dias para clientes adimplentes (capital)":
+    da carteira("carteira capital")
+    frequencia de 14 dias
+    
+### Regras vendedores de campo interior
+parametros "Regra Padrao da NB Distribuidora Customizavel: 30 dias para todos os clientes (interior)":
+    da carteira("carteira interior")
+    frequencia de 30 dias
+    

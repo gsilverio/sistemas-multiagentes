@@ -1,0 +1,37 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+    
+time "time campo":
+    vendedores todosdecampo
+
+## Parametros televendas
+parametros "Regra Padrao da Elluc: 7 dias para clientes sem venda (televendas)":
+    do time("time televendas")
+    quando sem vendas
+    frequencia de 7 dias
+    
+parametros "Regra Padrao da Elluc: 30 dias para ativos inadimplentes (televendas)":
+    do time("time televendas")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+
+parametros "Regra Padrao da Elluc: nao agendar inativos inadimplentes (televendas)":
+    do time("time televendas")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+    
+parametros "Regra Padrao da Elluc: 7 dias para clientes adimplentes (televendas)":
+    do time("time televendas")
+    quando adimplentes
+    frequencia de 7 dias
+
+    
+## Parametros vendas externas
+parametros "Regra Padrao da Elluc: 30 dias para clientes dos externos":
+    do time("time campo")
+    frequencia de 30 dias
+    
+

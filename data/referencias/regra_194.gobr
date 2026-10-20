@@ -1,0 +1,36 @@
+
+#### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9548242112/list-270761555428/task-552627184596
+version 1.0
+
+
+### Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+### Regras de planejamento
+
+parametros "Baixados na Receita Federal":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Prospects (Nunca tirou pedido)":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativo (Com último pedido em até 60d atrás)":
+    do time("televendas")
+    quando recencia de positivacao global em 60 dias
+    frequencia de 14 dias
+
+parametros "Risco de Inatividade (Com pedido entre 60 e 90d atrás)":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+    frequencia de 7 dias
+
+parametros "Inativo (Com último pedido há mais de 90d atrás)":
+    do time("televendas")
+    frequencia de 28 dias
+    

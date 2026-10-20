@@ -1,0 +1,25 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-568568117201
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de planejamento
+
+parametros "Matenha relacionamento com seu cliente!":
+    do time("televendas")
+    quando recencia de positivacao global em 59 dias
+    frequencia de 14 dias
+
+parametros "Se não mantiver a regularidade de compra, o cliente ficará inativo!":
+    do time("televendas")
+    quando recencia de positivacao global em 89 dias
+    frequencia de 14 dias
+
+parametros "Resgate seu cliente inativo!":
+    do time("televendas")
+    frequencia de 14 dias
+    

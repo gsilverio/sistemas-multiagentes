@@ -1,0 +1,41 @@
+
+# Solicitação: https://govendas-team.atlassian.net/browse/CS-90?focusedCommentId=24177&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-24177
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de agendamento
+
+parametros "Freq. de 10d para Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 10 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Freq. de 21d para Ativos Adimplentes":
+    do time("televendas")
+    quando ativos para o vendedor
+        e adimplentes
+    frequencia de 21 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Freq. de 10d para Ativos Inadimplentes":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 10 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Freq. de 14d para Inativos Adimplentes":
+    do time("televendas")
+    quando adimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis e no sabado
+
+parametros "Freq. de 21d para Inativos Inadimplentes":
+    do time("televendas")
+    frequencia de 21 dias
+    preferencia nos dias uteis e no sabado
+    

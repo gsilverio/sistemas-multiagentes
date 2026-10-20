@@ -1,0 +1,43 @@
+
+# Regras padrão
+version 1.0
+
+time "todos":
+    vendedores todos ativados
+
+# Regras de curva
+
+parametros "Ever Limp: Frequência de 15 dias para clientes ativos curva A":
+    do time("todos")
+    quando curva A com a empresa e ativos para o vendedor
+    frequência de 15 dias
+    
+parametros "Ever Limp: Frequência de 7 dias para clientes inativos curva A":
+    do time("todos")
+    quando curva A com a empresa
+    frequência de 7 dias
+    
+parametros "Ever Limp: Frequência de 21 dias para clientes ativos curva B":
+    do time("todos")
+    quando curva B com a empresa e ativos para o vendedor
+    frequência de 21 dias
+    
+parametros "Ever Limp: Frequência de 14 dias para clientes inativos curva B":
+    do time("todos")
+    quando curva B com a empresa
+    frequência de 14 dias
+    
+parametros "Ever Limp: Frequência de 30 dias para clientes ativos curva C":
+    do time("todos")
+    quando curva C com a empresa e ativos para o vendedor
+    frequência de 30 dias
+    
+parametros "Ever Limp: Frequência de 21 dias para clientes inativos curva C":
+    do time("todos")
+    quando curva C com a empresa
+    frequência de 21 dias
+    
+parametros "Ever Limp: Frequência de 21 dias para prospects":
+    do time("todos")
+    frequência de 21 dias
+    

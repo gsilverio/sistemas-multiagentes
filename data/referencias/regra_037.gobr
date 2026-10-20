@@ -1,0 +1,14 @@
+
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+    
+carteira "carteira":
+    clientes carteirafixa("empresa toda")
+    
+parametros "Regra Padrao da Magnavet - Customizavel: 30 dias para todos os clientes":
+    da carteira("carteira")
+    frequencia de 30 dias
+    preferencia nos dias uteis
+

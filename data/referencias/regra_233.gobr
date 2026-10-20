@@ -1,0 +1,41 @@
+
+# Card da última aplicação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6427721972
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas ativados
+    
+# Regras de não agendamento:
+
+parametros "Nordece: Não agendar clientes DH com crédito igual ou menor que R$0,00 (televendas)":
+    do time("televendas")
+    quando nao tem credito e tipo de cobranca igual("DH")
+    nao agendar
+
+parametros "Nordece: Não agendar clientes BK com crédito menor que R$200,00 (televendas)":
+    do time("televendas")
+    quando com menos de R$ 199 de credito disponivel e tipo de cobranca igual("BK")
+    nao agendar
+
+parametros "Nordece: Não agendar clientes inadimplentes (televendas)":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+# Regras de agendamento:
+
+parametros "Nordece: Frequência de 7d para clientes ativos/adimplentes (televendas)":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Nordece: Frequência de 14d para clientes inativos/adimplentes (televendas)":
+    do time("televendas")
+    quando inativos para o vendedor
+    frequencia de 14 dias
+
+parametros "Nordece: Frequência de 14d para clientes sem venda (televendas)":
+    do time("televendas")
+    quando sem venda
+    frequencia de 14 dias
+    

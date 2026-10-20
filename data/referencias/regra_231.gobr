@@ -1,0 +1,63 @@
+
+### Solicitação: 
+version 1.0
+
+## Definição de times
+
+time "carteira_regional":
+    vendedores porid("200","382","677","631","686","731","789")
+
+time "carteira_reativacao":
+    vendedores porid("706","763")
+
+time "carteira_direta":
+    vendedores porid("708","736","737","755")
+
+## Parâmetros
+
+
+# TODOS
+
+parametros "Baixados na receita":
+    do time("carteira_regional", "carteira_reativacao", "carteira_direta")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+
+# CARTEIRA REGIONAL
+
+parametros "Clientes com compra nos últimos 30 dias":
+    do time("carteira_regional")
+    quando recencia de positivacao global em 30 dias
+    nao agendar
+
+parametros "Clientes com compra entre 30 e 150 dias":
+	do time("carteira_regional")
+	quando recencia de positivacao global entre 30 dias e 150 dias
+	frequencia de 7 dias
+
+
+# CARTEIRA REATIVAÇÃO
+
+parametros "Clientes com compra em 150 dias":
+	do time("carteira_reativacao")
+	quando recencia de positivacao global em 150 dias
+	nao agendar
+
+parametros "Clientes sem compra":
+	do time("carteira_reativacao")
+	quando no ciclo de vida prospect com a empresa
+	frequencia de 14 dias
+	
+parametros "Clientes sem compra em 150 dias":
+	do time("carteira_reativacao")
+	quando inatividade global maior que 149 dias
+	frequencia de 14 dias
+
+
+# CARTEIRA DIRETA
+
+parametros "Freq. de 7d para todos os clientes":
+	do time("carteira_direta")
+	frequencia de 7 dias
+    

@@ -1,0 +1,13 @@
+
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao do goVendas Customizavel: Frequencia de inativos":
+    da carteira("empresa toda")
+    frequencia de 14 dias
+

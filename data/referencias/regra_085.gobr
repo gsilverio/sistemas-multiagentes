@@ -1,0 +1,31 @@
+
+
+# Regras para Pérola
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa perola":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Empresa Customizavel: 7 dias para adimplentes":
+    da carteira("empresa perola")
+    quando adimplentes
+    frequencia semanal()
+    
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para ativos e inadimplentes":
+    da carteira("empresa perola")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Empresa Customizavel: 30 dias para inativos e inadimplentes":
+    da carteira("empresa perola")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+
+parametros "Regra Padrao da Empresa Customizavel: 7 dias para cliente sem vendas":
+    da carteira("empresa perola")
+    frequencia semanal()
+    preferencia nos dias uteis
+

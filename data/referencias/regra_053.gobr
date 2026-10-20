@@ -1,0 +1,61 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+
+time "regra padrao":
+    vendedores todosdecampo
+
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+
+carteira "regra padrao":
+    clientes carteirafixa("regra padrao")
+
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para ativos adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Empresa Customizavel: 30 dias para ativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+    
+parametros "Regra Padrao da Empresa Customizavel: 7 dias para inativos adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Empresa Customizavel: nao agendar inativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Empresa Customizavel: 7 dias para sem vendas (televendas)":
+    da carteira("carteira televendas")
+    quando sem vendas
+    frequencia de 7 dias
+
+## Configuracao padrao
+
+parametros "Regra Padrao da Empresa Customizavel: configuracao padrao de inativos":
+    da carteira("regra padrao")
+    quando inativos para o vendedor
+    frequencia de inativos  da empresa
+    preferencia do vendedor
+
+parametros "Regra Padrao da Empresa Customizavel: configuracao padrao de ativos":
+    da carteira("regra padrao")
+    quando ativos para o vendedor
+    frequencia de ativos da empresa
+    preferencia do vendedor
+    
+parametros "Regra Padrao da Empresa Customizavel: configuracao padrao de sem vendas":
+    da carteira("regra padrao")
+    quando sem vendas
+    frequencia de inativos da empresa
+    preferencia do vendedor
+
+

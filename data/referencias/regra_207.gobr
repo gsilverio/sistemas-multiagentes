@@ -1,0 +1,46 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/9066320556
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Parâmetros de planejamento
+
+parametros "Não agendar CPF":
+    do time("televendas")
+    quando pessoa fisica
+    nao agendar
+
+parametros "Clientes sem pedido com a empresa":
+    do time("televendas")
+    quando sem venda
+    frequencia de 14 dias
+
+parametros "Clientes ativos com alta regularidade":
+    do time("televendas")
+    quando recencia de positivacao em 14 dias
+    frequencia do historico mais 7 dias ou no maximo de 14 dias
+
+parametros "Manter a regularidade":
+    do time("televendas")
+    quando recencia de positivacao entre 14 dias e 30 dias
+    frequencia de 14 dias
+
+parametros "Sem pedido entre 30 a 45d":
+    do time("televendas")
+    quando recencia de positivacao entre 30 dias e 45 dias
+    frequencia de 21 dias
+
+parametros "Risco de ficar inativo":
+    do time("televendas")
+    quando recencia de positivacao entre 45 dias e 90 dias
+    frequencia de 14 dias
+
+parametros "Resgate de inativos":
+    do time("televendas")
+    quando fora da recencia de positivacao em 90 dias
+    frequencia de 28 dias
+    

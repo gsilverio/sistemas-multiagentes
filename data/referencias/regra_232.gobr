@@ -1,0 +1,47 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/9053185212
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+#
+## Parâmetros de atendimento
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Não agendar clientes Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Freq. de 21d para clientes Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 21 dias
+
+parametros "Freq. do histórico para clientes com compra entre 1 e 29 dias":
+    do time("televendas")
+    quando recencia de positivacao em 29 dias
+    frequencia do historico ou no minimo de 14 dias e no maximo de 30 dias
+
+parametros "Freq. de 21d para clientes com compra entre 30 e 59 dias":
+    do time("televendas")
+    quando recencia de positivacao entre 30 dias e 59 dias
+    frequencia de 21 dias
+
+parametros "Freq. de 21d para clientes com compra entre 60 e 89 dias":
+    do time("televendas")
+    quando recencia de positivacao entre 60 dias e 89 dias
+    frequencia de 21 dias
+
+parametros "Freq. de 21d para clientes sem compra em 90 dias":
+    do time("televendas")
+    frequencia de 21 dias
+    

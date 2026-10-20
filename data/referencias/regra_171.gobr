@@ -1,0 +1,70 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7850172902
+version 1.0
+
+## Definição de times:
+
+time "televendas":
+    vendedores todostelevendas
+
+## Regras de não agendamento:
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar bloqueados":
+    do time("televendas")
+    quando bloqueados
+    nao agendar
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Não agendar Baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+## Regras de agendamento:
+
+parametros "Freq. de 14d para 'Prospect: Cliente potencial'":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Freq. de 10d para 'Ativado: fez um pedido e ainda não comprou mais'":
+    do time("televendas")
+    quando unica compra com a empresa e cadastrado há 30 dias
+    frequencia de 10 dias
+
+parametros "Freq. de 14d para 'Ativo: Alta frequência de compra'":
+    do time("televendas")
+    quando recencia de positivacao global em 30 dias
+        e frequencia historica menor que 14 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para 'Ativo: compra regularmente'":
+    do time("televendas")
+    quando recencia de positivacao global em 30 dias 
+        e frequencia historica menor que 30 dias
+    frequencia do histórico ou no mínimo de 14 dias e no máximo de 28 dias
+
+parametros "Freq. de 14d para 'Ativo: estimular a regularidade de compra'":
+    do time("televendas")
+    quando recencia de positivacao global entre 21 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 7d para 'Em ruptura: risco de ficar inativo'":
+    do time("televendas")
+    quando recencia de positivacao global entre 61 dias e 90 dias
+    frequencia de 7 dias
+
+parametros "Freq. de 21d para 'Inativo: reativar cliente sem compra'":
+    do time("televendas")
+    quando fora da recencia de positivacao global entre 90 dias e 180 dias
+    frequencia de 21 dias
+    

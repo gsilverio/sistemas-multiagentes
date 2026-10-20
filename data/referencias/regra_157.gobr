@@ -1,0 +1,24 @@
+
+# Card: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7128610845
+version 1.0
+
+time "toda empresa":
+    vendedores todos ativados
+
+parametros "Regra Padrao da Lubrilages: Frequência de 14 dias para clientes com mais de 120 dias sem vendas":
+    do time("toda empresa")
+    quando fora da recencia de positivacao em 120 dias
+    frequencia de 14 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Lubrilages: Frequência de 7 dias para clientes com mais de 30 dias sem vendas":
+    do time("toda empresa")
+    quando fora da recencia de positivacao em 30 dias
+    frequencia de 7 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Lubrilages: mínimo de 5 dias e máximo de 30 dias":
+    do time("toda empresa")
+    frequencia do historico ou no minimo de 5 dias e no maximo de 30 dias
+    preferencia nos dias uteis
+

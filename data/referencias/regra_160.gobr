@@ -1,0 +1,114 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8300038735
+version 1.0
+
+## Definição de times
+
+time "vendedores_ativos":
+    vendedores todostelevendas ativados menos("2136","2179","2134","1865")
+
+time "vendedores_prospects":
+    vendedores porid("2136","2179","2134","1865")
+
+## PARÂMETROS POR PERFIL E ROTA
+
+parametros "Fechamento de Rota e Sem Atendimento há 3 dias - Primeira Compra":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e data da rota nos proximos 1 dia
+           e sem venda do vendedor
+           e recencia de visita entre 4 dias e 3000 dias
+    frequencia de 1 dia
+
+parametros "Fechamento de Rota e Sem Atendimento há 3 dias - Estimular Regularidade de Compra":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e data da rota nos proximos 1 dia
+           e recencia de visita entre 4 dias e 3000 dias
+           e recencia de positivacao do vendedor entre 31 dias e 60 dias
+    frequencia de 1 dia
+    
+parametros "Fechamento de Rota e Sem Atendimento há 3 dias - Risco de inatividade":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e data da rota nos proximos 1 dia
+           e recencia de visita entre 4 dias e 3000 dias
+           e recencia de positivacao do vendedor entre 61 dias e 90 dias
+    frequencia de 1 dia
+
+parametros "Fechamento de Rota e Sem Atendimento há 3 dias - Compra regularmente":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e data da rota nos proximos 1 dia
+           e recencia de visita entre 4 dias e 3000 dias
+           e atividade do vendedor de 30 dias
+    frequencia de 1 dia
+
+parametros "Fechamento de Rota e Sem Atendimento há 3 dias - Resgate de cliente sem compra":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e data da rota nos proximos 1 dia
+           e recencia de visita entre 4 dias e 3000 dias
+           e inativos para o vendedor
+    frequencia de 1 dia
+
+parametros "Fechamento de Rota e Sem Atendimento há 3 dias":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e data da rota nos proximos 1 dia
+           e recencia de visita entre 4 dias e 3000 dias
+    frequencia de 1 dia
+
+## PARÂMETROS SOMENTE POR PERFIL
+
+# Específicos para o time "vendedores_prospects"
+
+parametros "Primeira Compra (Vendedores Prospects)":
+    do time("vendedores_prospects")
+    quando pessoa juridica
+        e sem venda do vendedor
+    frequencia de 7 dias
+
+# Específicos para o time "vendedores_ativos"
+
+parametros "Primeira Compra (Vendedores Ativos)":
+    do time("vendedores_ativos")
+    quando pessoa juridica
+           e sem venda do vendedor
+    frequencia de 14 dias
+
+# Para todos
+
+parametros "Risco de inatividade":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e recencia de positivacao do vendedor entre 61 dias e 90 dias
+    frequencia de 7 dias
+
+parametros "Estimular a regularidade de compra":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e recencia de positivacao do vendedor entre 31 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Compra regularmente":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e atividade do vendedor de 30 dias
+    frequencia de 14 dias
+
+parametros "Resgate de cliente sem compra":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa juridica
+           e inativos para o vendedor
+    frequencia de 21 dias
+
+parametros "Pessoa Física":
+    do time("vendedores_ativos","vendedores_prospects")
+    quando pessoa fisica
+    frequencia de 14 dias
+
+parametros "Pessoa Física/Jurídica (indefinido)":
+    do time("vendedores_ativos","vendedores_prospects")
+    frequencia de 14 dias
+

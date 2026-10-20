@@ -1,0 +1,45 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7576564145#__recording_7576564245
+version 1.0
+
+# Definição de Times
+
+time "televendas":
+    vendedores todostelevendas menos("1")
+
+# Parâmetros de agendamento
+
+parametros "Freq. de 21d para 'Prospect: Fazer o primeiro pedido'":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 21 dias
+
+parametros "Freq. de 10d para 'Ativado: Boas vindas ao cliente com primeiro pedido'":
+    do time("televendas")
+    quando unica compra com a empresa
+    frequencia de 10 dias
+
+parametros "Freq. do histórico para 'Alta frequência de compra'":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia do historico mais 5 dias ou no maximo de 30 dias
+
+parametros "Freq. de 14d para 'Compra regularmente'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor em 30 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 7d para 'Estimular regularidade de compra'":
+    do time("televendas")
+    quando recencia de positivacao entre 31 dias e 60 dias
+    frequencia de 7 dias
+
+parametros "Freq. de 7d para 'Risco de inatividade'":
+    do time("televendas")
+    quando recencia de positivacao entre 61 dias e 90 dias
+    frequencia de 7 dias
+
+parametros "Freq. de 21d para 'Resgate de cliente sem compra' (Inativos)":
+    do time("televendas")
+    frequencia de 21 dias
+    

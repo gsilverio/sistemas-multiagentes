@@ -1,0 +1,36 @@
+
+version 1.0
+
+time "time interior":
+    vendedores porid("35", "34")
+
+time "time capital":
+    vendedores todosdecampo menos("35", "34")
+    
+carteira "carteira capital":
+    clientes carteirafixa("time capital")
+
+carteira "carteira interior":
+    clientes carteirafixa("time interior")
+
+## REGRAS TIME EXTERNO CAPITAL
+parametros "Regra Padrao da NB PI Customizavel: 14 dias para adimplentes (Capital)":
+    da carteira("carteira capital")
+    quando adimplentes
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da NB PI Customizavel: 14 dias para clientes sem venda (Capital)":
+    da carteira("carteira capital")
+    quando sem venda
+    frequencia de 14 dias
+
+parametros "Regra Padrao da NB PI Customizavel: 30 dias para inadimplentes (Capital)":
+    da carteira("carteira capital")
+    quando inadimplentes
+    frequencia de 30 dias
+    
+## REGRAS TIME EXTERNO INTERIOR
+parametros "Regra Padrao da NB PI Customizavel: 30 dias para todos os clientes (Interior)":
+    da carteira("carteira interior")
+    frequencia de 30 dias
+

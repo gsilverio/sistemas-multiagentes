@@ -1,0 +1,48 @@
+
+### Solicitação:
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+    
+#
+## Regras de planejamento
+
+parametros "Não agendar baixados na receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Primeira compra":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Tirou o primeiro pedido":
+    do time("televendas")
+    quando unica compra com a empresa
+    frequencia de 15 dias
+
+parametros "Ativo: cliente que tem compra com a empresa em 30 dias":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia do historico ou no minimo de 7 dias e no maximo de 21 dias
+
+parametros "Aumentar a regularidade de compra":
+    do time("televendas")
+    quando recencia de positivacao entre 31 dias e 90 dias
+    frequencia de 28 dias
+
+parametros "Cliente caminhando para inatividade":
+    do time("televendas")
+    quando recencia de positivacao entre 91 dias e 120 dias
+    frequencia de 45 dias
+
+parametros "Resgate de inativos":
+    do time("televendas")
+    quando nao tem venda da empresa em 120 dias
+    frequencia de 60 dias
+    

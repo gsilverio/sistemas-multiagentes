@@ -1,0 +1,101 @@
+
+#### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9548242112/list-270761555428/task-558875550388
+version 1.0
+
+
+### TIMES
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+### REGRAS PARA CARTEIRAS POR RAMOS DE ATIVIDADE
+
+carteira livre "ramos_1":
+    clientes carteirafixa("televendas")
+    quando ramo de atividade igual(
+        "101009","101016","101025","101101","101102","101103","101104",
+        "101105","201008","201009","201018","201099"
+    )
+
+carteira livre "ramos_2":
+    clientes carteirafixa("televendas")
+    quando ramo de atividade igual(
+        "101001","101002","101003","101004","101005","101006","101007",
+        "101011","101012","101014","101015","101027","101028","101029",
+        "101032","101035","101037","101039","101106","101107","201012",
+        "201016","301001","301004","301007","301015"
+    )
+
+carteira livre "ramos_3":
+    clientes carteirafixa("televendas")
+    quando ramo de atividade igual(
+        "101008","101010","101017","101018","101019","101020","101021","101022",
+        "101023","101024","101026","101031","101033","101034","101036","101038",
+        "201003","201004","201010","201013","201014","201015","201019","201022",
+        "201023","301002","301005","301006","301009","301010","301011","301012",
+        "301013","301014"
+    )
+
+carteira livre "ramos_4":
+    clientes carteirafixa("televendas")
+    quando ramo de atividade igual(
+        "101013","101040","102001","102002","201011","201021","201025","999999"
+    )
+
+
+### REGRAS DE PLANEJAMENTO
+
+parametros "Baixados na Receita Federal":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos dos ramos de atividade POSTO DE COMBUSTIVEL, FARMACIA E DROGARIA, SUPERMERCADO, REDE DE FAST FOOD, REDE DE POSTO DE COMBUSTIVEL, REDE DE DROGARIA, REDE DE SUPERMERCADO, REDE DE HIPERMERCADO, EMPRESA DE ONIBUS, TRANSPORTADORA, LOGISTICA, POSTO DE SERVICO - VDO":
+    da carteira("ramos_1")
+    quando recencia de positivacao global em 45 dias
+    frequencia de 14 dias
+
+parametros "Inativos dos ramos de atividade POSTO DE COMBUSTIVEL, FARMACIA E DROGARIA, SUPERMERCADO, REDE DE FAST FOOD, REDE DE POSTO DE COMBUSTIVEL, REDE DE DROGARIA, REDE DE SUPERMERCADO, REDE DE HIPERMERCADO, EMPRESA DE ONIBUS, TRANSPORTADORA, LOGISTICA, POSTO DE SERVICO - VDO":
+    da carteira("ramos_1")
+    frequencia de 7 dias
+
+parametros "Ativos dos ramos de atividade DISTRIB. AUTOPECAS, DISTRIB. PECAS MECANICAS, DISTRIB. PECAS ELETRICAS, DISTRIB. PECAS E ACESSORIOS, DISTRIB. ACESSORIOS, DISTRIB. FILTROS/LUBRIFICANTES, CONCESSIONARIAS, AUTOMACAO, SUPRIMENTO DE INFORMATICA, GRAFICA, EMBALAGEM E DESCARTAVEL, MATERIAL DE LIMPEZA, MATERIAL DE ESCRITORIO, MATERIAL HOSPITALAR, PAPELARIA, COOPERATIVA, MAGAZINES, E-COMERCE, REDE DE MAGAZINE, REDE LOJA VAREJISTA, HOSPITAL, LABORATORIO, IND. ALIMENTICIA, IND. DE BEBIDAS, IND. FARMACEUTICA, IND. FRIGORIFICA":
+    da carteira("ramos_2")
+    quando recencia de positivacao global em 60 dias
+    frequencia de 21 dias
+
+parametros "Inativos dos ramos de atividade DISTRIB. AUTOPECAS, DISTRIB. PECAS MECANICAS, DISTRIB. PECAS ELETRICAS, DISTRIB. PECAS E ACESSORIOS, DISTRIB. ACESSORIOS, DISTRIB. FILTROS/LUBRIFICANTES, CONCESSIONARIAS, AUTOMACAO, SUPRIMENTO DE INFORMATICA, GRAFICA, EMBALAGEM E DESCARTAVEL, MATERIAL DE LIMPEZA, MATERIAL DE ESCRITORIO, MATERIAL HOSPITALAR, PAPELARIA, COOPERATIVA, MAGAZINES, E-COMERCE, REDE DE MAGAZINE, REDE LOJA VAREJISTA, HOSPITAL, LABORATORIO, IND. ALIMENTICIA, IND. DE BEBIDAS, IND. FARMACEUTICA, IND. FRIGORIFICA":
+    da carteira("ramos_2")
+    frequencia de 10 dias
+
+parametros "Ativos dos ramos de atividade IMPLEMENTOS RODOVIARIOS, LOJA DE CONVENIENCIA, FARMACIA DE MANIPULACAO, ACOUGUE, PEIXARIA, HORTIFRUTI, PADARIA E CONFEITARIA, LANCHONETE, PIZZARIA, RESTAURANTE, MATERIAL DE CONSTRUCAO, JOALHERIA, LIVRARIA, FLORICULTURA, ARMARINHOS E MIUDEZAS, COSMETICOS, PERFUMARIA, HIGIENE PESSOAL, CIA DE GAS, ADMINISTRADORA DE CARTOES, ESTACIONAMENTO, HOTEL, INST. DE ENSINO, INST. FINANCEIRA, OFICINA, SHOPPING, ENTRETERIMENTO, IND. AUTOMOBILISTICA, IND. DE CALCADOS, IND. DE COSMETICOS, IND. PAPEL, IND. QUIMICA, IND. TEXTIL, IND. BRINQUEDOS, IND. MANUFATURAS, IND. ELETRONICOS":
+    da carteira("ramos_3")
+    quando recencia de positivacao global em 75 dias
+    frequencia de 28 dias
+
+parametros "Inativos dos ramos de atividade IMPLEMENTOS RODOVIARIOS, LOJA DE CONVENIENCIA, FARMACIA DE MANIPULACAO, ACOUGUE, PEIXARIA, HORTIFRUTI, PADARIA E CONFEITARIA, LANCHONETE, PIZZARIA, RESTAURANTE, MATERIAL DE CONSTRUCAO, JOALHERIA, LIVRARIA, FLORICULTURA, ARMARINHOS E MIUDEZAS, COSMETICOS, PERFUMARIA, HIGIENE PESSOAL, CIA DE GAS, ADMINISTRADORA DE CARTOES, ESTACIONAMENTO, HOTEL, INST. DE ENSINO, INST. FINANCEIRA, OFICINA, SHOPPING, ENTRETERIMENTO, IND. AUTOMOBILISTICA, IND. DE CALCADOS, IND. DE COSMETICOS, IND. PAPEL, IND. QUIMICA, IND. TEXTIL, IND. BRINQUEDOS, IND. MANUFATURAS, IND. ELETRONICOS":
+    da carteira("ramos_3")
+    frequencia de 14 dias
+
+parametros "Ativos dos ramos de atividade RECARGA CELULAR, VIDRACARIA, EXPORTACAO DIRETA, EXPORTACAO TRADE, EVENTOS E SHOWS, REPRESENTANTE, PROMOTOR DE VENDA, OUTROS":
+    da carteira("ramos_4")
+    quando recencia de positivacao global em 90 dias
+    frequencia de 28 dias
+
+parametros "Inativos dos ramos de atividade RECARGA CELULAR, VIDRACARIA, EXPORTACAO DIRETA, EXPORTACAO TRADE, EVENTOS E SHOWS, REPRESENTANTE, PROMOTOR DE VENDA, OUTROS":
+    da carteira("ramos_4")
+    frequencia de 14 dias
+
+
+## Regra Catch all
+
+parametros "Clientes que hoje não se enquadraram nas regras padrão":
+    do time("televendas")
+    nao agendar
+

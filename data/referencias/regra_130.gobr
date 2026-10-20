@@ -1,0 +1,55 @@
+
+version 1.0
+
+time "time interno":
+    vendedores todostelevendas
+
+time "time externo":
+    vendedores todosdecampo
+
+### Parametrização time interno
+
+parametros "Regra Padrao da Macropac: Não agendar clientes CPF (Televendas)":
+    do time("time interno")
+    quando pessoa fisica
+    não agendar
+
+parametros "Regra Padrao da Macropac: Frequencia de 7 dias para ativos (Televendas)":
+    do time("time interno")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Macropac: Frequencia de 15 dias para inativos adimplentes (Televendas)":
+    do time("time interno")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 15 dias
+
+parametros "Regra Padrao da Macropac: Não agendar clientes inativos inadimplentes (Televendas)":
+    do time("time interno")
+    quando inativos para o vendedor e inadimplentes
+    não agendar
+
+parametros "Regra Padrao da Macropac: Não agendar clientes sem compra e CPF (Televendas)":
+    do time("time interno")
+    quando sem vendas e pessoa fisica
+    não agendar
+
+parametros "Regra Padrao da Macropac: Frequencia de 20 dias para clientes sem compra e CNPJ (Televendas)":
+    do time("time interno")
+    quando sem vendas e pessoa juridica
+    frequencia de 20 dias
+
+
+### Parametrização time externo
+
+parametros "Regra Padrao da Macropac: Frequencia de 7 dias para clientes ativos (campo)":
+	do time("time externo")
+	quando ativos para o vendedor
+	frequencia de 7 dias
+	fixo
+
+parametros "Regra Padrao da Macropac: Frequencia de 14 dias para clientes inativos (campo)":
+	do time("time externo")
+	frequencia de 15 dias
+	fixo
+    

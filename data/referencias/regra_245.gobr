@@ -1,0 +1,200 @@
+
+#### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-541275164026
+#### Obs.: Em teste!
+version 1.0
+
+
+### TIMES
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+### REGRAS PARA CARTEIRAS DE ROTAS POR CIDADE
+
+carteira livre "rota_todo_dia":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "AMERICANA","ATIBAIA","BOM JESUS DOS PERDOES","CAMPINAS","HORTOLANDIA","INDAIATUBA","ITATIBA",
+        "ITU","JARINU","JUNDIAI","LOUVEIRA","NOVA ODESSA","PAULINIA","SALTO","SUMARE","VALINHOS",
+        "VINHEDO","PORANGABA","TAQUARITUBA"
+    )
+
+carteira livre "rota_segunda":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "CAMPO LIMPO PAULISTA","ARACOIABA DA SERRA","SAO PEDRO","JOANOPOLIS","PINHALZINHO","VARGEM",
+        "AGUAS DE LINDOIA","AMPARO","ITAPIRA","LINDOIA","PEDREIRA","SERRA NEGRA","SOCORRO",
+        "MORUNGABA","BRAGANCA PAULISTA","PIRACAIA","AGUAS DE SANTA BARBARA","ITATINGA"
+    )
+
+carteira livre "rota_terca":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "ARTUR NOGUEIRA","CABREUVA","CAPIVARI","CONCHAL","COSMOPOLIS","ELIAS FAUSTO",
+        "ENGENHEIRO COELHO","ESTIVA GERBI","FRANCISCO MORATO","HOLAMBRA","ITUPEVA",
+        "JAGUARIUNA","MOGI GUACU","MOGI MIRIM","MONTE MOR","SANTO ANTONIO DE POSSE",
+        "CONCHAS","IBIUNA","ITAPETININGA","LEME","MAIRINQUE","MONTE ALEGRE DO SUL",
+        "PIRAJU","SOROCABA","VOTORANTIM","MAIRIPORA","NAZARE PAULISTA",
+        "SALTO DE PIRAPORA","PARANAPANEMA","BRAGANCA PAULISTA","PIRACAIA",
+        "LIMEIRA","PIRACICABA","RIO CLARO","RIO DAS PEDRAS",
+        "SANTA BARBARA DO OESTE","SANTA GERTRUDES","CORDEIROPOLIS","IRACEMAPOLIS"
+    )
+
+carteira livre "rota_quarta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "SOROCABA","VOTORANTIM","CAMPO LIMPO PAULISTA","ARACOIABA DA SERRA","SAO PEDRO",
+        "JOANOPOLIS","PINHALZINHO","VARGEM","AGUAS DE LINDOIA","AMPARO","ITAPIRA",
+        "LINDOIA","PEDREIRA","SERRA NEGRA","SOCORRO","BOITUVA","CERQUILHO",
+        "CESARIO LANGE","IPERO","LARANJAL PAULISTA","PORTO FELIZ","TATUI","TIETE",
+        "VARZEA PAULISTA","AGUAI","AGUAS DE SAO PEDRO","ARARAS","CAPELA DO ALTO",
+        "CERQUEIRA CESAR","ITAI","MANDURI","PIEDADE","PILAR DO SUL",
+        "BRAGANCA PAULISTA","PIRACAIA"
+    )
+
+carteira livre "rota_quinta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "ARTUR NOGUEIRA","CABREUVA","CAPIVARI","CONCHAL","COSMOPOLIS","ELIAS FAUSTO",
+        "ENGENHEIRO COELHO","ESTIVA GERBI","FRANCISCO MORATO","HOLAMBRA","ITUPEVA",
+        "JAGUARIUNA","MOGI GUACU","MOGI MIRIM","MONTE MOR","SANTO ANTONIO DE POSSE",
+        "CONCHAS","IBIUNA","ITAPETININGA","LEME","MAIRINQUE","MONTE ALEGRE DO SUL",
+        "PIRAJU","BRAGANCA PAULISTA","PIRACAIA","ARANDU","AVARE","BOTUCATU",
+        "PEREIRAS","AGUAS DE SANTA BARBARA","ITATINGA"
+    )
+
+carteira livre "rota_sexta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "SOROCABA","VOTORANTIM","MAIRIPORA","NAZARE PAULISTA","SALTO DE PIRAPORA",
+        "PARANAPANEMA","CAMPO LIMPO PAULISTA","ARACOIABA DA SERRA","SAO PEDRO",
+        "BOITUVA","CERQUILHO","CESARIO LANGE","IPERO","LARANJAL PAULISTA",
+        "PORTO FELIZ","TATUI","TIETE","VARZEA PAULISTA","AGUAI",
+        "AGUAS DE SAO PEDRO","ARARAS","CAPELA DO ALTO","CERQUEIRA CESAR",
+        "ITAI","MANDURI","PIEDADE","PILAR DO SUL","LIMEIRA","PIRACICABA",
+        "RIO CLARO","RIO DAS PEDRAS","SANTA BARBARA DO OESTE",
+        "SANTA GERTRUDES","CORDEIROPOLIS","IRACEMAPOLIS"
+    )
+
+
+### PARÂMETROS DE PLANEJAMENTO
+
+## NÃO AGENDAMENTO
+
+parametros "Não agendar Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar sem crédito":
+    do time("televendas")
+    quando nao tem credito
+    nao agendar
+
+parametros "Não agendar clientes com compra em 60d":
+    do time("televendas")
+    quando recencia de positivacao em 60 dias
+    nao agendar
+
+
+## AGENDAMENTO PARA ROTA TODOS OS DIAS
+
+parametros "Com atendimento/venda na semana / Rota: Todos os dias - Agendar para semana seguinte (freq. do hist.)":
+    da carteira("rota_todo_dia")
+    quando recencia de visita na semana
+    frequencia do historico ou no minimo de 7 dias e no maximo de 14 dias
+
+# (D+2)
+parametros "Sem atendimento/venda na semana / Rota: Todos os dias - Agendar para semana corrente (freq. do hist. +2)":
+    da carteira("rota_todo_dia")
+    frequencia do historico mais 2 dias ou no minimo de 3 dias e no maximo de 7 dias
+
+
+## AGENDAMENTO PARA SEGUNDA
+
+parametros "Com atendimento/venda na semana / Rota: Ter / Pref. de agend.: Seg":
+    da carteira("rota_terca")
+    quando recencia de visita na semana
+    frequencia de 7 dias
+    preferencia maior na segunda
+
+parametros "Sem atendimento/venda na semana / Rota: Ter / Pref. de agend.: Seg":
+    da carteira("rota_terca")
+    frequencia de 7 dias
+    preferencia maior na segunda
+
+
+## AGENDAMENTO PARA TERÇA
+
+parametros "Com atendimento/venda na semana / Rota: Qua / Pref. de agend.: Ter":
+    da carteira("rota_quarta")
+    quando recencia de visita na semana
+    frequencia de 7 dias
+    preferencia maior na terca
+
+parametros "Sem atendimento/venda na semana / Rota: Qua / Pref. de agend.: Ter":
+    da carteira("rota_quarta")
+    frequencia de 7 dias
+    preferencia maior na terca
+
+
+## AGENDAMENTO PARA QUARTA
+
+parametros "Com atendimento/venda na semana / Rota: Qui / Pref. de agend.: Qua":
+    da carteira("rota_quinta")
+    quando recencia de visita na semana
+    frequencia de 7 dias
+    preferencia maior na quarta
+
+parametros "Sem atendimento/venda na semana / Rota: Qui / Pref. de agend.: Qua":
+    da carteira("rota_quinta")
+    frequencia de 7 dias
+    preferencia maior na quarta
+
+
+## AGENDAMENTO PARA QUINTA
+
+parametros "Com atendimento/venda na semana / Rota: Sex / Pref. de agend.: Qui":
+    da carteira("rota_sexta")
+    quando recencia de visita na semana
+    frequencia de 7 dias
+    preferencia maior na quinta
+
+parametros "Sem atendimento/venda na semana / Rota: Sex / Pref. de agend.: Qui":
+    da carteira("rota_sexta")
+    frequencia de 7 dias
+    preferencia maior na quinta
+
+
+## AGENDAMENTO PARA SEXTA
+
+parametros "Com atendimento/venda na semana / Rota: Seg / Pref. de agend.: Sex":
+    da carteira("rota_segunda")
+    quando recencia de visita na semana
+    frequencia de 7 dias
+    preferencia maior na sexta
+
+parametros "Sem atendimento/venda na semana / Rota: Seg / Pref. de agend.: Sex":
+    da carteira("rota_segunda")
+    frequencia de 7 dias
+    preferencia maior na sexta
+
+
+## DEMAIS CIDADES - NÃO INFORMADAS NAS ROTAS
+
+parametros "Com atendimento/venda na semana - Cidades não informadas nas rotas - Agendar para semana seguinte (freq. do hist.)":
+    do time("televendas")
+    quando recencia de visita na semana
+    frequencia do historico ou no minimo de 7 dias e no maximo de 14 dias
+
+# (D-1)
+parametros "Sem atendimento/venda na semana - Cidades não informadas nas rotas - Agendar para semana corrente (freq. do hist. -1)":
+    do time("televendas")
+    frequencia do historico menos 1 dias ou no minimo de 1 dias e no maximo de 7 dias
+    

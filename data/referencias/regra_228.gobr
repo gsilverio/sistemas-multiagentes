@@ -1,0 +1,43 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8909314048
+version 1.0
+
+#
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+#
+## Parâmetros de atendimento
+
+parametros "Ative este novo cliente!":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 28 dias
+
+parametros "Cliente ativado!":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 21 dias
+
+parametros "Compra com regularidade! (Curva C)":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+        e curva c com a empresa
+    frequencia de 7 dias
+
+parametros "Compra com regularidade! (Curva A e B)":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+    frequencia de 14 dias
+
+parametros "Cliente caminhando para inatividade!":
+    do time("televendas")
+    quando recencia de positivacao entre 91 dias e 180 dias
+    frequencia de 28 dias
+
+parametros "Resgatar cliente inativo!":
+    do time("televendas")
+    frequencia de 45 dias
+    

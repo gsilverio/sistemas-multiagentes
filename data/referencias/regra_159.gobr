@@ -1,0 +1,56 @@
+
+# Card da aplicação: https://3.basecamp.com/3199393/buckets/31233413/todos/7635854033
+version 1.0
+
+time "todos os vendedores":
+    vendedores todos
+
+time "baby":
+    vendedores porid("2095", "2152")
+
+time "pet":
+    vendedores porid("2150", "2151")
+
+# Parâmetros do time "Baby":
+
+parametros "Brasgroup: 45d para clientes Curva C (Segmento Baby)":
+    do time("baby")
+    quando total faturado no ano com a empresa menor que R$ 10000 ou indefinido
+    frequencia de 45 dias
+
+parametros "Brasgroup: 15d para clientes Curva A (Segmento Baby)":
+    do time("baby")
+    quando total faturado no ano com a empresa maior que R$ 30000
+    frequencia de 15 dias
+
+parametros "Brasgroup: 30d para clientes Curva B (Segmento Baby)":
+    do time("baby")
+    frequencia de 30 dias
+
+# Parâmetros do time "Pet":
+
+parametros "Brasgroup: 45d para clientes Curva C (Segmento Pet)":
+    do time("pet")
+    quando total faturado no ano com a empresa menor que R$ 5000 ou indefinido
+    frequencia de 45 dias
+
+parametros "Brasgroup: 15d para clientes Curva A (Segmento Pet)":
+    do time("pet")
+    quando total faturado no ano com a empresa maior que R$ 20000
+    frequencia de 15 dias
+
+parametros "Brasgroup: 30d para clientes Curva B (Segmento Pet)":
+    do time("pet")
+    frequencia de 30 dias
+    
+## regras default para todos os vendedores
+
+parametros "Regra Padrao do goVendas: Frequencia semanal para clientes ativos":
+    do time("todos os vendedores")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Regra Padrao do goVendas: Frequencia quinzenal para clientes inativos":
+    do time("todos os vendedores")
+    frequencia de 15 dias
+

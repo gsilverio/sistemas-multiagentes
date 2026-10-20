@@ -1,0 +1,37 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8276594666
+version 1.0
+
+## Definição de times:
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de agendamento:
+
+parametros "Freq. de 7d para clientes sem compra em 60d":
+    do time("televendas")
+    quando fora da recencia de positivacao em 60 dias
+    frequencia de 7 dias
+
+parametros "Ative um novo cliente na sua carteira":
+    do time("televendas")
+    quando sem venda do vendedor
+    frequencia de 7 dias
+
+parametros "Estabeleça relacionamento com seu novo cliente":
+    do time("televendas")
+    quando unica compra com o vendedor
+        e fora da recencia de positivacao em 7 dias
+    frequencia de 7 dias
+
+parametros "Cliente que tem uma alta frequência de compra com você!":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia do historico ou no maximo de 30 dias
+
+parametros "Estimule a regularidade de compra do seu cliente, pois ele está sem pedido há mais de 30 dias!":
+    do time("televendas")
+    quando fora da recencia de positivacao entre 31 dias e 60 dias
+    frequencia de 7 dias
+    

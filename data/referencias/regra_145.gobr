@@ -1,0 +1,82 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7359366073
+version 1.0
+
+#---
+
+## Definição de times
+
+time "empresa toda":
+    vendedores todos ativados
+
+#---
+
+## Regras de não agendamento
+
+parametros "Não agendar Filiais":
+    do time("empresa toda")
+    quando e o cliente filial
+    nao agendar
+
+#---
+
+## Regras de agendamento
+
+# Regra 1 - "Ativação de Prospects";
+
+parametros "Freq. de 10d para 'Ativação de Prospects'":
+    do time("empresa toda")
+    quando pessoa juridica
+        e no ciclo de vida prospect com o vendedor
+    frequencia de 10 dias
+
+# Regra 2 - "Primeira compra" (Indústria e Revenda);
+
+parametros "Freq. de 14d para 'Primeira compra' (Indústria)":
+    do time("empresa toda")
+    quando pessoa juridica
+        e sem venda do vendedor
+        e ramo de atividade igual("2")
+    frequencia de 14 dias
+
+parametros "Freq. de 7d para 'Primeira compra' (Revenda)":
+    do time("empresa toda")
+    quando pessoa juridica
+        e sem venda do vendedor
+        e ramo de atividade igual("1")
+    frequencia de 7 dias
+
+# Regra 3 - "Estimular a regularidade de compra";
+
+parametros "Freq. de 14d para 'Estimular a regularidade de compra'":
+    do time("empresa toda")
+    quando pessoa juridica
+        e adimplentes
+        e recencia de positivacao do vendedor entre 31 dias e 60 dias
+    frequencia de 14 dias
+
+# Regra 4 - "Compra regularmente";
+
+parametros "Freq. de 21d para 'Compra regularmente'":
+    do time("empresa toda")
+    quando pessoa juridica
+        e adimplentes
+        e atividade do vendedor de 30 dias
+    frequencia de 21 dias
+
+# Regra 5 - "Risco de inatividade";
+
+parametros "Freq. de 7d para 'Risco de inatividade'":
+    do time("empresa toda")
+    quando pessoa juridica
+        e adimplentes
+        e recencia de positivacao do vendedor entre 61 dias e 90 dias
+    frequencia de 7 dias
+
+# Regra 6 - "Resgate de clientes sem compra" (Inativos);
+
+parametros "Freq. de 21d para 'Resgate de clientes sem compra'":
+    do time("empresa toda")
+    quando pessoa juridica
+    frequencia de 21 dias
+    

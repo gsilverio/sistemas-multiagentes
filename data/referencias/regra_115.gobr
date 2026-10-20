@@ -1,0 +1,18 @@
+
+version 1.0
+
+time "time atacado":
+    vendedores porid("510","617","596")
+
+time "time salmao":
+    vendedores porid("613","614","568")
+
+## Parametros televendas
+parametros "Regra Padrao da Frigoforte: 7 dias para atacado (televendas)":
+    do time("time atacado")
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Frigoforte: 2 dias para salmao (televendas)":
+    do time("time salmao")
+    frequencia de 2 dias
+

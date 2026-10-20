@@ -1,0 +1,83 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7859898850
+version 1.0
+
+## Definição de times:
+
+time "televendas":
+    vendedores todostelevendas
+
+## Regras de não agendamento:
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar Baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+## Regras de agendamento:
+
+parametros "Freq. de 14d para 'Prospect: Cliente potencial'":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para 'Ativado: fez um pedido e ainda não comprou mais'":
+    do time("televendas")
+    quando unica compra com o vendedor
+        e cadastrado faz 60 dias
+    frequencia de 21 dias
+
+parametros "Freq. do histórico para 'Ativo: Alta frequência de compra'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor em 30 dias
+        e frequencia historica menor que 14 dias
+    frequencia do histórico ou no mínimo de 10 dias e no máximo de 14 dias
+
+parametros "Freq. do histórico para 'Ativo: compra regularmente'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor em 60 dias
+        e frequencia historica menor que 30 dias
+        e ramo de atividade igual("9", "18")
+    frequencia do histórico ou no mínimo de 14 dias e no máximo de 21 dias
+
+parametros "Freq. de 28d para 'Ativo: compra regularmente'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor em 60 dias
+        e frequencia historica menor que 30 dias
+        e ramo de atividade diferente("9", "18")
+    frequencia de 28 dias
+
+parametros "Freq. de 14d para 'Ativo: estimular a regularidade de compra'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor entre 21 dias e 60 dias
+        e ramo de atividade igual("9", "18")
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para 'Ativo: estimular a regularidade de compra'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor entre 21 dias e 60 dias
+        e ramo de atividade diferente("9", "18")
+    frequencia de 21 dias
+
+parametros "Freq. de 14d para 'Em ruptura: risco de ficar inativo para os ramos 9 e 18'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor entre 61 dias e 90 dias
+        e ramo de atividade igual("9", "18")
+    frequencia de 14 dias
+
+parametros "Freq. de 14d para 'Em ruptura: risco de ficar inativo'":
+    do time("televendas")
+    quando recencia de positivacao do vendedor entre 61 dias e 90 dias
+        e ramo de atividade diferente("9", "18")
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para 'Inativo: reativar cliente sem compra'":
+    do time("televendas")
+    quando fora da recencia de positivacao do vendedor em 90 dias
+    frequencia de 21 dias
+    

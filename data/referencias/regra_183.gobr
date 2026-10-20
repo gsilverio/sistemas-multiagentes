@@ -1,0 +1,45 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7641730946
+version 1.0
+
+time "televendas":
+    vendedores porid("522","353","519","520","523")
+
+## Regras de não agendamento:
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+## Regras de agendamento:
+
+parametros "Freq. de 21d para prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 21 dias
+
+parametros "Freq. do histórico para 'Alta frequência de compra'":
+    do time("televendas")
+    quando ativos para o vendedor
+        e frequencia historica menor que 30 dias
+    frequencia do historico ou no minimo de 5 dias e no maximo de 30 dias
+
+parametros "Freq. de 14d para 'Compra regularmente' (Sem pedido em 30d)":
+    do time("televendas")
+    quando ativos para o vendedor
+        e frequencia historica maior que 30 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 14d para 'Compra regularmente' (Com pedido em 30d)":
+    do time("televendas")
+    quando ativos para o vendedor
+        e frequencia historica maior que 30 dias
+        e atividade do vendedor de 30 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 21 para inativos":
+    do time("televendas")
+    quando no ciclo de vida inativo com a empresa
+    frequencia de 21 dias
+    

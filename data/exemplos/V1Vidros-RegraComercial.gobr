@@ -1,0 +1,39 @@
+### TIMES
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+## BLOQUEIOS
+############
+
+parametros "Nao agendar baixados receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+
+## REGRAS DE PARAMETRIZAÇÕES
+############################
+
+parametros "Clientes Ativos":
+    do time ("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia de 14 dias
+
+
+parametros "Risco de Inatividade":
+    do time ("televendas")
+    quando recencia de positivacao em 45 dias
+    e fora da recencia de positivacao em 30 dias
+    frequencia de 7 dias
+
+parametros "Inativos":
+    do time ("televendas")
+    quando fora da recencia de positivacao em 45 dias
+    frequencia de 14 dias
+
+parametros "Clientes Prospects":
+    do time ("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 7 dias

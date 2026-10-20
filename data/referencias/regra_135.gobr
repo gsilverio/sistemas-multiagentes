@@ -1,0 +1,320 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/CS-83?focusedCommentId=23820&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel&sourceType=mention#comment-23820
+version 1.0
+
+
+# -------------------------
+# Definição de Times
+# -------------------------
+
+time "televendas_1":
+    vendedores todostelevendas ativados menos("0000002")
+
+time "televendas_2":
+    vendedores porid("0000002")
+
+
+# -------------------------
+# Carteiras da Camila (Rotas)
+# -------------------------
+
+carteira livre "segunda_feira_televendas_2":
+   clientes carteirafixa("televendas_2")
+   quando nome da cidade igual("AGUAS DE SAO PEDRO","AMERICANA","ARARAS","CHARQUEADA","CORDEIROPOLIS","Cordeirópolis","IPEUNA","IRACEMAPOLIS","Iracemápolis","PIRACICABA","RIO CLARO","RIO DAS PEDRAS","SANTA BARBARA D OESTE","SANTA BÁRBARA D'OESTE","SANTA GERTRUDES","SAO PEDRO")
+
+carteira livre "terca_feira_televendas_2":
+   clientes carteirafixa("televendas_2")
+   quando nome da cidade igual("AMERICO BRASILIENSE","ARARAQUARA","BARRINHA","CRAVINHOS","DESCALVADO","GUARIBA","IBATE","JABOTICABAL","LEME","MATAO","MONTE ALTO","PIRASSUNUNGA","PONTAL","PORTO FERREIRA","RIBEIRAO PRETO","SANTA CRUZ DAS PALMEIRAS","SANTA RITA DO PASSA QUATRO","SAO CARLOS","SERRANA","SERTAOZINHO","TAQUARITINGA")
+
+carteira livre "quarta_feira_televendas_2":
+   clientes carteirafixa("televendas_2")
+   quando nome da cidade igual("AGUAI","AGUAS DE LINDOIA","AMPARO","ANDRADAS","ARTUR NOGUEIRA","ENGENHEIRO COELHO","ESPIRITO SANTO DO PINHAL","HOLAMBRA","ITAPIRA","JACUTINGA","JAGUARIUNA","LINDOIA","MOGI GUACU","MOGI MIRIM","MONTE ALEGRE DO SUL","MONTE SIAO","OURO FINO","PEDREIRA","PINHALZINHO","POCOS DE CALDAS","SAO JOAO DA BOA VISTA","SERRA NEGRA","SOCORRO")
+
+carteira livre "quinta_feira_televendas_2":
+   clientes carteirafixa("televendas_2")
+   quando nome da cidade igual("ALUMINIO","ARACOIABA DA SERRA","BOITUVA","CERQUILHO","COTIA","IBIUNA","INDAIATUBA","IPERO","ITAPETININGA","ITAPEVI","ITU","MAIRINQUE","MONTE MOR","PORTO FELIZ","SALTO","SAO ROQUE","SOROCABA","TATUI","TIETE","VARGEM GRANDE PAULISTA","VOTORANTIM")
+
+carteira livre "sexta_feira_televendas_2":
+   clientes carteirafixa("televendas_2")
+   quando nome da cidade igual("ATIBAIA","BRAGANCA PAULISTA","CAMPINAS","CAMPO LIMPO PAULISTA","COSMOPOLIS","HORTOLANDIA","ITATIBA","JUNDIAI","LOUVEIRA","NOVA ODESSA","PAULINIA","SUMARE","VALINHOS","VARZEA PAULISTA","VINHEDO")
+
+carteira livre "irrestrito_televendas_2":
+    clientes carteirafixa("televendas_2")
+    quando nome da cidade igual("ARUJA","BARUERI","CAIEIRAS","CAJAMAR","CARAPICUIBA","DIADEMA","EMBU DAS ARTES","FERRAZ DE VASCONCELOS","FRANCISCO MORATO","FRANCO DA ROCHA","GUARULHOS","ITAQUAQUECETUBA","JANDIRA","MAIRIPORA","MAUA","MOGI DAS CRUZES","OSASCO","POA","RIBEIRAO PIRES","SANTANA DE PARNAIBA","SANTO ANDRE","SAO BERNARDO DO CAMPO","SAO CAETANO DO SUL","SAO PAULO","SUZANO")
+
+
+# -------------------------
+# Parametrização (Perfil + Rota)
+# -------------------------
+
+parametros "Prospects Segunda":
+    da carteira("segunda_feira_televendas_2")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia semanal()
+    preferencia na sexta
+
+parametros "Alta Frequencia Segunda":
+    da carteira("segunda_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 30 dias
+    frequencia semanal()
+    preferencia na sexta
+
+parametros "Regularidade Segunda":
+    da carteira("segunda_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 45 dias
+    frequencia semanal()
+    preferencia na sexta
+
+parametros "Risco Inatividade Segunda":
+    da carteira("segunda_feira_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+    frequencia semanal()
+    preferencia na sexta
+
+parametros "Inativos Segunda":
+    da carteira("segunda_feira_televendas_2")
+    quando fora da recencia de positivacao em 180 dias
+    frequencia semanal()
+    preferencia na sexta
+
+parametros "Sem Regra Segunda":
+    da carteira("segunda_feira_televendas_2")
+    frequencia semanal()
+    preferencia na sexta
+    
+    
+# Terça
+parametros "Prospects Terca":
+    da carteira("terca_feira_televendas_2")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia semanal()
+    preferencia na segunda
+
+parametros "Alta Frequencia Terca":
+    da carteira("terca_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 30 dias
+    frequencia semanal()
+    preferencia na segunda
+
+parametros "Regularidade Terca":
+    da carteira("terca_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 45 dias
+    frequencia semanal()
+    preferencia na segunda
+
+parametros "Risco Inatividade Terca":
+    da carteira("terca_feira_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+    frequencia semanal()
+    preferencia na segunda
+
+parametros "Inativos Terca":
+    da carteira("terca_feira_televendas_2")
+    quando fora da recencia de positivacao em 180 dias
+    frequencia semanal()
+    preferencia na segunda
+
+parametros "Sem Regra Terca":
+    da carteira("terca_feira_televendas_2")
+    frequencia semanal()
+    preferencia na segunda
+
+
+# Quarta
+parametros "Prospects Quarta":
+    da carteira("quarta_feira_televendas_2")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia semanal()
+    preferencia na terca
+
+parametros "Alta Frequencia Quarta":
+    da carteira("quarta_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 30 dias
+    frequencia semanal()
+    preferencia na terca
+
+parametros "Regularidade Quarta":
+    da carteira("quarta_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 45 dias
+    frequencia semanal()
+    preferencia na terca
+
+parametros "Risco Inatividade Quarta":
+    da carteira("quarta_feira_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+    frequencia semanal()
+    preferencia na terca
+
+parametros "Inativos Quarta":
+    da carteira("quarta_feira_televendas_2")
+    quando fora da recencia de positivacao em 180 dias
+    frequencia semanal()
+    preferencia na terca
+
+parametros "Sem Regra Quarta":
+    da carteira("quarta_feira_televendas_2")
+    frequencia semanal()
+    preferencia na terca
+
+
+# Quinta
+parametros "Prospects Quinta":
+    da carteira("quinta_feira_televendas_2")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia semanal()
+    preferencia na quarta
+
+parametros "Alta Frequencia Quinta":
+    da carteira("quinta_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 30 dias
+    frequencia semanal()
+    preferencia na quarta
+
+parametros "Regularidade Quinta":
+    da carteira("quinta_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 45 dias
+    frequencia semanal()
+    preferencia na quarta
+
+parametros "Risco Inatividade Quinta":
+    da carteira("quinta_feira_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+    frequencia semanal()
+    preferencia na quarta
+
+parametros "Inativos Quinta":
+    da carteira("quinta_feira_televendas_2")
+    quando fora da recencia de positivacao em 180 dias
+    frequencia semanal()
+    preferencia na quarta
+
+parametros "Sem Regra Quinta":
+    da carteira("quinta_feira_televendas_2")
+    frequencia semanal()
+    preferencia na quarta
+
+
+# Sexta
+parametros "Prospects Sexta":
+    da carteira("sexta_feira_televendas_2")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia semanal()
+    preferencia na quinta
+
+parametros "Alta Frequencia Sexta":
+    da carteira("sexta_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 30 dias
+    frequencia semanal()
+    preferencia na quinta
+
+parametros "Regularidade Sexta":
+    da carteira("sexta_feira_televendas_2")
+    quando recencia de positivacao do vendedor em 45 dias
+    frequencia semanal()
+    preferencia na quinta
+
+parametros "Risco Inatividade Sexta":
+    da carteira("sexta_feira_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+    frequencia semanal()
+    preferencia na quinta
+
+parametros "Inativos Sexta":
+    da carteira("sexta_feira_televendas_2")
+    quando fora da recencia de positivacao em 180 dias
+    frequencia semanal()
+    preferencia na quinta
+
+parametros "Sem Regra Sexta":
+    da carteira("sexta_feira_televendas_2")
+    frequencia semanal()
+    preferencia na quinta
+    
+## Irrestrito
+
+parametros "Irrestrito: Clientes prospects":
+    da carteira("irrestrito_televendas_2")
+    quando no ciclo de vida prospect com o vendedor 
+    frequencia semanal()
+
+parametros "Irrestrito: Clientes com Alta Freq. de compra":
+    da carteira("irrestrito_televendas_2")
+    quando recencia de positivacao em 7 dias
+    frequencia de 7 dias
+
+parametros "Irrestrito: Clientes que compram com regularidade":
+    da carteira("irrestrito_televendas_2")
+    quando recencia de positivacao em 45 dias
+    frequencia de 14 dias
+
+parametros "Irrestrito: Risco de ficar inativo curva A":
+    da carteira("irrestrito_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+           e curva a com a empresa
+    frequencia de 14 dias
+
+parametros "Irrestrito: Risco de ficar inativo curva B":
+    da carteira("irrestrito_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+           e curva b com a empresa
+    frequencia de 30 dias
+
+parametros "Irrestrito: Risco de ficar inativo curva C":
+    da carteira("irrestrito_televendas_2")
+    quando fora da recencia de positivacao global em 120 dias
+           e curva c com a empresa
+    frequencia de 30 dias
+
+parametros "Irrestrito: Clientes inativos":
+    da carteira("irrestrito_televendas_2")
+    quando fora da recencia de positivacao em 180 dias
+    frequencia de 21 dias
+    
+parametros "cidade SÃO JOSE DO RIO PRETO - 30 dias":
+    do time("televendas_2")
+    quando nome da cidade igual("SAO JOSE DO RIO PRETO")
+    frequencia de 30 dias
+
+parametros "Irrestrito: sem regra mapeada":
+    do time("televendas_2")
+    frequencia de 30 dias
+
+
+# -------------------------
+# Regras atuais para demais vendedores
+# -------------------------
+
+parametros "Freq. de 14d para Prospects":
+    do time("televendas_1")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Ativos - recência 1 a 7 dias":
+    do time("televendas_1")
+    quando recencia de positivacao em 7 dias
+    frequencia de 21 dias
+
+parametros "Ativos - recência 8 a 30 dias":
+    do time("televendas_1")
+    quando recencia de positivacao em 30 dias
+    frequencia de 30 dias
+
+parametros "Ativos - recência 31 a 60 dias":
+    do time("televendas_1")
+    quando recencia de positivacao em 60 dias
+    frequencia de 45 dias
+
+parametros "Ativos - recência 61 a 90 dias":
+    do time("televendas_1")
+    quando recencia de positivacao em 90 dias
+    frequencia de 70 dias
+
+parametros "Ativos - recência 91 a 180 dias":
+    do time("televendas_1")
+    quando recencia de positivacao em 180 dias
+    frequencia de 15 dias
+
+parametros "Inativos - sem compra acima de 180 dias":
+    do time("televendas_1")
+    frequencia de 21 dias
+    

@@ -1,0 +1,68 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9548242112/list-270761555428/task-542415248107
+version 1.0
+
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+## Parâmetros de não agendamento
+
+parametros "Não agendar clientes baixados na receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar clientes com data da rota na semana":
+    do time ("televendas")
+    quando data da rota na semana
+    nao agendar
+
+
+## Parâmetros de agendamento
+
+parametros "Clientes prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Clientes ativos":
+    do time("televendas")
+    quando recencia de positivacao em 60 dias
+    frequencia de 14 dias
+
+parametros "Risco de inatividade":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+    frequencia de 7 dias
+
+parametros "Inativos (90 dias)":
+    do time("televendas")
+    quando recencia de positivacao em 120 dias
+    frequencia de 14 dias
+
+parametros "Inativos (120 dias)":
+    do time("televendas")
+    quando recencia de positivacao em 150 dias
+    frequencia de 21 dias
+
+parametros "Inativos (150 dias)":
+    do time("televendas")
+    quando recencia de positivacao em 180 dias
+    frequencia de 28 dias
+
+
+## REGRA FALLBACK
+
+parametros "Clientes que não se enquadraram nas regras padrão":
+    do time("televendas")
+    nao agendar
+    

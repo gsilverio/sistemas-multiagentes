@@ -1,0 +1,30 @@
+
+# Card: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6888246016
+version 1.0
+
+time "todos":
+    vendedores todos ativados
+
+# Regras de não agendamento:
+
+parametros "Boa Praça: Não agendar clientes inadimplentes":
+    do time("todos")
+    quando inadimplentes
+    nao agendar
+
+parametros "Boa Praça: Não agendar clientes filial":
+    do time("todos")
+    quando é o cliente filial
+    nao agendar
+
+# Regras de agendamento:
+
+parametros "Boa Praça: Freq. de 7 dias para clientes ativos":
+    do time("todos")
+    quando ativos para o vendedor 
+    frequencia de 7 dias
+    
+parametros "Boa Praça: Freq. de 14 dias para clientes inativos":
+    do time("todos")
+    frequencia de 14 dias
+    

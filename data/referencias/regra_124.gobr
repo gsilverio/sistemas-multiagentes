@@ -1,0 +1,43 @@
+
+version 1.0
+
+time "time campo":
+    vendedores todosdecampo
+
+time "time televendas":
+    vendedores todostelevendas
+
+## TIME EXTERNO
+parametros "Regra Padrao da Roda Viva: 30 dias para todos os clientes (time externo)":
+    do time("time campo")
+    frequencia de 30 dias
+    
+## TIME INTERNO
+parametros "Regra Padrao da Roda Viva: 25 dias para clientes ativos (televendas)":
+    do time("time televendas")
+    quando ativos para o vendedor
+    frequencia de 25 dias
+    preferencia nos dias uteis
+    sem choque no time("time campo")
+    
+parametros "Regra Padrao da Roda Viva: 25 dias para clientes inativos adimplentes (televendas)":
+    do time("time televendas")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 25 dias
+    preferencia nos dias uteis
+    sem choque no time("time campo")
+    
+parametros "Regra Padrao da Roda Viva: 25 dias para clientes inativos inadimplentes (televendas)":
+    do time("time televendas")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 25 dias
+    preferencia nos dias uteis
+    sem choque no time("time campo")
+    
+parametros "Regra Padrao da Roda Viva: 25 dias para clientes sem vendas (televendas)":
+    do time("time televendas")
+    quando sem vendas
+    frequencia de 25 dias
+    preferencia nos dias uteis
+    sem choque no time("time campo")
+    

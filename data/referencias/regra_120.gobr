@@ -1,0 +1,107 @@
+
+version 1.0
+
+time "Yasmim":
+    vendedores porid("12")
+
+time "televendas":
+    vendedores todostelevendas menos("12")
+    
+time "interior":
+    vendedores porid("2", "3", "12")
+    
+time "capital":
+    vendedores porid("5", "17", "18")
+    
+carteira "televendas":
+    clientes carteirafixa("televendas")
+
+carteira "interior":
+    clientes carteirafixa("interior")
+    
+carteira "capital":
+    clientes carteirafixa("capital")
+    
+### Regras para televendas
+parametros "Regra Padrao da IdealPet: Nao agendar clientes de carteira propria para RCA 12":
+    do time("Yasmim")
+    nao agendar
+    
+parametros "Regra Padrao da IdealPet - Customizavel: 14 dias para clientes ativos (televendas)":
+    da carteira("televendas")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdealPet - Customizavel: 30 dias para clientes inativos (televendas)":
+    da carteira("televendas")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdealPet - Customizavel: 7 dias para clientes sem venda (televendas)":
+    da carteira("televendas")
+    quando sem venda
+    frequencia de 7 dias
+    preferencia nos dias uteis
+    
+## Regras Capital
+parametros "Regra Padrao da IdelPet - Customizavel: 20 dias para clientes ativos adimplentes (capital)":
+    da carteira("capital")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 20 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdelPet - Customizavel: 20 dias para clientes ativos inadimplentes (capital)":
+    da carteira("capital")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 20 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdelPet - Customizavel: 30 dias para clientes inativos adimplentes (capital)":
+    da carteira("capital")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdelPet - Customizavel: 14 dias para clientes sem venda (capital)":
+    da carteira("capital")
+    quando sem venda
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdelPet - Customizavel: 30 dias para clientes inativos inadimplentes (capital)":
+    da carteira("capital")
+    quando inativos para o vendedor e inadimplentes
+    não agendar
+    
+### Regras para interior
+parametros "Regra Padrao da IdealPet - Customizavel: 21 dias para clientes ativos (interior)":
+    da carteira("interior")
+    quando ativos para o vendedor
+    frequencia de 21 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdealPet - Customizavel: 21 dias para clientes inativos adimplentes (interior)":
+    da carteira("interior")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 21 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdealPet - Customizavel: 30 dias para clientes inativos inadimplentes (interior)":
+    da carteira("interior")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 42 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdealPet - Customizavel: 38 dias para clientes sem venda (interior)":
+    da carteira("interior")
+    quando sem venda
+    frequencia de 38 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da IdealPet - Customizavel: clientes inativos inadimplentes (interior)":
+    da carteira("interior")
+    quando inativos para o vendedor e inadimplentes
+    não agendar
+    

@@ -1,0 +1,71 @@
+
+version 1.0
+
+time "televenda":
+    vendedores todostelevendas
+    
+time "campo":
+    vendedores todosdecampo
+
+carteira "carteira televendas":
+    clientes carteirafixa("televenda")
+    
+carteira "carteira campo":
+    clientes carteirafixa("campo")
+
+###########################################
+### Parametros televendas 
+
+parametros "Regra Padrao da Royal Pet - Customizavel: Frequencia de 7 dias para ativos adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Royal Pet -  Customizavel: Frequencia de 14 dias para ativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Royal Pet - Customizavel: Frequencia de 14 dias para inativos adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Royal Pet - Customizavel: Não agendar inativos inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Royal Pet - Customizavel: Frequencia de 14 dias para clientes sem vendas (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 14 dias
+    
+###########################################
+### Parametros campo 
+
+parametros "Regra Padrao da Royal Pet - Customizavel: Frequencia de 7 dias para ativos adimplentes (campo)":
+    da carteira("carteira campo")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Royal Pet -  Customizavel: Frequencia de 14 dias para ativos inadimplentes (campo)":
+    da carteira("carteira campo")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Royal Pet - Customizavel: Frequencia de 14 dias para inativos adimplentes (campo)":
+    da carteira("carteira campo")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Royal Pet - Customizavel: Frequencia de 30 dias para inativos adimplentes (campo)":
+    da carteira("carteira campo")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+
+parametros "Regra Padrao da Royal Pet - Customizavel: Frequencia de 14 dias para clientes sem vendas (campo)":
+    da carteira("carteira campo")
+    quando sem venda
+    frequencia de 14 dias
+    

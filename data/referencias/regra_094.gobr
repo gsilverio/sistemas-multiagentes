@@ -1,0 +1,34 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+
+time "time campo":
+    vendedores todosdecampo
+
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+    
+carteira "carteira campo":
+    clientes carteirafixa("time campo")
+
+parametros "Regra Padrao da AHL Customizavel: 30 dias para clientes adimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando adimplentes
+    frequencia de 30 dias
+
+parametros "Regra Padrao da AHL Customizavel: 60 dias para clientes inadimplentes (televendas)":
+    da carteira("carteira televendas")
+    quando inadimplentes
+    frequencia de 60 dias
+
+parametros "Regra Padrao da AHL Customizavel: 30 dias para clientes sem venda (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 30 dias
+    
+parametros "Regra Padrao da AHL Customizavel: 30 dias para todos os clientes (campo)":
+    da carteira("carteira campo")
+    frequencia de 30 dias
+    

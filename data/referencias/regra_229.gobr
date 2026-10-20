@@ -1,0 +1,37 @@
+
+### Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8241114953
+version 1.0
+
+## Definição de times
+
+time "farm":
+    vendedores porid("3","4","8","9","10","12","16")
+
+## Regras de não agendamento
+
+parametros "Não agendar clientes com compra em 30 dias":
+    do time("farm")
+    quando recencia de positivacao em 30 dias
+    nao agendar
+
+## Regras de agendamento
+
+parametros "Este cliente nunca comprou de você. Faz sentido ele ficar na sua carteira? Ele é perfil? Você tem interesse em ativá-lo? Se sim, execute o atendimento!":
+    do time("farm")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+parametros "Mantenha este cliente com cobertura mensal de positivação - Ele está entre 31 e 60 dias sem compra!":
+    do time("farm")
+    quando fora da recencia de positivacao entre 31 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Este cliente está caminhando para inatividade - Ele está entre 61 e 90 dias sem compra!":
+    do time("farm")
+    quando fora da recencia de positivacao entre 61 dias e 90 dias
+    frequencia de 21 dias
+
+parametros "Este cliente já não tem fidelidade com a sua empresa - Ele está há mais de 90 dias sem compra!":
+    do time("farm")
+    frequencia de 28 dias
+    

@@ -1,0 +1,43 @@
+
+# Regras para Milenium
+version 1.0
+
+# Todos os vendedores ativos, menos a vendedora Sandra
+time "empresa toda":
+    vendedores todos menos("945")
+    
+time "sandra":
+    vendedores porid("945")
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+    
+carteira "carteira sandra":
+    clientes carteirafixa("sandra")
+
+parametros "Regra Padrao da Empresa Customizavel: frequencia semanal para clientes da sandra":
+    da carteira("carteira sandra")
+    frequencia semanal()
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Empresa Customisavel: 30 dias para clientes inativos inadimplentes":
+    da carteira("empresa toda")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customisavel: 7 dias para clientes inativos adiplentes":
+    da carteira("empresa toda")
+    quando inativos para o vendedor
+    frequencia de 7 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Empresa Customisavel: 14 dias para clientes ativos ou adimplentes ou sem venda":
+    da carteira("empresa toda")
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+    
+
+
+

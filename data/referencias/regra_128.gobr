@@ -1,0 +1,256 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-572279404795
+version 1.0
+
+
+## Definição de times
+
+# televendas
+
+time "tmk_1":
+    vendedores porid("291")
+
+time "tmk_2":
+    vendedores porid("292")
+
+time "tmk_3":
+    vendedores porid("294")
+
+time "tmk_5":
+    vendedores porid("375")
+
+time "tmk_6":
+    vendedores porid("900")
+
+time "tmk_7":
+    vendedores porid("901")
+
+# externos
+
+time "ext_niteroi_rio2":
+    vendedores porid("283", "279")
+
+time "ext_lagos_norte":
+    vendedores porid("286", "284")
+
+time "ext_baixada1_baixada3":
+    vendedores porid("275", "277")
+
+time "ext_rio1_rio3":
+    vendedores porid("278", "280")
+
+time "ext_sulflu1_sulflu2":
+    vendedores porid("273", "274")
+
+time "ext_serrana_baixada2":
+    vendedores porid("282", "276")
+
+
+## Definição de segmentações (Para configurar planejamento de ruptura)
+
+segmentacao "ext_niteroi_rio2_para_tmk1":
+    clientes carteirafixa("ext_niteroi_rio2")
+
+segmentacao "ext_lagos_norte_para_tmk2":
+    clientes carteirafixa("ext_lagos_norte")
+
+segmentacao "ext_baixada1_baixada3_para_tmk3":
+    clientes carteirafixa("ext_baixada1_baixada3")
+
+segmentacao "ext_rio1_rio3_para_tmk5":
+    clientes carteirafixa("ext_rio1_rio3")
+
+segmentacao "ext_sulflu1_sulflu2_para_tmk6":
+    clientes carteirafixa("ext_sulflu1_sulflu2")
+
+segmentacao "ext_serrana_baixada2_para_tmk7":
+    clientes carteirafixa("ext_serrana_baixada2")
+
+
+## Parâmetros iniciais de não agendamento
+
+parametros "Não agendar clientes baixados na receita":
+    do time("tmk_1","tmk_2","tmk_3","tmk_5","tmk_6","tmk_7")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+
+## Parâmetros para segmentações (Ruptura / externos para internos)
+
+parametros "Prospects / Ext. Niteroi (283) e Rio 2 (279) para Tmk 1 (291)":
+    do time("tmk_1")
+    quando contido na segmentacao("ext_niteroi_rio2_para_tmk1")
+        e no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos (A partir do dia 20 de cada mês) / Ext. Niteroi (283) e Rio 2 (279) para Tmk 1 (291)":
+    do time("tmk_1")
+    a partir do dia 16
+    quando contido na segmentacao("ext_niteroi_rio2_para_tmk1")
+        e recencia de positivacao global em 60 dias
+    frequencia de 5 dias
+
+parametros "Retenção / Ext. Niteroi (283) e Rio 2 (279) para Tmk 1 (291)":
+    do time("tmk_1")
+    quando contido na segmentacao("ext_niteroi_rio2_para_tmk1")
+        e recencia de positivacao global em 90 dias
+    frequencia de 7 dias
+
+parametros "Recuperação / Ext. Niteroi (283) e Rio 2 (279) para Tmk 1 (291)":
+    do time("tmk_1")
+    quando contido na segmentacao("ext_niteroi_rio2_para_tmk1")
+    frequencia de 7 dias
+
+parametros "Prospects / Ext. Lagos (286) e Norte (284) para Tmk 2 (292)":
+    do time("tmk_2")
+    quando contido na segmentacao("ext_lagos_norte_para_tmk2")
+        e no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos (A partir do dia 20 de cada mês) / Ext. Lagos (286) e Norte (284) para Tmk 2 (292)":
+    do time("tmk_2")
+    a partir do dia 16
+    quando contido na segmentacao("ext_lagos_norte_para_tmk2")
+        e recencia de positivacao global em 60 dias
+    frequencia de 5 dias
+
+parametros "Retenção / Ext. Lagos (286) e Norte (284) para Tmk 2 (292)":
+    do time("tmk_2")
+    quando contido na segmentacao("ext_lagos_norte_para_tmk2")
+        e recencia de positivacao global em 90 dias
+    frequencia de 7 dias
+
+parametros "Recuperação / Ext. Lagos (286) e Norte (284) para Tmk 2 (292)":
+    do time("tmk_2")
+    quando contido na segmentacao("ext_lagos_norte_para_tmk2")
+    frequencia de 7 dias
+
+parametros "Prospects / Ext. Baixada 1 (275) e Baixada 3 (277) para Tmk 3 (294)":
+    do time("tmk_3")
+    quando contido na segmentacao("ext_baixada1_baixada3_para_tmk3")
+        e no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos (A partir do dia 20 de cada mês) / Ext. Baixada 1 (275) e Baixada 3 (277) para Tmk 3 (294)":
+    do time("tmk_3")
+    a partir do dia 16
+    quando contido na segmentacao("ext_baixada1_baixada3_para_tmk3")
+        e recencia de positivacao global em 60 dias
+    frequencia de 5 dias
+
+parametros "Retenção / Ext. Baixada 1 (275) e Baixada 3 (277) para Tmk 3 (294)":
+    do time("tmk_3")
+    quando contido na segmentacao("ext_baixada1_baixada3_para_tmk3")
+        e recencia de positivacao global em 90 dias
+    frequencia de 7 dias
+
+parametros "Recuperação / Ext. Baixada 1 (275) e Baixada 3 (277) para Tmk 3 (294)":
+    do time("tmk_3")
+    quando contido na segmentacao("ext_baixada1_baixada3_para_tmk3")
+    frequencia de 7 dias
+
+parametros "Prospects / Ext. Rio 1 (278) e Rio 3 (280) para Tmk 5 (375)":
+    do time("tmk_5")
+    quando contido na segmentacao("ext_rio1_rio3_para_tmk5")
+        e no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos (A partir do dia 20 de cada mês) / Ext. Rio 1 (278) e Rio 3 (280) para Tmk 5 (375)":
+    do time("tmk_5")
+    a partir do dia 16
+    quando contido na segmentacao("ext_rio1_rio3_para_tmk5")
+        e recencia de positivacao global em 60 dias
+    frequencia de 5 dias
+
+parametros "Retenção / Ext. Rio 1 (278) e Rio 3 (280) para Tmk 5 (375)":
+    do time("tmk_5")
+    quando contido na segmentacao("ext_rio1_rio3_para_tmk5")
+        e recencia de positivacao global em 90 dias
+    frequencia de 7 dias
+
+parametros "Recuperação / Ext. Rio 1 (278) e Rio 3 (280) para Tmk 5 (375)":
+    do time("tmk_5")
+    quando contido na segmentacao("ext_rio1_rio3_para_tmk5")
+    frequencia de 7 dias
+
+parametros "Prospects / Ext. Sul Flu 1 (273) e Sul Flu 2 (274) para Tmk 6 (900)":
+    do time("tmk_6")
+    quando contido na segmentacao("ext_sulflu1_sulflu2_para_tmk6")
+        e no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos (A partir do dia 20 de cada mês) / Ext. Sul Flu 1 (273) e Sul Flu 2 (274) para Tmk 6 (900)":
+    do time("tmk_6")
+    a partir do dia 16
+    quando contido na segmentacao("ext_sulflu1_sulflu2_para_tmk6")
+        e recencia de positivacao global em 60 dias
+    frequencia de 5 dias
+
+parametros "Retenção / Ext. Sul Flu 1 (273) e Sul Flu 2 (274) para Tmk 6 (900)":
+    do time("tmk_6")
+    quando contido na segmentacao("ext_sulflu1_sulflu2_para_tmk6")
+        e recencia de positivacao global em 90 dias
+    frequencia de 7 dias
+
+parametros "Recuperação / Ext. Sul Flu 1 (273) e Sul Flu 2 (274) para Tmk 6 (900)":
+    do time("tmk_6")
+    quando contido na segmentacao("ext_sulflu1_sulflu2_para_tmk6")
+    frequencia de 7 dias
+
+parametros "Prospects / Ext. Serrana (282) e Baixada 2 (276) para Tmk 7 (901)":
+    do time("tmk_7")
+    quando contido na segmentacao("ext_serrana_baixada2_para_tmk7")
+        e no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos (A partir do dia 20 de cada mês) / Ext. Serrana (282) e Baixada 2 (276) para Tmk 7 (901)":
+    do time("tmk_7")
+    a partir do dia 16
+    quando contido na segmentacao("ext_serrana_baixada2_para_tmk7")
+        e recencia de positivacao global em 60 dias
+    frequencia de 5 dias
+
+parametros "Retenção / Ext. Serrana (282) e Baixada 2 (276) para Tmk 7 (901)":
+    do time("tmk_7")
+    quando contido na segmentacao("ext_serrana_baixada2_para_tmk7")
+        e recencia de positivacao global em 90 dias
+    frequencia de 7 dias
+
+parametros "Recuperação / Ext. Serrana (282) e Baixada 2 (276) para Tmk 7 (901)":
+    do time("tmk_7")
+    quando contido na segmentacao("ext_serrana_baixada2_para_tmk7")
+    frequencia de 7 dias
+
+
+## Parâmetros para clientes somente do televendas
+
+parametros "Prospects / Exclusivo do televendas":
+    do time("tmk_1","tmk_2","tmk_3","tmk_5","tmk_6","tmk_7")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 7 dias
+
+parametros "Ativos / Exclusivo do televendas":
+    do time("tmk_1","tmk_2","tmk_3","tmk_5","tmk_6","tmk_7")
+    quando recencia de positivacao global em 60 dias
+    frequencia de 7 dias
+
+parametros "Retenção / Exclusivo do televendas":
+    do time("tmk_1","tmk_2","tmk_3","tmk_5","tmk_6","tmk_7")
+    quando recencia de positivacao global em 90 dias
+    frequencia de 7 dias
+
+parametros "Recuperação / Exclusivo do televendas":
+    do time("tmk_1","tmk_2","tmk_3","tmk_5","tmk_6","tmk_7")
+    quando nao contido na segmentacao(
+        "ext_niteroi_rio2_para_tmk1","ext_lagos_norte_para_tmk2","ext_baixada1_baixada3_para_tmk3",
+        "ext_rio1_rio3_para_tmk5","ext_sulflu1_sulflu2_para_tmk6","ext_serrana_baixada2_para_tmk7"
+    )
+    frequencia de 7 dias
+
+
+## Parâmetros para regra fallback
+
+parametros "Clientes que hoje não se enquadraram nas regra solicitadas":
+    do time("tmk_1","tmk_2","tmk_3","tmk_5","tmk_6","tmk_7")
+    nao agendar
+    

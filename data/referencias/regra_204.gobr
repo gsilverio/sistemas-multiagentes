@@ -1,0 +1,38 @@
+
+### Solicitação: https://govendas-team.atlassian.net/browse/IMP-257
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+## Regras de não agendamento
+
+parametros "Não agendar clientes com compra em 7d":
+    do time("televendas")
+    quando tem venda em 7 dias
+    nao agendar
+
+## Regras de agendamento
+
+parametros "Manter a Regularidade de Compra":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia de 14 dias
+
+parametros "Garantir a Positivação da Carteira":
+    do time("televendas")
+    quando recencia de positivacao entre 31 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Cliente com Risco de Inatividade":
+    do time("televendas")
+    quando recencia de positivacao entre 61 dias e 90 dias
+    frequencia de 7 dias
+    
+parametros "Clientes Inativos - Frequencia 21 dias":
+    do time("televendas")
+    frequencia de 21 dias
+    

@@ -1,0 +1,35 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas ativados
+    
+#Parametrizacao televendas
+
+parametros "Regra padrão da Ultrax : Frequencia de 15 dias para clientes ativos adimplentes":
+    do time ("time televendas") 
+    quando ativos para o vendedor e adimplentes
+    frequencia de 15 dias
+    
+parametros "Regra padrão da Ultrax: Frequencia de 30 dias para clientes ativos inadimplentes":
+    do time ("time televendas") 
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+    
+parametros "Regra padrão da Ultrax: Frequencia de 7 dias para clientes inativos adimplentes":
+    do time ("time televendas") 
+    quando inativos para o vendedor e adimplentes
+    frequencia de 7 dias
+    
+
+parametros "Regra padrão da Ultrax: Não agendar clientes inativos inadimplentes":
+    do time ("time televendas") 
+    quando inativos para o vendedor e inadimplentes
+    não agendar
+    
+    
+parametros "Regra padrão da Ultrax: Frequencia de 15 dias para clientes sem compra":
+    do time ("time televendas") 
+    quando sem vendas
+    frequencia de 15 dias	
+

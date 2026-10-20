@@ -1,0 +1,80 @@
+
+### Regras para Motor Diesel
+### Última atualização: 2026-09-28
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-570034895215
+version 1.0
+
+## Definição de times
+
+time "fornecedor":
+    vendedores porid("341")
+    
+time "televendas":
+    vendedores porid("203","466","314","291")
+
+time "televendas_2":
+    vendedores porid("132","232","145")
+
+segmentacao "televendas ruptura de fornecedor":
+    clientes ruptura("fornecedor" para "televendas") de positivacao(7 dias) ou prospects
+    quando adimplentes
+    
+carteira "televendas consumidor":
+    clientes carteirafixa("televendas")
+    quando nao tem venda em 7 dias
+           e adimplentes
+           e nao contido na segmentacao("televendas ruptura de fornecedor")
+
+## Definição das regras
+
+parametros "Clientes Prospects":
+    da segmentacao("televendas ruptura de fornecedor")
+    e da carteira("televendas consumidor")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+
+
+parametros "Ativos com compra entre 7d e 30d":
+    da segmentacao("televendas ruptura de fornecedor")
+    e da carteira("televendas consumidor")
+    quando recencia de positivacao global em 30 dias
+    frequencia de 14 dias
+    
+    
+parametros "Ativos com compra entre 30d e 60d":
+    da segmentacao("televendas ruptura de fornecedor")
+    e da carteira("televendas consumidor")
+    quando recencia de positivacao global em 60 dias
+    frequencia de 14 dias
+    
+    
+parametros "Ativos com compra entre 60d e 90d":
+    da segmentacao("televendas ruptura de fornecedor")
+    e da carteira("televendas consumidor")
+    quando recencia de positivacao global em 90 dias
+    frequencia de 14 dias
+    
+parametros "Clientes inativos":
+    da segmentacao("televendas ruptura de fornecedor")
+    e da carteira("televendas consumidor")
+    quando recencia de positivacao global entre 90 dias e 180 dias
+    frequencia de 14 dias
+    
+parametros "Ativos com compra em 7 dias":
+    do time("televendas","televendas_2")
+    quando recencia de positivacao global em 7 dias
+    nao agendar
+
+parametros "Não agendar Inadimplentes":
+    do time("televendas","televendas_2")
+    quando inadimplentes
+    nao agendar
+    
+parametros "Não agendar - choque de agendas":
+    do time("televendas")
+    nao agendar
+
+parametros "Freq. de 14 dias para clientes sem venda em 8 dias":
+    do time("televendas_2")
+    frequencia de 14 dias
+    

@@ -1,0 +1,30 @@
+
+version 1.0
+
+time "time todos":
+    vendedores todos
+
+carteira "carteira todos":
+    clientes carteirafixa("time todos")
+
+### Parametros televendas ###
+
+parametros "Regra Padrao da Gomes - Customizavel: 7 dias para ativos":
+    da carteira("carteira todos")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+    
+parametros "Regra Padrao da Gomes - Customizavel: 14 dias para inativos adimplentes":
+    da carteira("carteira todos")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 14 dias
+    
+parametros "Regra Padrao da Gomes - Customizavel: 30 dias para inativos inadimplentes":
+    da carteira("carteira todos")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+    
+parametros "Regra Padrao da Gomes - Customizavel: 14 dias para sem vendas":
+    da carteira("carteira todos")
+    frequencia de 14 dias
+

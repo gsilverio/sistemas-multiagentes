@@ -1,0 +1,54 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8941545704
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de agendamento
+
+parametros "Base de valor alto":
+    do time("televendas")
+    quando nao tem venda da empresa no ano
+        e com ticket medio maior que R$ 4999
+    frequencia semanal()
+    preferencia na segunda e na sexta
+    fixo
+
+parametros "Base de valor médio":
+    do time("televendas")
+    quando nao tem venda da empresa no ano
+        e com ticket medio menor que R$ 4999
+    frequencia semanal()
+    preferencia na terca e na sexta
+    fixo
+
+parametros "Última compra em 2024":
+    do time("televendas")
+    quando não tem venda da empresa no ano
+        e tem venda da empresa no ano passado
+    frequencia semanal()
+    preferencia na quarta e na quinta
+
+parametros "Ativação de um novo cliente em potencial":
+    do time("televendas")
+    quando sem venda do vendedor
+    frequencia de 7 dias
+
+parametros "Boas vindas a um novo cliente ativado":
+    do time("televendas")
+    quando unica compra com o vendedor
+    frequencia de 7 dias
+
+parametros "Clientes com bom histórico de compra":
+    do time("televendas")
+    quando frequencia historica entre 0 dias e 14 dias
+    frequencia do historico ou no minimo de 4 dias e no maximo de 6 dias
+
+parametros "Atenção!!! Cliente com RISCO de ficar inativo":
+    do time("televendas")
+    quando fora da recencia de positivacao do vendedor entre 25 dias e 30 dias
+    frequencia de 7 dias
+    

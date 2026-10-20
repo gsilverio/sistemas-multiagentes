@@ -1,0 +1,36 @@
+
+# Regras padrão
+version 1.0
+
+time "todos":
+    vendedores todos ativados
+    
+## Regras de não agendamento
+
+parametros "Tropical Color: Não agendar clientes inadimplentes":
+    do time("todos")
+    quando inadimplentes
+    nao agendar
+
+## Regras de agendamento
+
+parametros "Tropical Color: 14 dias para prospects":
+    do time("todos")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 14 dias
+
+parametros "Tropical Color: 10 dias para clientes com apenas 1 compra":
+    do time("todos")
+    quando unica compra com o vendedor
+    frequencia de 10 dias
+
+parametros "Tropical Color: 7 dias para adimplentes/ativos":
+    do time("todos")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Tropical Color: 14 dias para adimplentes/inativos":
+    do time("todos")
+    frequencia de 14 dias
+
+

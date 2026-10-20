@@ -1,0 +1,24 @@
+
+version 1.0
+
+time "empresa toda":
+    vendedores todostelevendas
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Nutri Distribuidora: 30 dias para inativos":
+    da carteira("empresa toda")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+
+parametros "Regra Padrao da Nutri Distribuidora: 14 dias para ativos":
+    da carteira("empresa toda")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Nutri Distribuidora: 7 dias para sem vendas":
+    da carteira("empresa toda")
+    quando sem venda
+    frequencia de 7 dias
+

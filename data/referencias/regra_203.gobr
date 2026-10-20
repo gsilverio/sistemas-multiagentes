@@ -1,0 +1,78 @@
+
+### Solicitação: https://gogeo.proofhub.com/bappswift/#app/todos/project-9580562790/list-270894162472/task-524707004035
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Parâmetros de não agendamento
+
+parametros "Não agendar baixados na receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando cliente filial
+           e id do cliente principal é diferente("36979")
+    nao agendar
+
+parametros "Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar prospects":
+    do time("televendas")
+    quando sem venda
+    nao agendar
+
+parametros "Não agendar clientes sem compra em 95 dias":
+    do time("televendas")
+    quando fora da recencia de positivacao em 95 dias
+    nao agendar
+
+## Parâmetros de agendamento
+
+parametros "Clientes que compraram apenas uma vez":
+    do time("televendas")
+    quando unica compra com a empresa
+    frequencia de 28 dias
+
+parametros "Clientes freq. hist. média de pedidos entre 0 e 7 dias":
+    do time("televendas")
+    quando frequencia historica entre 0 dias e 7 dias
+    frequencia de 6 dias
+
+parametros "Clientes com freq. hist. média de pedidos entre 8 e 14 dias":
+    do time("televendas")
+    quando frequencia historica entre 8 dias e 14 dias
+    frequencia de 9 dias
+
+parametros "Clientes com freq. hist. média de pedidos entre 15 e 21 dias":
+    do time("televendas")
+    quando frequencia historica entre 15 dias e 21 dias
+    frequencia de 16 dias
+
+parametros "Clientes com freq. hist. média de pedidos entre 22 e 28 dias":
+    do time("televendas")
+    quando frequencia historica entre 22 dias e 28 dias
+    frequencia de 23 dias
+
+parametros "Clientes com freq. hist. média de pedidos entre 29 e 38 dias":
+    do time("televendas")
+    quando frequencia historica entre 29 dias e 38 dias
+    frequencia de 29 dias
+
+parametros "Clientes com freq. hist. média de pedidos entre 39 e 60 dias":
+    do time("televendas")
+    quando frequencia historica entre 39 dias e 60 dias
+    frequencia de 35 dias
+
+parametros "Clientes com freq. hist. média de pedidos entre 61 e 95 dias":
+    do time("televendas")
+    frequencia de 55 dias
+    

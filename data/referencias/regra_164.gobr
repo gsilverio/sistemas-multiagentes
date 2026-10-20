@@ -1,0 +1,132 @@
+
+# Card da última aplicação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7719846190
+
+version 1.0
+
+# Definicao dos times
+
+time "time todos":
+    vendedores todos ativados
+
+time "time bruna":
+    vendedores porid("10bruna")
+
+# Regras de agendamento Bruna:
+
+parametros "Freq. 14 dias para novos cadastros 'Condomínio' vendedora Bruna":
+    do time("time bruna")
+    quando o rotulo contem("condominio")
+           e cadastrado a partir do dia '2024-10-03'
+    frequencia de 14 dias
+
+parametros "Freq. de 7 dias para compra detectada com a empresa entre 0 e 30 dias 'Condomínio' vendedora Bruna":
+    do time("time bruna")
+    quando o rotulo contem("condominio")
+           e recencia de positivacao global em 30 dias
+    frequencia de 7 dias
+
+parametros "Freq. de 30 dias para não tem compra com a empresa nos últimos 90 dias 'Condomínio' vendedora Bruna":
+    do time("time bruna")
+    quando o rotulo contem("condominio")
+           e fora da recencia de positivacao global em 90 dias
+    frequencia de 30 dias
+
+# Regras de agendamento "construtora":
+
+parametros "Freq. de 7d para: 'Ativar prospects'":
+    do time("time todos")
+    quando sem venda
+            e cadastrado a partir do dia '2024-08-01'
+    frequencia de 7 dias
+
+parametros "Boas vindas: Frequência de 14d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e unica compra com a empresa
+           e fora da recencia de positivacao em 60 dias
+    frequencia de 14 dias
+    
+parametros "Compra com regularidade no RJ - Curva A: Frequência de 7d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e frequencia historica menor que 30 dias
+           e fora da recencia de positivacao em 14 dias
+           e uf do estado igual("RJ")
+           e curva A com a empresa
+    frequencia de 7 dias  
+    
+parametros "Compra com regularidade no RJ - Curva B: Frequência de 10d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e frequencia historica menor que 30 dias
+           e fora da recencia de positivacao em 14 dias
+           e uf do estado igual("RJ")
+           e curva B com a empresa
+    frequencia de 10 dias 
+    
+parametros "Compra com regularidade no RJ - Curva C: Frequência de 14d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e frequencia historica menor que 30 dias
+           e fora da recencia de positivacao em 14 dias
+           e uf do estado igual("RJ")
+           e curva C com a empresa
+    frequencia de 14 dias
+    
+parametros "Compra com regularidade: Frequência de 14d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e frequencia historica menor que 30 dias
+           e fora da recencia de positivacao em 14 dias
+    frequencia de 14 dias
+    
+parametros "Estimular regularidade: Frequência de 10d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e no ciclo de vida ativo com a empresa
+           e fora da recencia de positivacao global em 45 dias
+    frequencia de 10 dias
+    
+parametros "Risco de ficar inativo: Frequência de 14d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e fora da recencia de positivacao em 60 dias
+    frequencia de 14 dias
+
+parametros "Ativar novos clientes: Frequência de 7d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+           e cadastrado a partir do dia '2024-10-03'
+    frequencia de 7 dias
+    
+parametros "Resgate de inativos: Frequência de 45d para construtora":
+    do time("time todos")
+    quando o rotulo contem("construtora")
+    frequencia de 45 dias
+
+# Regras de agendamento shopping, supermercado, industria, estaleiro, clube, escolas, universidade, igreja, hotel, hospital, clínica, restaurantes, condominio":
+
+parametros "Freq. de 14 dias para Novos cadastros shopping, supermercado, industria, estaleiro, clube, escolas, universidade, igreja, hotel, hospital, clínica, restaurantes, condominio":
+    do time("time todos")
+    quando o rotulo contem("shopping", "supermercado", "industria", "estaleiro", "clube","escolas", "universidade", "igreja", "hotel", "hospital", "clinica", "restaurantes", "condominio")
+           e cadastrado a partir do dia '2024-10-03'
+    frequencia de 14 dias
+
+parametros "Freq. de 7 dias para Novos cadastros shopping, supermercado, industria, estaleiro, clube, escolas, universidade, igreja, hotel, hospital, clínica, restaurantes, condominio":
+    do time("time todos")
+    quando o rotulo contem("shopping", "supermercado", "industria", "estaleiro", "clube","escolas", "universidade", "igreja", "hotel", "hospital", "clinica", "restaurantes", "condominio")
+           e recencia de positivacao global em 30 dias
+    frequencia de 7 dias
+
+parametros "Freq. de 30 dias para Novos cadastros shopping, supermercado, industria, estaleiro, clube, escolas, universidade, igreja, hotel, hospital, clínica, restaurantes, condominio":
+    do time("time todos")
+    quando o rotulo contem("shopping", "supermercado", "industria", "estaleiro", "clube","escolas", "universidade", "igreja", "hotel", "hospital", "clinica", "restaurantes", "condominio")
+           e recencia de positivacao global em 30 dias
+    frequencia de 30 dias
+
+# Regras de não agendamento:
+
+parametros "Isocom: Não agendar - cliente não coberto por regra comercial":
+    do time("time todos")
+    nao agendar
+    

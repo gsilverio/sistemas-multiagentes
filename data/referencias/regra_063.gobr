@@ -1,0 +1,57 @@
+
+# Regras padrão
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+    
+time "time campo":
+    vendedores todosdecampo
+    
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+    
+carteira "carteira campo":
+    clientes carteirafixa("time campo")
+    
+## campo
+parametros "Regra Padrao da Verteiler - Customizavel: 30 dias para clientes ativos (campo)":
+    da carteira("carteira campo")
+    quando ativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Verteiler - Customizavel: 30 dias para clientes inativos (campo)":
+    da carteira("carteira campo")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da Verteiler - Customizavel: 30 dias para clientes sem venda (campo)":
+    da carteira("carteira campo")
+    quando sem venda
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+## televendas
+parametros "Regra Padrao da Verteiler - Customizavel: 30 dias para clientes ativos (televendas)":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    sem choque no time("time campo")
+    
+parametros "Regra Padrao da Verteiler - Customizavel: 30 dias para clientes inativos(televendas)":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    sem choque no time("time campo")
+    
+parametros "Regra Padrao da Verteiler - Customizavel: 30 dias para clientes sem venda (televendas)":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    sem choque no time("time campo")
+    

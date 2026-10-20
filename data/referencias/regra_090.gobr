@@ -1,0 +1,28 @@
+
+#Fribel
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "carteira fixa":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Empresa Customizavel: semanal para ativos":
+    da carteira("carteira fixa")
+    quando ativos para o vendedor
+    frequencia semanal()
+    preferencia na segunda e na terca e na quarta e na quinta e na sexta e no sabado
+
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para inativos":
+    da carteira("carteira fixa")
+    quando inativos para o vendedor
+    frequencia de 14 dias
+    preferencia na segunda e na terca e na quarta e na quinta e na sexta e no sabado
+    
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para clientes sem venda":
+    da carteira("carteira fixa")
+    quando sem venda
+    frequencia de 14 dias
+    preferencia na segunda e na terca e na quarta e na quinta e na sexta e no sabado
+    

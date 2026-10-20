@@ -1,0 +1,44 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/8996838188
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa cescom":
+    clientes carteirafixa("empresa toda")
+    
+parametros "Restrição de agendamento - não agendar filiais":
+    da carteira("empresa cescom")
+    quando cliente filial
+    nao agendar
+
+parametros "Regra Padrao da Empresa Customizavel: semanal para ativos adimplentes":
+    da carteira("empresa cescom")
+    quando ativos para o vendedor e adimplentes
+    frequencia semanal()
+    preferencia do vendedor
+
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para ativos inadimplentes":
+    da carteira("empresa cescom")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    preferencia do vendedor
+
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para inativos adimplentes":
+    da carteira("empresa cescom")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 14 dias
+    preferencia do vendedor
+    
+parametros "Regra Padrao da Empresa Customizavel: 30 dias para inativos inadimplentes":
+    da carteira("empresa cescom")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+    preferencia do vendedor
+    
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para clientes sem vendas":
+    da carteira("empresa cescom")
+    quando sem vendas
+    frequencia de 14 dias
+    

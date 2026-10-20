@@ -1,0 +1,113 @@
+
+# Regras dinâmicas para Palmed
+version 1.0
+
+# time televendas da paraiba e do piaui
+
+time "televendas pi":
+    vendedores todostelevendas dos supervisores("2736")
+
+time "televendas pb":
+    vendedores todostelevendas dos supervisores("2731")
+
+
+time "tocantins":
+    vendedores porid("435", "261", "385", "276", "438", "63", "164")
+
+time "televendas":
+    vendedores todostelevendas
+ 
+time "campo":
+    vendedores todosdecampo
+
+carteira "carteira televendas pi":
+    clientes carteirafixa("televendas pi")
+
+carteira "carteira televendas pb":
+    clientes carteirafixa("televendas pb")
+
+carteira "carteira tocantins":
+    clientes carteirafixa("tocantins")
+
+carteira "carteira televendas":
+    clientes carteirafixa("televendas")
+
+## Time Paraiba e Piaui
+
+# parametrizacao dos televendas da paraiba e piaui com 14 dias para inadimplentes
+
+parametros "Regra Padrao da Palmed: 14 dias para inativos e inadimplentes":
+    da carteira("carteira televendas pi","carteira televendas pb")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    sem choque na rota com time("campo")
+
+# parametrizacao dos televendas da paraiba e piaui com no máximo 7 dias
+
+parametros "Regra Padrao da Palmed: Maximo 7 dias - PI":
+    da carteira("carteira televendas pi")
+    frequencia do historico ou no maximo semanal()
+    preferencia nos dias uteis e no sabado
+    sem choque na rota com time("campo")
+    
+parametros "Regra Padrao da Palmed: maximo 7 dias - PB":
+    da carteira("carteira televendas pb")
+    frequencia do historico ou no maximo semanal()
+    preferencia nos dias uteis
+    sem choque na rota com time("campo")
+
+## Time Tocantins
+
+parametros "Regra Padrao da Palmed: 14 dias para inativos e inadimplentes - Tocantins":
+    da carteira("carteira tocantins")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    sem choque na rota com time("campo")
+
+parametros "Regra Padrao da Palmed: semanal para ativos":
+    da carteira("carteira tocantins")
+    frequencia do historico ou no maximo semanal()
+    preferencia nos dias uteis e no sabado
+    sem choque na rota com time("campo")
+    
+### Time Televendas
+
+parametros "Regra Padrao da Palmed: semanal para ativos e adimplentes (segunda a sexta) - Time Televendas":
+    do time("televendas")
+    quando ativos para o vendedor e adimplentes
+    frequencia do historico ou no maximo semanal()
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Palmed: quinzenal para ativos e inadimplente (segunda a sexta) - Time Televendas":
+    do time("televendas")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 14 dias
+    preferencia nos dias uteis
+
+parametros "Regra Padrao da Palmed: semanal exceto na segunda para inativos adimplentes (terca a sexta) - Time Televendas":
+    do time("televendas")
+    quando inativos para o vendedor e adimplentes
+    frequencia do historico ou no maximo semanal()
+#   preferencia na terca e na quarta e na quinta e na sexta
+    preferencia na segunda e na terca e na quarta e na quinta e na sexta
+
+parametros "Regra Padrao da Palmed: 30 dias para inativos e inadimplentes (terca a sexta) - Time Televendas":
+    do time("televendas")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 30 dias
+#    preferencia na terca e na quarta e na quinta e na sexta
+    preferencia na segunda e na terca e na quarta e na quinta e na sexta
+    
+parametros "Regra Padrao da Palmed: 7 dias de terca a sexta - Time Televendas":
+    do time("televendas")
+    frequencia do historico ou no maximo semanal()
+#   preferencia na terca e na quarta e na quinta e na sexta
+    preferencia na segunda e na terca e na quarta e na quinta e na sexta
+    
+## Time campo
+parametros "Regra Padrao da Palmed: 7 dias para todos os clientes - Time de Campo":
+    do time("campo")
+    frequencia semanal()
+    

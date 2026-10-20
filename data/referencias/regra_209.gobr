@@ -1,0 +1,45 @@
+
+### Solicitação: https://govendas-team.atlassian.net/jira/software/c/projects/CS/boards/356?selectedIssue=CS-84
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+## Regras de não agendamento
+
+parametros "Não agendar Inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando é o cliente filial
+    nao agendar
+
+parametros "não agendar clientes fora de recencia em 90 dias":
+    do time("televendas")
+    quando fora da recencia de positivacao do vendedor em 90 dias
+    não agendar
+
+## Regras de agendamento
+
+parametros "Ative este novo cliente e aumente sua carteira!!!":
+    do time("televendas")
+    quando no ciclo de vida prospect com o vendedor
+    frequencia de 7 dias
+
+parametros "Cliente compra com regularidade!":
+    do time("televendas")
+    quando frequencia historica entre 0 dias e 30 dias
+        e recencia de positivacao do vendedor em 30 dias
+    frequencia de 7 dias
+
+parametros "Cliente precisa de acompanhamento!":
+    do time("televendas")
+    quando fora da recencia de positivacao do vendedor entre 31 dias e 90 dias
+    frequencia de 17 dias
+    

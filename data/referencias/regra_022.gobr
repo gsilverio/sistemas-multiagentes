@@ -1,0 +1,29 @@
+
+version 1.0
+
+time "time campo":
+    vendedores todosdecampo
+
+time "time televendas":
+    vendedores todostelevendas
+
+carteira "carteira campo":
+    clientes carteirafixa("time campo")
+
+## Parametros televendas
+parametros "Regra Padrao da Supergiro - Customizavel: 14 dias para todos os clientes clientes (time televendas)":
+    do time("time televendas")
+    frequencia de 14 dias
+    preferencia nos dias uteis
+
+## Parametros campo
+parametros "Regra Padrao da Supergiro - Customizavel: Nao agendar clientes sem venda (campo)":
+    da carteira("carteira campo")
+    quando sem venda
+    nao agendar
+  
+parametros "Regra Padrao da Supergiro - Customizavel: 14 dias para clientes ativos ou inativos (campo)":
+    da carteira("carteira campo")
+    frequencia de 14 dias
+    preferencia nos dias uteis
+

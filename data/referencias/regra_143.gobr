@@ -1,0 +1,63 @@
+
+# Solicitação: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/9027212142
+version 1.0
+
+# Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+# Regras de não agendamento:
+
+parametros "Não agendar filiais":
+    do time("televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Não agendar clientes com compra em 30d":
+    do time("televendas")
+    quando recencia de positivacao global em 30 dias
+    nao agendar
+
+# Regras de agendamento:
+
+parametros "Freq. de 28d para 'Prospects'":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 28 dias
+
+parametros "Freq. de 7d para 'Ativos sem compra com a empresa há mais de 30d (Curva A)'":
+    do time("televendas")
+    quando no ciclo de vida ativo com a empresa
+        e fora da recencia de positivacao global entre 30 dias e 45 dias
+        e curva A com a empresa
+    frequencia de 7 dias
+
+parametros "Freq. de 14d para 'Ativos sem compra com a empresa há mais de 30d (Curva B)'":
+    do time("televendas")
+    quando no ciclo de vida ativo com a empresa
+        e fora da recencia de positivacao global entre 30 dias e 45 dias
+        e curva B com a empresa
+    frequencia de 14 dias
+
+parametros "Freq. de 21d para 'Ativos sem compra com a empresa há mais de 30d (Curva C)'":
+    do time("televendas")
+    quando no ciclo de vida ativo com a empresa
+        e fora da recencia de positivacao global entre 30 dias e 45 dias
+    frequencia de 21 dias
+
+parametros "Freq. de 14d para 'Ativos sem compra com a empresa há mais de 45d'":
+    do time("televendas")
+    quando no ciclo de vida ativo com a empresa
+        e fora da recencia de positivacao global entre 45 dias e 60 dias
+    frequencia de 14 dias
+
+parametros "Freq. de 7d para 'Ativos sem compra com a empresa há mais de 60d'":
+    do time("televendas")
+    quando no ciclo de vida ativo com a empresa
+    frequencia de 7 dias
+
+parametros "Freq. de 7d para 'Inativos'":
+    do time("televendas")
+    frequencia de 7 dias
+    

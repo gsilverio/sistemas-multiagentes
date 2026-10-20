@@ -1,0 +1,28 @@
+
+# Regras de parametrização da jumori
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## regras time interno
+parametros "Regra Padrao da Jumori: Não agendar inadimplentes":
+    do time("televendas")
+    quando inadimplentes
+    nao agendar
+    
+parametros "Regra Padrao da Jumori: Frequencia semanal para clientes ativos":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia semanal()
+    
+parametros "Regra Padrao da Jumori: Frequencia quinzenal para clientes inativos":
+    do time("televendas")
+    quando inativos para o vendedor
+    frequencia quinzenal()
+
+parametros "Regra Padrao da Jumori: Frequencia de 14 dias para clientes sem vendas":
+    do time("televendas")
+    quando sem venda
+    frequencia quinzenal()
+    

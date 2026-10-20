@@ -1,0 +1,26 @@
+
+version 1.0
+
+
+time "de campo":
+    vendedores porid("283","279")
+    
+time "televendas":
+    vendedores porid("291")
+
+## Parâmetros de não agendamento
+
+segmentacao "cliente de ruptura":
+    clientes carteirafixa("de campo")
+    quando tem venda em 60 dias
+    
+
+carteira "televendas fixa com ruptura de campo":
+    clientes ruptura("de campo" para "televendas") de positivacao(entre 7 dias e 60 dias)
+
+parametros "Não agendar Ativos de campo com vendas em 60 dias":
+    da carteira("televendas fixa com ruptura de campo")
+    na ultima semana
+    quando contido na segmentacao("cliente de ruptura")
+    nao agendar
+    

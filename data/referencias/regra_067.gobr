@@ -1,0 +1,94 @@
+
+version 1.0
+
+time "televendas":
+    vendedores todostelevendas
+    
+time "interior":
+    vendedores porid("11", "3","12", "21")
+    
+time "capital":
+    vendedores porid("2", "4", "5", "6")
+    
+carteira "capital":
+    clientes carteirafixa("capital")
+    
+### Regras para televendas
+parametros "Regra Padrao da NutriPet - Customizavel: 14 dias para clientes ativos (televendas)":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 30 dias para clientes inativos (televendas)":
+    do time("televendas")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 7 dias para clientes sem venda (televendas)":
+    do time("televendas")
+    quando sem venda
+    frequencia de 7 dias
+    preferencia nos dias uteis
+    
+## Regras Capital
+parametros "Regra Padrao da NutriPet - Customizavel: 20 dias para clientes ativos adimplentes (capital)":
+    da carteira("capital")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 20 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 20 dias para clientes ativos inadimplentes (capital)":
+    da carteira("capital")
+    quando ativos para o vendedor e inadimplentes
+    frequencia de 20 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 30 dias para clientes inativos adimplentes (capital)":
+    da carteira("capital")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 30 dias para clientes inativos inadimplentes (capital)":
+    da carteira("capital")
+    quando inativos para o vendedor e inadimplentes
+    não agendar
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 14 dias para clientes sem venda (capital)":
+    da carteira("capital")
+    quando sem venda
+    frequencia de 30 dias
+    preferencia nos dias uteis
+    
+### Regras para interior
+parametros "Regra Padrao da NutriPet - Customizavel: 21 dias para clientes ativos (interior)":
+    do time("interior")
+    quando ativos para o vendedor
+    frequencia de 21 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 21 dias para clientes inativos adimplentes (interior)":
+    do time("interior")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 21 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 42 dias para clientes inativos inadimplentes (interior)":
+    do time("interior")
+    quando inativos para o vendedor e inadimplentes
+    frequencia de 42 dias
+    preferencia nos dias uteis
+    
+parametros "Regra Padrao da NutriPet - Customizavel: clientes inativos inadimplentes (interior)":
+    da carteira("capital")
+    quando inativos para o vendedor e inadimplentes
+    não agendar
+    
+parametros "Regra Padrao da NutriPet - Customizavel: 14 dias para clientes sem venda (interior)":
+    do time("interior")
+    quando sem venda
+    frequencia de 14 dias
+    preferencia nos dias uteis
+    

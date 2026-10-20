@@ -1,0 +1,13 @@
+
+version 1.0
+
+time "empresa toda":
+    vendedores todos
+
+carteira "empresa toda":
+    clientes carteirafixa("empresa toda")
+
+parametros "Regra Padrao da Trenas - Customizavel: Frequencia de 7 dias para todos os clientes":
+    da carteira("empresa toda")
+    frequencia de 7 dias
+    

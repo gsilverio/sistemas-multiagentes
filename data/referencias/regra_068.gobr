@@ -1,0 +1,66 @@
+
+version 1.0
+
+time "time campo":
+    vendedores todosdecampo
+
+time "time televendas":
+    vendedores todostelevendas
+
+carteira "carteira campo":
+    clientes carteirafixa("time campo")
+
+carteira "carteira televendas":
+    clientes carteirafixa("time televendas")
+
+####################################################
+### Regras campo
+
+parametros "Regra Padrao da Playpet Customizavel: nao agendar plano veterinario":
+    da carteira("carteira campo")
+    quando ramo de atividade igual("17")
+    nao agendar
+
+parametros "Regra Padrao da Playpet Customizavel: nao agendar clientes pessoa fisica":
+    da carteira("carteira campo")
+    quando pessoa fisica
+    nao agendar
+
+parametros "Regra Padrao da Playpet Customizavel: 30 dias para ativos adimplentes":
+    da carteira("carteira campo")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 30 dias
+    
+parametros "Regra Padrao da Playpet Customizavel: 21 dias para clientes sem venda":
+    da carteira("carteira campo")
+    quando sem venda
+    frequencia de 21 dias
+    
+parametros "Regra Padrao da Playpet Customizavel: nao agendar inadimplentes ou inativos":
+    da carteira("carteira campo")
+    nao agendar
+
+
+####################################################
+### Regras televendas
+
+parametros "Regra Padrao da Playpet Customizavel: Nao agendar inadimplentes":
+    da carteira("carteira televendas")
+    quando inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Playpet Customizavel: 14 dias para ativos adimplentes":
+    da carteira("carteira televendas")
+    quando ativos para o vendedor e adimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Playpet Customizavel: 30 dias quando inativos adimplentes":
+    da carteira("carteira televendas")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 30 dias
+  
+parametros "Regra Padrao da Playpet Customizavel: 14 dias para sem venda":
+    da carteira("carteira televendas")
+    quando sem venda
+    frequencia de 14 dias
+    

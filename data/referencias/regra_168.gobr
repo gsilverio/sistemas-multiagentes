@@ -1,0 +1,120 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9580562790/list-270894162472/task-531336623560
+version 1.0
+
+
+## DEFINIÇÃO DE TIMES
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+
+## CARTEIRAS DE ROTAS POR CIDADE
+
+carteira livre "rota_todo_dia":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "BALNEARIO CAMBORIU","BOMBINHAS","CAMBORIU","ITAJAI","ITAPEMA","PORTO BELO"
+    )
+
+carteira livre "rota_terca":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "CASCAVEL","LAGES","BOM RETIRO","SAO JOAQUIM","BIGUACU","BLUMENAU","BRUSQUE","FLORIANOPOLIS",
+        "GOVERNADOR CELSO RAMOS","GUABIRUBA","IBIRAMA","PALHOCA","POMERODE","RIO DO SUL","SAO JOSE",
+        "TIJUCAS","LUIZ ALVES","GASPAR","INDAIAL","BOTUVERA","ILHOTA","RIO DOS CEDROS"
+    )
+
+carteira livre "rota_quarta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "IRATI","PONTA GROSSA","FERNANDES PINHEIRO","TEIXEIRA SOARES","ARAUCARIA","CURITIBA",
+        "SAO JOSE DOS PINHAIS","PIRAQUARA","COLOMBO","PINHAIS","CAMPO LARGO","JARAGUA DO SUL",
+        "BALNEARIO BARRA DO SUL","BALNEARIO PICARRAS","CAMPO ALEGRE","JOINVILLE","NAVEGANTES",
+        "PENHA","POUSO REDONDO","CORUPA","GUARAMIRIM","SAO BENTO DO SUL","BARRA VELHA",
+        "SCHROEDER","REBOUÇAS","RIO AZUL"
+    )
+
+carteira livre "rota_quinta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "BENTO GONCALVES","CACHOEIRINHA","CAMPO BOM","CANOAS","CAPAO DA CANOA","CAXIAS DO SUL",
+        "GRAMADO","NOVO HAMBURGO","PORTO ALEGRE","TORRES","TRES COROAS","XANGRI LA","BIGUACU",
+        "BLUMENAU","COCAL DO SUL","CRICIUMA","BRUSQUE","FORQUILINHAS","GAROPABA","FLORIANOPOLIS",
+        "GOVERNADOR CELSO RAMOS","GUABIRUBA","IMBITUBA","IBIRAMA","PALHOCA","JAGUARUNA","LAGUNA",
+        "POMERODE","RIO DO SUL","SAO JOSE","PRAIA GRANDE","TIJUCAS","LUIZ ALVES","GASPAR",
+        "TUBARAO","INDAIAL","BOTUVERA","ILHOTA","RIO DOS CEDROS"
+    )
+
+carteira livre "rota_sexta":
+    clientes carteirafixa("televendas")
+    quando nome da cidade igual(
+        "GUARATUBA","MATINHOS","ITAPOA","MORRETES","PARANAGUA","ARAUCARIA","CURITIBA",
+        "SAO JOSE DOS PINHAIS","PIRAQUARA","COLOMBO","PINHAIS","CAMPO LARGO",
+        "BALNEARIO BARRA DO SUL","BALNEARIO PICARRAS","CAMPO ALEGRE","JOINVILLE",
+        "SAO FRANCISCO DO SUL","NAVEGANTES","PENHA","POUSO REDONDO","CORUPA",
+        "GUARAMIRIM","SAO BENTO DO SUL","BARRA VELHA","SCHROEDER","BIGUACU",
+        "FLORIANOPOLIS","GOVERNADOR CELSO RAMOS","PALHOCA","SAO JOSE","TIJUCAS"
+    )
+
+
+## PARÂMETROS DE PLANEJAMENTO
+
+parametros "Não agendar baixados na Receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar bloqueados":
+    do time("televendas")
+    quando bloqueados
+    nao agendar
+
+parametros "Rota todo dia -> Agendamento todo dia":
+    da carteira("rota_todo_dia")
+    frequencia diaria()
+    preferencia maior na segunda
+        e maior na terca
+        e maior na quarta
+        e maior na quinta
+        e maior na sexta
+    roteirizavel
+    fixo
+
+parametros "Rota de terça -> Agendamento segunda":
+    da carteira("rota_terca")
+    na segunda
+    frequencia diaria()
+    preferencia maior na segunda
+    roteirizavel
+    fixo
+    
+
+parametros "Rota de quarta -> Agendamento terça":
+    da carteira("rota_quarta")
+    na terca
+    frequencia diaria()
+    preferencia maior na terca
+    roteirizavel
+    fixo
+
+parametros "Rota de quinta -> Agendamento quarta":
+    da carteira("rota_quinta")
+    na quarta
+    frequencia diaria()
+    preferencia maior na quarta
+    roteirizavel
+    fixo
+
+parametros "Rota de sexta -> Agendamento quinta":
+    da carteira("rota_sexta")
+    na quinta
+    frequencia diaria()
+    preferencia maior na quinta
+    roteirizavel
+    fixo
+
+parametros "Não agendar clientes que não se enquadraram nas regras hoje":
+    do time("televendas")
+    nao agendar
+    

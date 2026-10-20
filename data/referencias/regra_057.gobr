@@ -1,0 +1,25 @@
+
+# Card: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/7325876988
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Regras de agendamento
+
+parametros "Freq. de 30d para Prospects":
+    do time("televendas")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 30 dias
+
+parametros "Freq. de 25d para Ativos (Adimplentes e Inadimplentes)":
+    do time("televendas")
+    quando ativos para o vendedor
+    frequencia de 25 dias
+
+parametros "Freq. de 30d para Inativos (Adimplentes e Inadimplentes)":
+    do time("televendas")
+    frequencia de 30 dias
+

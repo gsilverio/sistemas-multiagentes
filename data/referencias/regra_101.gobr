@@ -1,0 +1,72 @@
+
+version 1.0
+
+time "time televendas":
+    vendedores todostelevendas
+
+time "time capital":
+	vendedores todosdecampo menos("17","18","13")
+
+time "time interior":
+	vendedores porid("17","18","13")
+
+
+## time televendas
+parametros "Regra Padrao da Propec: Frequencia de 7 dias para clientes ativos (televendas)":
+    do time("time televendas")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Propec: Frequencia de 30 dias para clientes inativos (televendas)":
+    do time("time televendas")
+    quando inativos para o vendedor
+    frequencia de 30 dias
+
+parametros "Regra Padrao da Propec: Frequencia de 7 dias para clientes sem venda (televendas)":
+    do time("time televendas")
+    quando sem venda
+    frequencia de 7 dias
+
+## time capital
+parametros "Regra Padrao da Propec: Frequencia de 7 dias para clientes ativos (regiao metropolitana)":
+    do time("time capital")
+    quando ativos para o vendedor
+    frequencia de 7 dias
+
+parametros "Regra Padrao da Propec: Frequencia de 14 dias para clientes inativos adimplentes (regiao metropolitana)":
+    do time("time capital")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Propec: Nao agendar clientes inativos inadimplentes (regiao metropolitana)":
+    do time("time capital")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Propec: Frequencia de 14 dias para clientes sem venda (regiao metropolitana)":
+    do time("time capital")
+    quando sem venda
+    frequencia de 14 dias
+
+
+## time interior
+parametros "Regra Padrao da Propec: Frequencia de 14 dias para clientes ativos (interior)":
+    do time("time interior")
+    quando ativos para o vendedor
+    frequencia de 14 dias
+
+parametros "Regra Padrao da Propec: Frequencia de 30 dias para clientes inativos adimplentes (interior)":
+    do time("time interior")
+    quando inativos para o vendedor e adimplentes
+    frequencia de 30 dias
+
+parametros "Regra Padrao da Propec: Nao agendar clientes inativos inadimplentes (interior)":
+    do time("time interior")
+    quando inativos para o vendedor e inadimplentes
+    nao agendar
+
+parametros "Regra Padrao da Propec: Frequencia de 30 dias para clientes sem venda (interior)":
+    do time("time interior")
+    quando sem venda
+    frequencia de 30 dias
+    

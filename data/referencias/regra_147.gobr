@@ -1,0 +1,78 @@
+
+# Aplicação inicial: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6358826469
+# Última atualização: https://3.basecamp.com/3199393/buckets/26567206/card_tables/cards/6549433779
+version 1.0
+
+time "time carteira":
+    vendedores porid("3597","3598","3603","3602","3599","3600","3601","3555","3530","3560","3557","3533","3511","3528","3512","3529","3568")
+    
+time "time distribuidor":
+    vendedores porid("3516", "3556", "3531", "3519")
+    
+time "time petvet":
+    vendedores porid("3559")
+    
+time "time portal":
+    vendedores porid("3594","3595","3596","3565","3566","3571","3573","3570","3575","3572","3574","3576","3586","3585","3592","3584","3583","3582","3581","3580")
+
+time "pre-venda":
+    vendedores porid("3621","3622","3623")
+
+#######################
+## Regras Times Carteira, Petvet e Portal
+
+parametros "HospDrogas: Frequência de 1 dia para clientes novos e sem atendimento (Time Carteira, PetVet e Portal)":
+    do time("time carteira","time petvet","time portal")
+    quando cadastrado a partir do dia '2023-07-18'
+           e fora da recencia de visita em 60 dias
+    frequencia de 1 dias
+    
+parametros "HospDrogas: Frequência de 7 dias para clientes novos (Time Carteira, PetVet e Portal)":
+    do time("time carteira","time petvet","time portal")
+    quando cadastrado a partir do dia '2023-07-18'
+    frequencia de 7 dias
+    
+parametros "HospDrogas: Frequência de 5 dias para clientes ativos (Time Carteira, PetVet e Portal)":
+    do time("time carteira","time petvet","time portal")
+    quando ativos para o vendedor
+    frequencia de 5 dias
+    
+parametros "HospDrogas: Frequência de 10 dias para clientes inativos (Time Carteira, PetVet e Portal)":
+    do time("time carteira","time petvet","time portal")
+    quando inativos para o vendedor
+    frequencia de 10 dias
+    
+parametros "HospDrogas: Frequência de 20 dias para clientes sem venda (Time Carteira, PetVet e Portal)":
+    do time("time carteira","time petvet","time portal")
+    quando sem venda
+    frequencia de 20 dias
+
+###########################
+## Regras Time Distribuidor
+
+parametros "HospDrogas: Frequência de 2 dias para clientes curva A (Time Distribuidor)":
+    do time("time distribuidor")
+    quando curva A com o vendedor
+    frequencia de 2 dias
+    
+parametros "HospDrogas: Frequência de 4 dias para clientes curva B (Time Distribuidor)":
+    do time("time distribuidor")
+    quando curva B com o vendedor
+    frequencia de 4 dias
+    
+parametros "HospDrogas: Frequência de 7 dias para clientes curva C (Time Distribuidor)":
+    do time("time distribuidor")
+    quando curva C com o vendedor
+    frequencia de 7 dias
+    
+parametros "HospDrogas: Frequência de 15 dias para clientes sem classificação de curva ABC (Time Distribuidor)":
+    do time("time distribuidor")
+    frequencia de 15 dias
+
+#######################
+## Regras time Pré-venda
+
+parametros "HospDrogas: Freq. de 7d para todos os clientes (Time Pré-venda)":
+    do time("pre-venda")
+    frequencia de 7 dias
+

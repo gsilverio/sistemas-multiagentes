@@ -1,0 +1,55 @@
+
+### Solicitação: https://gogeo.proofhub.com/bapplite/#app/todos/project-9587835621/list-270919671655/task-558242189942
+version 1.0
+
+## Definição de times
+
+time "televendas":
+    vendedores todostelevendas ativados
+
+## Parâmetros de planejamento
+
+parametros "Não agendar clientes baixados na receita":
+    do time("televendas")
+    quando status na receita federal definido como baixada
+    nao agendar
+
+parametros "Não agendar Filiais":
+    do time("televendas")
+    quando cliente filial
+    nao agendar
+
+parametros "Clientes que compraram apenas uma vez após período de inatividade":
+    do time("televendas")
+    quando no ciclo de vida reativado com a empresa
+    frequencia de 3 dias
+
+parametros "Clientes com apenas uma compra":
+    do time("televendas")
+    quando unica compra com a empresa
+    frequencia de 3 dias
+
+parametros "Ativos recorrentes (com compra em 30 dias)":
+    do time("televendas")
+    quando recencia de positivacao em 30 dias
+    frequencia do historico ou no minimo de 3 dias e no maximo de 21 dias
+
+parametros "Ativos (com compra entre 30 e 60 dias)":
+    do time("televendas")
+    quando recencia de positivacao em 60 dias
+    frequencia de 14 dias
+
+parametros "Ativos (com compra entre 60 e 90 dias)":
+    do time("televendas")
+    quando recencia de positivacao em 90 dias
+    frequencia de 21 dias
+
+parametros "Ativos (com compra entre 90 e 120 dias)":
+    do time("televendas")
+    quando recencia de positivacao em 120 dias
+    frequencia de 14 dias
+
+parametros "Clientes que hoje não se enquadraram nas regras padrão":
+    do time("televendas")
+    frequencia de 7 dias
+
