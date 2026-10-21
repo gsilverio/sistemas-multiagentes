@@ -1,0 +1,20 @@
+{
+  "nome": "Regra Padrao da Empresa Customizavel: 14 dias para clientes sem venda",
+  "escopos": [
+    {
+      "tipo": "carteira",
+      "valor": "empresa toda",
+      "operador": null
+    }
+  ],
+  "condicoes": [
+    {
+      "texto": "sem venda",
+      "operador": null
+    }
+  ],
+  "frequencia": "14 dias",
+  "nao_agendar": false,
+  "modificadores": [],
+  "desconhecidos": []
+}

@@ -1,0 +1,4 @@
+parametros "Regra Padrao da Empresa Customizavel: 14 dias para clientes sem venda":
+    da carteira("empresa toda")
+    quando sem venda
+    frequencia de 14 dias

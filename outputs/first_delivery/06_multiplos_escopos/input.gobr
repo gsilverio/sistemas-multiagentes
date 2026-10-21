@@ -1,0 +1,5 @@
+parametros "Clientes Prospects":
+    da segmentacao("televendas ruptura de fornecedor")
+    e da carteira("televendas consumidor")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias

@@ -1,7 +1,7 @@
 from langchain_ollama import ChatOllama
 
 from src.models.business_explanation import BusinessExplanation
-from src.models.rule_interpretation import RuleInterpretation
+from src.models.semantic_interpretation import SemanticInterpretation
 from src.prompts.business_explainer_prompt import BUSINESS_EXPLAINER_PROMPT
 
 
@@ -12,112 +12,81 @@ class BusinessExplainerAgent:
             temperature=0
         )
 
-        self.chain = BUSINESS_EXPLAINER_PROMPT | self.model
+        self.chain = (
+            BUSINESS_EXPLAINER_PROMPT
+            | self.model
+        )
 
     def explain(
         self,
-        interpretation: RuleInterpretation
+        interpretation: SemanticInterpretation
     ) -> BusinessExplanation:
 
-        publico = self._build_publico(interpretation)
-        criterios = self._build_criterios(interpretation)
-        comportamento = self._build_comportamento(interpretation)
+        criterios_formatados = self._format_list(
+            interpretation.criterios
+        )
 
-        criterios_formatados = self._format_criterios(
-            interpretation
+        restricoes_formatadas = self._format_list(
+            interpretation.restricoes
+        )
+
+        modificadores_formatados = self._format_list(
+            interpretation.modificadores
+        )
+
+        incertezas_formatadas = self._format_list(
+            interpretation.incertezas
         )
 
         response = self.chain.invoke({
-            "nome": interpretation.nome,
-            "publico": publico or "Não informado",
+            "publico": (
+                interpretation.publico
+                or "Não informado"
+            ),
             "criterios": criterios_formatados,
-            "comportamento": comportamento or "Não informado"
+            "regra_atendimento": (
+                interpretation.regra_atendimento
+                or "Não informado"
+            ),
+            "restricoes": restricoes_formatadas,
+            "modificadores": modificadores_formatados,
+            "incertezas": incertezas_formatadas
         })
 
+        comportamento = (
+            interpretation.regra_atendimento
+        )
+
+        if interpretation.restricoes:
+            restricoes_texto = " ".join(
+                interpretation.restricoes
+            )
+
+            if comportamento:
+                comportamento = (
+                    f"{comportamento} "
+                    f"{restricoes_texto}"
+                )
+            else:
+                comportamento = restricoes_texto
+
         return BusinessExplanation(
-            titulo=interpretation.nome,
+            titulo="Regra de negócio",
             explicacao=response.content.strip(),
-            publico=publico,
-            criterios=criterios,
+            publico=interpretation.publico,
+            criterios=interpretation.criterios,
             comportamento=comportamento
         )
 
-    def _build_publico(
+    def _format_list(
         self,
-        interpretation: RuleInterpretation
-    ) -> str | None:
-
-        if interpretation.escopo is None:
-            return None
-
-        tipo = interpretation.escopo.tipo
-        valor = interpretation.escopo.valor
-
-        if not tipo or not valor:
-            return None
-
-        if tipo == "time":
-            return f"Clientes do time {valor}"
-
-        if tipo == "carteira":
-            return f"Clientes da carteira {valor}"
-
-        if tipo == "segmentacao":
-            return f"Clientes da segmentação {valor}"
-
-        return f"Clientes de {tipo} {valor}"
-
-    def _build_criterios(
-        self,
-        interpretation: RuleInterpretation
-    ) -> list[str]:
-
-        return [
-            condition.texto
-            for condition in interpretation.condicoes
-        ]
-
-    def _build_comportamento(
-        self,
-        interpretation: RuleInterpretation
-    ) -> str | None:
-
-        if interpretation.nao_agendar:
-            return (
-                "Não incluir esses clientes "
-                "no agendamento de atendimento."
-            )
-
-        if interpretation.frequencia:
-            return (
-                "Realizar o atendimento com frequência de "
-                f"{interpretation.frequencia}."
-            )
-
-        return None
-
-    def _format_criterios(
-        self,
-        interpretation: RuleInterpretation
+        values: list[str]
     ) -> str:
 
-        if not interpretation.condicoes:
-            return "Nenhum critério informado."
+        if not values:
+            return "Nenhum."
 
-        partes = []
-
-        for index, condition in enumerate(
-            interpretation.condicoes
-        ):
-            if index == 0:
-                partes.append(condition.texto)
-                continue
-
-            if condition.operador:
-                partes.append(
-                    f"{condition.operador} {condition.texto}"
-                )
-            else:
-                partes.append(condition.texto)
-
-        return " ".join(partes)
+        return "\n".join(
+            f"- {value}"
+            for value in values
+        )

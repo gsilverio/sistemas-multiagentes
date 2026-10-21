@@ -1,0 +1,32 @@
+[
+  {
+    "id": "01_frequencia_simples",
+    "nome": "Regra Padrao da Trenas - Customizavel: Frequencia de 7 dias para todos os clientes",
+    "explicacao": "Atenderemos cada cliente da sua carteira com frequência de 7 dias."
+  },
+  {
+    "id": "02_clientes_sem_venda",
+    "nome": "Regra Padrao da Empresa Customizavel: 14 dias para clientes sem venda",
+    "explicacao": "Para todos os clientes da nossa carteira, devemos realizar atendimento a cada 14 dias."
+  },
+  {
+    "id": "03_nao_agendar_inadimplentes",
+    "nome": "Regra Padrao da Empresa Customizavel: Não agendar inadimplentes",
+    "explicacao": "Clientes com dívidas em aberto não devem ser agendados para atendimento."
+  },
+  {
+    "id": "04_preferencia_dias_uteis",
+    "nome": "Regra Padrao da Empresa Customizavel: Atendimento semanal",
+    "explicacao": "Atenção aos clientes da carteira Empresa Perola. Não há regras específicas a serem consideradas neste momento."
+  },
+  {
+    "id": "05_nao_agendar_filiais",
+    "nome": "Não agendar filiais",
+    "explicacao": "Clientes filiais são os que devem ser atendidos. Não podemos agendar atendimento para eles."
+  },
+  {
+    "id": "06_multiplos_escopos",
+    "nome": "Clientes Prospects",
+    "explicacao": "Para clientes da segmentação televendas ruptura de fornecedor e clientes da carteira televendas consumidor, devemos realizar atendimento a cada 14 dias, sempre que o cliente estiver no ciclo de vida prospect com a empresa."
+  }
+]

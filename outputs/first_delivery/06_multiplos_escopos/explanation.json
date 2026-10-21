@@ -1,0 +1,9 @@
+{
+  "titulo": "Regra de negócio",
+  "explicacao": "Para clientes da segmentação televendas ruptura de fornecedor e clientes da carteira televendas consumidor, devemos realizar atendimento a cada 14 dias, sempre que o cliente estiver no ciclo de vida prospect com a empresa.",
+  "publico": "Clientes da segmentação televendas ruptura de fornecedor e clientes da carteira televendas consumidor.",
+  "criterios": [
+    "O cliente deve estar no ciclo de vida prospect com a empresa."
+  ],
+  "comportamento": "Realizar atendimento a cada 14 dias."
+}

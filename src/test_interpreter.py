@@ -1,20 +1,38 @@
+from src.parsers.gobr_parser import GobrParser
 from src.agents.gobr_interpreter import GobrInterpreterAgent
 
 
 def main():
-    agent = GobrInterpreterAgent()
+    parser = GobrParser()
+    interpreter = GobrInterpreterAgent()
 
     gobr = """
-        parametros "Risco de Inatividade":
-            do time("televendas")
-            quando recencia de positivacao em 45 dias
-            e fora da recencia de positivacao em 30 dias
-            frequencia de 7 dias
-        """
+parametros "Clientes Prospects":
+    da segmentacao("televendas ruptura de fornecedor")
+    e da carteira("televendas consumidor")
+    quando no ciclo de vida prospect com a empresa
+    frequencia de 14 dias
+"""
 
-    result = agent.interpret(gobr)
+    parsed = parser.parse(gobr)
 
-    print(result.model_dump_json(indent=2))
+    interpretation = interpreter.interpret(
+        parsed
+    )
+
+    print("=== PARSER ===")
+    print(
+        parsed.model_dump_json(
+            indent=2
+        )
+    )
+
+    print("\n=== INTERPRETAÇÃO SEMÂNTICA ===")
+    print(
+        interpretation.model_dump_json(
+            indent=2
+        )
+    )
 
 
 if __name__ == "__main__":

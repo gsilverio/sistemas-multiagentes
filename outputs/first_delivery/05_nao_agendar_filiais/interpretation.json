@@ -1,0 +1,12 @@
+{
+  "publico": "Clientes do time televendas.",
+  "criterios": [
+    "O cliente deve ser um cliente filial."
+  ],
+  "regra_atendimento": null,
+  "restricoes": [
+    "O cliente não deve ser incluído no agendamento de atendimento."
+  ],
+  "modificadores": [],
+  "incertezas": []
+}

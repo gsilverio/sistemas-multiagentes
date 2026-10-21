@@ -1,0 +1,4 @@
+parametros "Regra Padrao da Empresa Customizavel: Não agendar inadimplentes":
+    da carteira("empresa toda")
+    quando inadimplentes
+    nao agendar

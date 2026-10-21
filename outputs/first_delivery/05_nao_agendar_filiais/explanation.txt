@@ -1,0 +1,1 @@
+Clientes filiais são os que devem ser atendidos. Não podemos agendar atendimento para eles.

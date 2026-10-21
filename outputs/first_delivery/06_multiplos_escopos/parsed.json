@@ -1,0 +1,25 @@
+{
+  "nome": "Clientes Prospects",
+  "escopos": [
+    {
+      "tipo": "segmentacao",
+      "valor": "televendas ruptura de fornecedor",
+      "operador": null
+    },
+    {
+      "tipo": "carteira",
+      "valor": "televendas consumidor",
+      "operador": "e"
+    }
+  ],
+  "condicoes": [
+    {
+      "texto": "no ciclo de vida prospect com a empresa",
+      "operador": null
+    }
+  ],
+  "frequencia": "14 dias",
+  "nao_agendar": false,
+  "modificadores": [],
+  "desconhecidos": []
+}

@@ -1,0 +1,20 @@
+{
+  "nome": "Regra Padrao da Empresa Customizavel: Não agendar inadimplentes",
+  "escopos": [
+    {
+      "tipo": "carteira",
+      "valor": "empresa toda",
+      "operador": null
+    }
+  ],
+  "condicoes": [
+    {
+      "texto": "inadimplentes",
+      "operador": null
+    }
+  ],
+  "frequencia": null,
+  "nao_agendar": true,
+  "modificadores": [],
+  "desconhecidos": []
+}

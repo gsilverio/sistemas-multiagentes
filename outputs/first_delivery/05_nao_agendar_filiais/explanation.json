@@ -1,0 +1,9 @@
+{
+  "titulo": "Regra de negócio",
+  "explicacao": "Clientes filiais são os que devem ser atendidos. Não podemos agendar atendimento para eles.",
+  "publico": "Clientes do time televendas.",
+  "criterios": [
+    "O cliente deve ser um cliente filial."
+  ],
+  "comportamento": "O cliente não deve ser incluído no agendamento de atendimento."
+}

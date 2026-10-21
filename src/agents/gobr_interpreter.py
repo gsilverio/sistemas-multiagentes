@@ -1,6 +1,7 @@
 from langchain_ollama import ChatOllama
 
-from src.models.rule_interpretation import RuleInterpretation
+from src.models.gobr_parsed_rule import GobrParsedRule
+from src.models.semantic_interpretation import SemanticInterpretation
 from src.prompts.gobr_interpreter_prompt import GOBR_INTERPRETER_PROMPT
 
 
@@ -12,7 +13,7 @@ class GobrInterpreterAgent:
         )
 
         self.structured_model = self.model.with_structured_output(
-            RuleInterpretation,
+            SemanticInterpretation,
             method="json_schema"
         )
 
@@ -21,12 +22,105 @@ class GobrInterpreterAgent:
             | self.structured_model
         )
 
-    def interpret(self, gobr: str) -> RuleInterpretation:
+    def _build_publico(
+        self,
+        parsed_rule: GobrParsedRule
+    ) -> str | None:
+
+        if not parsed_rule.escopos:
+            return None
+
+        partes = []
+
+        for index, escopo in enumerate(parsed_rule.escopos):
+            tipo = escopo.tipo.lower()
+            valor = escopo.valor.strip()
+
+            if tipo == "carteira":
+                texto = f"Clientes da carteira {valor}"
+
+            elif tipo == "segmentacao":
+                texto = f"Clientes da segmentação {valor}"
+
+            elif tipo == "time":
+                if valor.lower() == "todos":
+                    texto = "Todos os clientes"
+                elif valor.lower() in ("toda empresa", "empresa toda"):
+                    texto = "Todos os clientes da empresa"
+                else:
+                    texto = f"Clientes do time {valor}"
+
+            else:
+                texto = f"Clientes de {tipo} {valor}"
+
+            if index == 0:
+                partes.append(texto)
+            else:
+                operador = escopo.operador or "e"
+                partes.append(
+                    f"{operador} {texto.lower()}"
+                )
+
+        return " ".join(partes) + "."
+
+    def interpret(
+        self,
+        parsed_rule: GobrParsedRule
+    ) -> SemanticInterpretation:
+
         result = self.chain.invoke({
-            "gobr": gobr
+            "nome": parsed_rule.nome,
+
+            "escopos": [
+                scope.model_dump()
+                for scope in parsed_rule.escopos
+            ],
+
+            "condicoes": [
+                condition.model_dump()
+                for condition in parsed_rule.condicoes
+            ],
+
+            "frequencia": parsed_rule.frequencia,
+
+            "nao_agendar": parsed_rule.nao_agendar,
+
+            "modificadores": parsed_rule.modificadores,
+
+            "desconhecidos": parsed_rule.desconhecidos
         })
 
-        if result.condicoes:
-            result.condicoes[0].operador = None
+        result.publico = self._build_publico(parsed_rule)
+
+        # -------------------------------------------------
+        # Garantias estruturais
+        # -------------------------------------------------
+
+        # Se não existem condições na GOBR,
+        # o agente não pode inventar critérios.
+        if not parsed_rule.condicoes:
+            result.criterios = []
+
+        # Se "nao agendar" existe na GOBR,
+        # obrigatoriamente deve existir uma restrição.
+        if parsed_rule.nao_agendar:
+            result.restricoes = [
+                "O cliente não deve ser incluído no agendamento de atendimento."
+            ]
+
+            # "Não agendar" é restrição,
+            # não é uma regra de frequência/atendimento.
+            if not parsed_rule.frequencia:
+                result.regra_atendimento = None
+
+        # Se não existem modificadores,
+        # o agente não pode inventá-los.
+        if not parsed_rule.modificadores:
+            result.modificadores = []
+
+        # Elementos desconhecidos devem ser sinalizados.
+        for desconhecido in parsed_rule.desconhecidos:
+            if desconhecido not in result.incertezas:
+                result.incertezas.append(desconhecido)
 
         return result

@@ -1,0 +1,9 @@
+{
+  "titulo": "Regra de negócio",
+  "explicacao": "Clientes com dívidas em aberto não devem ser agendados para atendimento.",
+  "publico": "Clientes da carteira empresa toda.",
+  "criterios": [
+    "O cliente deve ser inadimplente."
+  ],
+  "comportamento": "O cliente não deve ser incluído no agendamento de atendimento."
+}

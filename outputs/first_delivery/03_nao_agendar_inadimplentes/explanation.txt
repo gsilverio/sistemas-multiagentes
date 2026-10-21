@@ -1,0 +1,1 @@
+Clientes com dívidas em aberto não devem ser agendados para atendimento.

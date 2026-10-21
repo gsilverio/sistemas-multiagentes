@@ -1,0 +1,7 @@
+{
+  "titulo": "Regra de negócio",
+  "explicacao": "Atenderemos cada cliente da sua carteira com frequência de 7 dias.",
+  "publico": "Clientes da carteira empresa toda.",
+  "criterios": [],
+  "comportamento": "Realizar atendimento a cada 7 dias."
+}

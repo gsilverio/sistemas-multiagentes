@@ -1,0 +1,17 @@
+{
+  "nome": "Regra Padrao da Empresa Customizavel: Atendimento semanal",
+  "escopos": [
+    {
+      "tipo": "carteira",
+      "valor": "empresa perola",
+      "operador": null
+    }
+  ],
+  "condicoes": [],
+  "frequencia": "semanal()",
+  "nao_agendar": false,
+  "modificadores": [
+    "preferencia nos dias uteis"
+  ],
+  "desconhecidos": []
+}

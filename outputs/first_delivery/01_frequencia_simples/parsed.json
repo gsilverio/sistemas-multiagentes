@@ -1,0 +1,15 @@
+{
+  "nome": "Regra Padrao da Trenas - Customizavel: Frequencia de 7 dias para todos os clientes",
+  "escopos": [
+    {
+      "tipo": "carteira",
+      "valor": "empresa toda",
+      "operador": null
+    }
+  ],
+  "condicoes": [],
+  "frequencia": "7 dias",
+  "nao_agendar": false,
+  "modificadores": [],
+  "desconhecidos": []
+}

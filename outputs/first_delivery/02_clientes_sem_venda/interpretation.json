@@ -1,0 +1,10 @@
+{
+  "publico": "Clientes da carteira empresa toda.",
+  "criterios": [
+    "Realizar atendimento a cada 14 dias para clientes sem venda."
+  ],
+  "regra_atendimento": "Realizar atendimento a cada 14 dias.",
+  "restricoes": [],
+  "modificadores": [],
+  "incertezas": []
+}

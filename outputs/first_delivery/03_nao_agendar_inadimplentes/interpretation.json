@@ -1,0 +1,12 @@
+{
+  "publico": "Clientes da carteira empresa toda.",
+  "criterios": [
+    "O cliente deve ser inadimplente."
+  ],
+  "regra_atendimento": null,
+  "restricoes": [
+    "O cliente não deve ser incluído no agendamento de atendimento."
+  ],
+  "modificadores": [],
+  "incertezas": []
+}

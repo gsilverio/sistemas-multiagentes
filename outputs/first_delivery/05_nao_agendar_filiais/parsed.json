@@ -1,0 +1,20 @@
+{
+  "nome": "Não agendar filiais",
+  "escopos": [
+    {
+      "tipo": "time",
+      "valor": "televendas",
+      "operador": null
+    }
+  ],
+  "condicoes": [
+    {
+      "texto": "é o cliente filial",
+      "operador": null
+    }
+  ],
+  "frequencia": null,
+  "nao_agendar": true,
+  "modificadores": [],
+  "desconhecidos": []
+}

@@ -1,0 +1,3 @@
+parametros "Regra Padrao da Trenas - Customizavel: Frequencia de 7 dias para todos os clientes":
+    da carteira("empresa toda")
+    frequencia de 7 dias

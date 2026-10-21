@@ -1,0 +1,9 @@
+{
+  "titulo": "Regra de negócio",
+  "explicacao": "Para todos os clientes da nossa carteira, devemos realizar atendimento a cada 14 dias.",
+  "publico": "Clientes da carteira empresa toda.",
+  "criterios": [
+    "Realizar atendimento a cada 14 dias para clientes sem venda."
+  ],
+  "comportamento": "Realizar atendimento a cada 14 dias."
+}
