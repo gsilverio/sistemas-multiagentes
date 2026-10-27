@@ -5,6 +5,7 @@ import unicodedata
 from dataclasses import dataclass, field
 
 from src.models.gobr_parsed_rule import GobrParsedRule, ParsedCondition, ParsedScope
+from src.models.scope_text import scope_subject
 
 
 def _normalize(value: str) -> str:
@@ -39,52 +40,56 @@ class ExplanationGuard:
         if not text:
             return GuardResult(False, ["O agente retornou texto vazio."])
 
-        # Escopos: nomes exatos após normalização básica, inclusive 'empresa toda'.
+        # Conferir TODOS os valores de cada chamada de escopo, na ordem
+        # informada. `e` e `ou` referem-se somente a cláusulas distintas.
         positions = []
+        offset = 0
         for scope in parsed.escopos:
-            target = _normalize(scope.valor)
-            position = text.find(target)
-            if position < 0:
-                issues.append(f'Escopo não preservado literalmente: {scope.tipo}("{scope.valor}").')
-            positions.append((position, position + len(target)))
+            scope_positions = []
+            for value in scope.valores or [scope.valor]:
+                target = _normalize(value)
+                # Fronteiras impedem que "campo" passe por "campo_2".
+                found = re.search(
+                    rf'(?<!\w){re.escape(target)}(?!\w)', text[offset:]
+                )
+                position = offset + found.start() if found else -1
+                if position < 0:
+                    issues.append(
+                        f'Escopo não preservado literalmente: {scope.tipo}("{value}").'
+                    )
+                else:
+                    offset = position + len(target)
+                scope_positions.append((position, position + len(target)))
+            positions.append(scope_positions)
 
-        # O operador deve estar entre os dois escopos, e não entre dois
-        # conjuntos independentes de 'clientes'.
         for i, scope in enumerate(parsed.escopos[1:], start=1):
-            prev_start, prev_end = positions[i - 1]
-            next_start, _ = positions[i]
-            if prev_start < 0 or next_start < 0:
-                continue
-            if next_start < prev_end:
-                issues.append("A ordem dos escopos foi alterada.")
+            prev_positions = positions[i - 1]
+            next_positions = positions[i]
+            prev_end = prev_positions[-1][1]
+            next_start = next_positions[0][0]
+            if prev_positions[-1][0] < 0 or next_start < 0:
                 continue
             middle = text[prev_end:next_start]
-            operator = _normalize(scope.operador or "e")
-            if not re.search(rf"\b{re.escape(operator)}\b", middle):
-                issues.append(f"Operador entre escopos não preservado: {operator}.")
-            elif operator == "e" and re.search(r"\be\s+(?:os\s+)?clientes\b", middle):
-                issues.append("A conjunção foi apresentada como públicos separados.")
+            if scope.operador in ("e", "ou"):
+                operator = scope.operador
+                if not re.search(rf"\b{re.escape(operator)}\b", middle):
+                    issues.append(f"Operador entre escopos não preservado: {operator}.")
+                elif operator == "e" and re.search(r"\be\s+(?:os\s+)?clientes\b", middle):
+                    issues.append("A conjunção foi apresentada como públicos separados.")
 
-        
         for condition in parsed.condicoes:
-            normalized = _normalize(condition.texto)
-
-            if normalized == "e o cliente filial":
-                preserved = bool(
-                    re.search(
-                        r"\b(?:cliente(?:s)?\s+filia(?:l|is)|filiais)\b",
-                        text
-                    )
-                )
+            normalized_condition = _normalize(condition.texto)
+            # Mantém a correção aplicada anteriormente no Windows: "filiais"
+            # é uma formulação aceitável de "é o cliente filial".
+            if normalized_condition in ("e o cliente filial", "cliente filial"):
+                preserved = bool(re.search(
+                    r"\b(?:cliente(?:s)?\s+filia(?:l|is)|filiais)\b", text
+                ))
             else:
                 anchor = _condition_anchor(condition.texto)
                 preserved = not anchor or anchor in text
-
             if not preserved:
-                issues.append(
-                    f'Condição não preservada: "{condition.texto}".'
-                )
-
+                issues.append(f'Condição não preservada: "{condition.texto}".')
 
         if parsed.frequencia:
             frequency = _normalize(parsed.frequencia)
@@ -159,22 +164,7 @@ class ExplanationGuard:
 
     @staticmethod
     def _subject(scopes: list[ParsedScope]) -> str:
-        if not scopes:
-            return "Os clientes"
-        chunks: list[str] = []
-        for i, scope in enumerate(scopes):
-            if scope.tipo == "carteira":
-                part = f'da carteira "{scope.valor}"'
-            elif scope.tipo == "segmentacao":
-                part = f'da segmentação "{scope.valor}"'
-            elif scope.tipo == "time":
-                part = f'do time "{scope.valor}"'
-            else:
-                part = f'de {scope.tipo} "{scope.valor}"'
-            if i:
-                part = f"{scope.operador or 'e'} {part}"
-            chunks.append(part)
-        return "Os clientes " + " ".join(chunks)
+        return scope_subject(scopes)
 
     @staticmethod
     def _conditions(conditions: list[ParsedCondition]) -> str:

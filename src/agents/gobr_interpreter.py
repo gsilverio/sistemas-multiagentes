@@ -1,6 +1,7 @@
 from src.llm_config import create_llm
 
 from src.models.gobr_parsed_rule import GobrParsedRule
+from src.models.scope_text import scope_subject
 from src.models.semantic_interpretation import SemanticInterpretation
 from src.prompts.gobr_interpreter_prompt import GOBR_INTERPRETER_PROMPT
 
@@ -21,46 +22,15 @@ class GobrInterpreterAgent:
 
     def _build_publico(
         self,
-        parsed_rule: GobrParsedRule
+        parsed_rule: GobrParsedRule,
     ) -> str | None:
-
         if not parsed_rule.escopos:
             return None
-
-        partes = []
-
-        for index, escopo in enumerate(parsed_rule.escopos):
-            tipo = escopo.tipo.lower()
-            valor = escopo.valor.strip()
-
-            if tipo == "carteira":
-                texto = f'Clientes da carteira "{valor}"'
-
-            elif tipo == "segmentacao":
-                texto = f'Clientes da segmentação "{valor}"'
-
-            elif tipo == "time":
-                if valor.lower() == "todos":
-                    texto = "Todos os clientes"
-                elif valor.lower() in ("toda empresa", "empresa toda"):
-                    texto = "Todos os clientes da empresa"
-                else:
-                    texto = f'Clientes do time "{valor}"'
-
-            else:
-                texto = f'Clientes de {tipo} "{valor}"'
-
-            if index == 0:
-                partes.append(texto)
-            else:
-                operador = escopo.operador or "e"
-                # Evita "... e clientes da carteira...", que pode
-                # sugerir dois públicos independentes. Faz a interseção
-                # dos escopos na mesma expressão nominal.
-                complemento = texto.replace("Clientes ", "", 1)
-                partes.append(f"{operador} {complemento}")
-
-        return " ".join(partes) + "."
+        texto = scope_subject(parsed_rule.escopos)
+        # Mantém a abertura de texto dos exemplos originais do agente.
+        if texto.startswith("Os clientes "):
+            texto = "Clientes " + texto[len("Os clientes "):]
+        return texto + "."
 
     def interpret(
         self,

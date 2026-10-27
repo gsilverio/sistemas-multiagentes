@@ -26,18 +26,19 @@ class GobrParser:
         r'^parametros\s+"(.*)"\s*:\s*(?:#.*)?$',
         re.IGNORECASE,
     )
-    TIME_REGEX = re.compile(
-        r'^do\s+time\s*\(\s*"([^"]+)"\s*\)$',
-        re.IGNORECASE,
+    # Argumentos sao uma lista de literais entre aspas, separados por virgula.
+    # A sintaxe interna e validada separadamente para nao aceitar expressoes
+    # arbitrarias nem perder silenciosamente argumentos malformados.
+    SCOPE_PATTERNS = (
+        ("time", re.compile(r'^do\s+time\s*\((?P<args>.*)\)$', re.IGNORECASE)),
+        ("carteira", re.compile(r'^da\s+carteira\s*\((?P<args>.*)\)$', re.IGNORECASE)),
+        ("segmentacao", re.compile(
+            r'^da\s+segmenta[cç][aã]o\s*\((?P<args>.*)\)$',
+            re.IGNORECASE,
+        )),
     )
-    CARTEIRA_REGEX = re.compile(
-        r'^da\s+carteira\s*\(\s*"([^"]+)"\s*\)$',
-        re.IGNORECASE,
-    )
-    SEGMENTACAO_REGEX = re.compile(
-        r'^da\s+segmenta[cç][aã]o\s*\(\s*"([^"]+)"\s*\)$',
-        re.IGNORECASE,
-    )
+    QUOTED_ARGS = re.compile(r'^\s*"[^"\r\n]+"\s*(?:,\s*"[^"\r\n]+"\s*)*$')
+    QUOTED_VALUE = re.compile(r'"([^"\r\n]+)"')
 
     def parse(self, gobr: str) -> GobrParsedRule:
         lines = self._linhas_logicas(gobr)
@@ -158,17 +159,23 @@ class GobrParser:
             operador = "ou"
             line = line[3:].strip()
 
-        for tipo, pattern in (
-            ("time", self.TIME_REGEX),
-            ("carteira", self.CARTEIRA_REGEX),
-            ("segmentacao", self.SEGMENTACAO_REGEX),
-        ):
-            match = pattern.match(line)
-            if match:
-                result.escopos.append(
-                    ParsedScope(tipo=tipo, valor=match.group(1), operador=operador)
+        for tipo, pattern in self.SCOPE_PATTERNS:
+            match = pattern.fullmatch(line)
+            if not match:
+                continue
+            argumentos = match.group("args")
+            if not self.QUOTED_ARGS.fullmatch(argumentos):
+                return False  # Permanece em desconhecidos; nao reduz a 1 valor.
+            valores = self.QUOTED_VALUE.findall(argumentos)
+            result.escopos.append(
+                ParsedScope(
+                    tipo=tipo,
+                    valor=valores[0],
+                    valores=valores,
+                    operador=operador,
                 )
-                return True
+            )
+            return True
         return False
 
     @staticmethod
@@ -196,8 +203,6 @@ class GobrParser:
         return bool(re.match(r"^(?:e\s+)?(?:maior|menor|normal|na|no|nos|nas)\s+", normalized))
 
     def _looks_like_scope(self, line: str) -> bool:
-        return any((
-            self.TIME_REGEX.match(line),
-            self.CARTEIRA_REGEX.match(line),
-            self.SEGMENTACAO_REGEX.match(line),
-        ))
+        # Mesmo uma lista malformada precisa continuar como desconhecida,
+        # nao virar condicao acidentalmente depois de `quando`.
+        return any(pattern.fullmatch(line) for _, pattern in self.SCOPE_PATTERNS)

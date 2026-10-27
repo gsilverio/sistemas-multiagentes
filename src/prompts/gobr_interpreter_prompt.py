@@ -36,6 +36,13 @@ Escopos podem representar:
 
 Preserve os operadores lógicos entre os escopos.
 
+Cada escopo tem um `valor` (primeiro nome, por compatibilidade) e um campo
+`valores` com TODOS os nomes da mesma cláusula. Não descarte os demais nomes.
+Exemplo: `do time("campo", "televendas")` representa UMA cláusula com dois
+nomes citados; descreva como "clientes dos times campo, televendas".
+NÃO crie um operador lógico "e"/"ou" entre nomes da lista: só existe operador
+lógico quando ele é fornecido entre DUAS cláusulas de escopo distintas.
+
 NÃO utilize condições para montar o público.
 NÃO utilize frequência para montar o público.
 NÃO utilize modificadores para montar o público.

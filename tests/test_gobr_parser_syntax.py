@@ -63,20 +63,21 @@ class GobrParserSyntaxTests(unittest.TestCase):
         self.assertIn('normal na quinta', rule.modificadores[0])
         self.assertEqual([], rule.desconhecidos)
 
-    def test_nao_aceita_escopo_multivalor_sem_suporte(self):
+    def test_escopo_multivalor_uma_unica_clausula(self):
         rule = self.parser.parse('''parametros "teste":
     do time("campo", "televendas")''')
-        # Para nao perder a cardinalidade, mantem desconhecido ate haver
-        # uma estrutura propria para multiplos valores de escopo.
-        self.assertEqual([], rule.escopos)
-        self.assertEqual(['do time("campo", "televendas")'], rule.desconhecidos)
+        self.assertEqual([], rule.desconhecidos)
+        self.assertEqual(1, len(rule.escopos))
+        self.assertEqual("campo", rule.escopos[0].valor)
+        self.assertEqual(["campo", "televendas"], rule.escopos[0].valores)
+        self.assertIsNone(rule.escopos[0].operador)
 
-    def test_multilinha_escopo_multivalor_nao_se_perde(self):
+    def test_multilinha_escopo_multivalor_conservado(self):
         rule = self.parser.parse('''parametros "teste":
     do time("campo",
         "televendas")''')
-        self.assertEqual(1, len(rule.desconhecidos))
-        self.assertIn('"televendas"', rule.desconhecidos[0])
+        self.assertEqual(["campo", "televendas"], rule.escopos[0].valores)
+        self.assertEqual([], rule.desconhecidos)
 
     def test_erro_real_regra_080_001_corrigido(self):
         path = Path('data/referencias/regra_080.gobr')
