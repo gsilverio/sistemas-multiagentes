@@ -1,4 +1,11 @@
+"""Parser sintatico conservador dos blocos `parametros` da GOBR.
+
+Reconhece apenas construcoes documentadas/observadas; o conteudo nao
+suportado permanece em `desconhecidos` para impedir indexacao silenciosa.
+"""
+
 import re
+import unicodedata
 
 from src.models.gobr_parsed_rule import (
     GobrParsedRule,
@@ -7,223 +14,190 @@ from src.models.gobr_parsed_rule import (
 )
 
 
+def _sem_acentos(texto: str) -> str:
+    normalizado = unicodedata.normalize("NFKD", texto.casefold())
+    return "".join(c for c in normalizado if not unicodedata.combining(c))
+
+
 class GobrParser:
-
+    # O titulo pode conter aspas internas (inclusive parametros com CNAEs).
+    # O GobrRuleExtractor ja preserva essas aspas; nao devemos perder a regra.
     PARAMETROS_REGEX = re.compile(
-        r'^parametros\s+"([^"]+)"\s*:$',
-        re.IGNORECASE
+        r'^parametros\s+"(.*)"\s*:\s*(?:#.*)?$',
+        re.IGNORECASE,
     )
-
     TIME_REGEX = re.compile(
         r'^do\s+time\s*\(\s*"([^"]+)"\s*\)$',
-        re.IGNORECASE
+        re.IGNORECASE,
     )
-
     CARTEIRA_REGEX = re.compile(
         r'^da\s+carteira\s*\(\s*"([^"]+)"\s*\)$',
-        re.IGNORECASE
+        re.IGNORECASE,
     )
-
     SEGMENTACAO_REGEX = re.compile(
         r'^da\s+segmenta[cç][aã]o\s*\(\s*"([^"]+)"\s*\)$',
-        re.IGNORECASE
+        re.IGNORECASE,
     )
 
     def parse(self, gobr: str) -> GobrParsedRule:
-        lines = [
-            line.strip()
-            for line in gobr.splitlines()
-            if line.strip()
-        ]
-
-        nome = self._extract_name(lines)
-
-        result = GobrParsedRule(
-            nome=nome
-        )
-
+        lines = self._linhas_logicas(gobr)
+        result = GobrParsedRule(nome=self._extract_name(lines))
         condition_started = False
+        preference_started = False
 
         for line in lines:
+            normalized = _sem_acentos(line)
+
             if self.PARAMETROS_REGEX.match(line):
                 continue
 
             if self._parse_scope(line, result):
+                preference_started = False
                 continue
 
-            if line.lower().startswith("quando "):
-                texto = line[7:].strip()
-
+            if normalized.startswith("quando "):
                 result.condicoes.append(
-                    ParsedCondition(
-                        texto=texto,
-                        operador=None
-                    )
+                    ParsedCondition(texto=line[7:].strip(), operador=None)
                 )
-
                 condition_started = True
+                preference_started = False
                 continue
 
-            if (
-                condition_started
-                and line.lower().startswith("e ")
-                and not self._looks_like_scope(line[2:].strip())
-            ):
-                result.condicoes.append(
-                    ParsedCondition(
-                        texto=line[2:].strip(),
-                        operador="e"
-                    )
-                )
-
+            # Preferencia de intensidade pode ter varias linhas:
+            # preferencia\n  maior na segunda e\n  menor na terca
+            # Guardamos todas sem deduzir pesos ou preencher dias ausentes.
+            if preference_started and self._continua_preferencia(normalized):
+                result.modificadores[-1] += "\n" + line
                 continue
 
-            if (
-                condition_started
-                and line.lower().startswith("ou ")
-                and not self._looks_like_scope(line[3:].strip())
-            ):
-                result.condicoes.append(
-                    ParsedCondition(
-                        texto=line[3:].strip(),
-                        operador="ou"
-                    )
-                )
-
+            if normalized.startswith("frequencia "):
+                result.frequencia = self._parse_frequency(line)
+                preference_started = False
                 continue
 
-            if line.lower().startswith("frequencia "):
-                result.frequencia = self._parse_frequency(
-                    line
-                )
-                continue
-
-            if line.lower() == "nao agendar":
+            if normalized == "nao agendar":
                 result.nao_agendar = True
+                preference_started = False
                 continue
 
             if self._is_modifier(line):
-                result.modificadores.append(
-                    line
-                )
+                result.modificadores.append(line)
+                preference_started = normalized == "preferencia"
                 continue
 
-            result.desconhecidos.append(
-                line
-            )
+            if (
+                condition_started
+                and normalized.startswith("e ")
+                and not self._looks_like_scope(line[2:].strip())
+            ):
+                result.condicoes.append(
+                    ParsedCondition(texto=line[2:].strip(), operador="e")
+                )
+                preference_started = False
+                continue
+
+            if (
+                condition_started
+                and normalized.startswith("ou ")
+                and not self._looks_like_scope(line[3:].strip())
+            ):
+                result.condicoes.append(
+                    ParsedCondition(texto=line[3:].strip(), operador="ou")
+                )
+                preference_started = False
+                continue
+
+            result.desconhecidos.append(line)
+            preference_started = False
 
         return result
 
+    @staticmethod
+    def _linhas_logicas(gobr: str) -> list[str]:
+        """Junta continuacoes de argumentos entre parenteses; ignora comentarios.
 
-    def _extract_name(
-        self,
-        lines: list[str]
-    ) -> str:
+        Nao inventa conteudo e mantem as clausulas multivalor nao reconhecidas
+        em `desconhecidos`, para uma etapa posterior de suporte completo.
+        """
+        result: list[str] = []
+        acumulado = ""
+        balance = 0
 
+        for original in gobr.splitlines():
+            line = original.strip()
+            if not line or line.startswith("#"):
+                continue
+            if acumulado:
+                acumulado += " " + line
+            else:
+                acumulado = line
+            balance += line.count("(") - line.count(")")
+            if balance <= 0:
+                result.append(acumulado)
+                acumulado = ""
+                balance = 0
+
+        if acumulado:
+            result.append(acumulado)  # Sintaxe incompleta continua detectavel.
+        return result
+
+    def _extract_name(self, lines: list[str]) -> str:
         for line in lines:
-            match = self.PARAMETROS_REGEX.match(
-                line
-            )
-
+            match = self.PARAMETROS_REGEX.match(line)
             if match:
                 return match.group(1)
+        raise ValueError("Bloco parametros não encontrado.")
 
-        raise ValueError(
-            "Bloco parametros não encontrado."
-        )
-
-    def _parse_scope(
-        self,
-        line: str,
-        result: GobrParsedRule
-    ) -> bool:
-
+    def _parse_scope(self, line: str, result: GobrParsedRule) -> bool:
         operador = None
-        original = line
-
-        if line.lower().startswith("e "):
+        normalized = _sem_acentos(line)
+        if normalized.startswith("e "):
             operador = "e"
             line = line[2:].strip()
-
-        elif line.lower().startswith("ou "):
+        elif normalized.startswith("ou "):
             operador = "ou"
             line = line[3:].strip()
 
-        match = self.TIME_REGEX.match(line)
-
-        if match:
-            result.escopos.append(
-                ParsedScope(
-                    tipo="time",
-                    valor=match.group(1),
-                    operador=operador
+        for tipo, pattern in (
+            ("time", self.TIME_REGEX),
+            ("carteira", self.CARTEIRA_REGEX),
+            ("segmentacao", self.SEGMENTACAO_REGEX),
+        ):
+            match = pattern.match(line)
+            if match:
+                result.escopos.append(
+                    ParsedScope(tipo=tipo, valor=match.group(1), operador=operador)
                 )
-            )
-            return True
-
-        match = self.CARTEIRA_REGEX.match(
-            line
-        )
-
-        if match:
-            result.escopos.append(
-                ParsedScope(
-                    tipo="carteira",
-                    valor=match.group(1),
-                    operador=operador
-                )
-            )
-            return True
-
-        match = self.SEGMENTACAO_REGEX.match(
-            line
-        )
-
-        if match:
-            result.escopos.append(
-                ParsedScope(
-                    tipo="segmentacao",
-                    valor=match.group(1),
-                    operador=operador
-                )
-            )
-            return True
-
+                return True
         return False
 
-    def _parse_frequency(
-        self,
-        line: str
-    ) -> str:
-
-        value = line[
-            len("frequencia")::
-        ].strip()
-
-        if value.lower().startswith("de "):
+    @staticmethod
+    def _parse_frequency(line: str) -> str:
+        # Comprimento e identico para "frequencia" e "frequência".
+        value = line[len("frequencia"):].strip()
+        if _sem_acentos(value).startswith("de "):
             value = value[3:].strip()
-
         return value
-    
-    def _is_modifier(
-        self,
-        line: str
-    ) -> bool:
 
-        normalized = line.lower()
-
+    @staticmethod
+    def _is_modifier(line: str) -> bool:
+        normalized = _sem_acentos(line)
         return (
             normalized.startswith("preferencia ")
+            or normalized == "preferencia"
             or normalized == "na ultima semana"
+            or normalized in ("fixo", "roteirizavel")
+            or normalized.startswith("sem choque ")
+            or bool(re.fullmatch(r"a partir do dia\s+\d{1,2}", normalized))
         )
 
-    def _looks_like_scope(
-        self,
-        line: str
-    ) -> bool:
+    @staticmethod
+    def _continua_preferencia(normalized: str) -> bool:
+        return bool(re.match(r"^(?:e\s+)?(?:maior|menor|normal|na|no|nos|nas)\s+", normalized))
 
-        return any([
+    def _looks_like_scope(self, line: str) -> bool:
+        return any((
             self.TIME_REGEX.match(line),
             self.CARTEIRA_REGEX.match(line),
-            self.SEGMENTACAO_REGEX.match(line)
-        ])
+            self.SEGMENTACAO_REGEX.match(line),
+        ))
