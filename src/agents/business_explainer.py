@@ -1,4 +1,4 @@
-from langchain_ollama import ChatOllama
+from src.llm_config import create_llm
 
 from src.models.business_explanation import BusinessExplanation
 from src.models.semantic_interpretation import SemanticInterpretation
@@ -7,10 +7,7 @@ from src.prompts.business_explainer_prompt import BUSINESS_EXPLAINER_PROMPT
 
 class BusinessExplainerAgent:
     def __init__(self):
-        self.model = ChatOllama(
-            model="gemma3:4b",
-            temperature=0
-        )
+        self.model = create_llm()
 
         self.chain = (
             BUSINESS_EXPLAINER_PROMPT

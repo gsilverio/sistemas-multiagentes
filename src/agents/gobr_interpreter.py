@@ -1,4 +1,4 @@
-from langchain_ollama import ChatOllama
+from src.llm_config import create_llm
 
 from src.models.gobr_parsed_rule import GobrParsedRule
 from src.models.semantic_interpretation import SemanticInterpretation
@@ -7,10 +7,7 @@ from src.prompts.gobr_interpreter_prompt import GOBR_INTERPRETER_PROMPT
 
 class GobrInterpreterAgent:
     def __init__(self):
-        self.model = ChatOllama(
-            model="gemma3:4b",
-            temperature=0
-        )
+        self.model = create_llm()
 
         self.structured_model = self.model.with_structured_output(
             SemanticInterpretation,

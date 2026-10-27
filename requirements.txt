@@ -1,5 +1,5 @@
-langchain
-langchain-ollama
-langgraph
-pydantic
-python-dotenv
+# Dependencias existentes utilizadas pelo pipeline (Python 3.10+)
+# Instaladas tanto no Windows quanto no Google Colab.
+pydantic>=2,<3
+langchain-ollama>=1,<2
+langgraph>=1,<2

@@ -1,1 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
 .venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Segredos e configuracoes locais
+.env
+.env.*
+!.env.example
+*.key
+
+# Resultados locais gerados durante testes e execucao em lote
+outputs/colab_generated/
+outputs/generated/
+outputs/reference_explanations/
+
+# Sistema / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
