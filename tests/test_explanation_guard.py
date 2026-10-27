@@ -81,6 +81,23 @@ class ExplanationGuardTests(unittest.TestCase):
         self.assertFalse(result.accepted)
         self.assertIn('Cláusulas ainda não interpretadas', self.guard.conservative_fallback(rule))
 
+    def test_filiais_no_plural(self):
+        rule = self.parser.parse('''
+        parametros "Não agendar filiais":
+            do time("televendas")
+            quando é o cliente filial
+            nao agendar
+        ''')
+
+        explanation = (
+            "Clientes do time televendas que forem filiais "
+            "não devem ser agendados para atendimento."
+        )
+
+        self.assertTrue(
+            self.guard.inspect(rule, explanation).accepted
+        )
+
 
 if __name__ == '__main__':
     unittest.main()

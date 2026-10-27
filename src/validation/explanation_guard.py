@@ -65,10 +65,26 @@ class ExplanationGuard:
             elif operator == "e" and re.search(r"\be\s+(?:os\s+)?clientes\b", middle):
                 issues.append("A conjunção foi apresentada como públicos separados.")
 
+        
         for condition in parsed.condicoes:
-            anchor = _condition_anchor(condition.texto)
-            if anchor and anchor not in text:
-                issues.append(f'Condição não preservada: "{condition.texto}".')
+            normalized = _normalize(condition.texto)
+
+            if normalized == "e o cliente filial":
+                preserved = bool(
+                    re.search(
+                        r"\b(?:cliente(?:s)?\s+filia(?:l|is)|filiais)\b",
+                        text
+                    )
+                )
+            else:
+                anchor = _condition_anchor(condition.texto)
+                preserved = not anchor or anchor in text
+
+            if not preserved:
+                issues.append(
+                    f'Condição não preservada: "{condition.texto}".'
+                )
+
 
         if parsed.frequencia:
             frequency = _normalize(parsed.frequencia)
