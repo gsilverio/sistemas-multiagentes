@@ -58,3 +58,12 @@ Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`
 - As saídas do Colab são salvas diretamente em `Meu Drive/gobr-agent/outputs/first_delivery_colab`.
 - O Colab apenas executa o pipeline; **o código-fonte continua sendo mantido no Windows e enviado ao GitHub**.
 - A indexação das explicações (segunda entrega) permanece pendente.
+
+
+## Revisão estrutural das explicações (antes do RAG)
+- `src/validation/explanation_guard.py` verifica elementos da AST contra o texto final: nomes de escopo, operadores lógicos, condições, frequência, restrição `nao agendar` e modificadores.
+- Quando detecta divergências, gera uma explicação conservadora, extraída da AST, e marca `revisao.status = "needs_review"`; também preserva o `rascunho_llm` e as causas. Caso contrário, marca `pending_review` — **nenhuma explicação é aprovada automaticamente para indexação**.
+- Os seis exemplos usam `explainer.explain(interpretation, parsed_rule=parsed)` para fornecer o GOBR original. Chamadas legadas sem `parsed_rule` continuam possíveis, mas retornam `needs_review`.
+- Verificações offline, sem LLM: `python -m unittest discover -s tests -v`.
+- O notebook atualizado grava esta rodada em `outputs/first_delivery_colab_v2` no Drive, preservando os resultados anteriores. Reinicie a sessão do Colab antes de clonar/rodar o novo código.
+- A revisão estrutural não substitui revisão humana nem validação semântica e não implementa avaliação quantitativa por accuracy.

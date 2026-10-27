@@ -115,7 +115,8 @@ def main():
         )
 
         explanation = explainer.explain(
-            interpretation
+            interpretation,
+            parsed_rule=parsed,
         )
 
         case_dir = OUTPUT_DIR / case_id
@@ -173,7 +174,8 @@ def main():
         summary.append({
             "id": case_id,
             "nome": parsed.nome,
-            "explicacao": explanation.explicacao
+            "explicacao": explanation.explicacao,
+            "revisao": explanation.revisao.model_dump() if explanation.revisao else None,
         })
 
         print(

@@ -33,6 +33,31 @@ segmentações, carteiras, times e classificações recebidas na interpretação
 Exemplo:
 "ciclo de vida prospect" deve continuar sendo "ciclo de vida prospect".
 Não substitua por "prospectação", "prospectivo" ou outros sinônimos.
+
+
+RESTRIÇÕES QUE NÃO PODEM SER REINTERPRETADAS:
+- "O cliente não deve ser incluído no agendamento" significa que o sistema
+  não deve AGENDAR aquele cliente. Não significa que o cliente já está agendado.
+- Não diga "não pode estar agendado", "já agendados ficam excluídos", nem
+  invente cancelamento ou alteração de agendamentos preexistentes.
+- Quando existir restrição de não agendar, use uma formulação explícita:
+  "não devem ser agendados para atendimento".
+
+PRESERVAÇÃO LITERAL:
+- Copie os nomes completos dos times, carteiras e segmentações, com a
+  mesma grafia do campo Público. Ex.: "empresa toda" não é "empresa".
+- Não corrija grafia, capitalização ou acentos de nomes cadastrados.
+- Mantenha condições do domínio sem criar fatos adicionais:
+  "sem venda" não quer dizer "nunca realizou nenhuma compra".
+- Se o público possui dois escopos associados por "e", descreva os clientes
+  que pertencem a AMBOS. Não descreva dois públicos independentes.
+- Prefira períodos curtos, diretos, sem pressupor regras que não foram dadas.
+
+EXEMPLOS DE FORMULAÇÕES:
+- "Os clientes da carteira empresa toda que estiverem sem venda devem
+  receber atendimento a cada 14 dias."
+- "Os clientes do time televendas que forem filiais não devem ser
+  agendados para atendimento."
 """
         ),
         (

@@ -23,7 +23,8 @@ parametros "Clientes Prospects":
     )
 
     explanation = explainer.explain(
-        interpretation
+        interpretation,
+        parsed_rule=parsed,
     )
 
     print("=== PARSER ===")
