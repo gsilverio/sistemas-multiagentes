@@ -1,3 +1,5 @@
+import json
+
 from src.llm_config import create_llm
 
 from src.models.gobr_parsed_rule import GobrParsedRule
@@ -34,11 +36,16 @@ class GobrInterpreterAgent:
 
     def interpret(
         self,
-        parsed_rule: GobrParsedRule
+        parsed_rule: GobrParsedRule,
+        contexto: list[dict[str, str]] | None = None,
     ) -> SemanticInterpretation:
 
         result = self.chain.invoke({
             "nome": parsed_rule.nome,
+
+            "contexto_definicoes": (
+                json.dumps(contexto, ensure_ascii=False) if contexto else "Nenhuma."
+            ),
 
             "escopos": [
                 scope.model_dump()
