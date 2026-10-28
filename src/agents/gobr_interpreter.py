@@ -56,6 +56,8 @@ class GobrInterpreterAgent:
 
             "modificadores": parsed_rule.modificadores,
 
+            "filtros_temporais": parsed_rule.filtros_temporais,
+
             "desconhecidos": parsed_rule.desconhecidos
         })
 
@@ -93,6 +95,13 @@ class GobrInterpreterAgent:
             # não é uma regra de frequência/atendimento.
             if not parsed_rule.frequencia:
                 result.regra_atendimento = None
+
+        # Filtros de execucao sao preservados deterministamente; nao
+        # devem ser interpretados como preferencias de visita.
+        result.filtros_temporais = [
+            f"A regra deve ser aplicada somente {filtro}."
+            for filtro in parsed_rule.filtros_temporais
+        ]
 
         # Se não existem modificadores,
         # o agente não pode inventá-los.

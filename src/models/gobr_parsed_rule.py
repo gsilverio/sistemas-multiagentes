@@ -34,4 +34,6 @@ class GobrParsedRule(BaseModel):
     frequencia: Optional[str] = None
     nao_agendar: bool = False
     modificadores: list[str] = Field(default_factory=list)
+    # Filtros de EXECUCAO da regra; distintos da preferencia de VISITA.
+    filtros_temporais: list[str] = Field(default_factory=list)
     desconhecidos: list[str] = Field(default_factory=list)

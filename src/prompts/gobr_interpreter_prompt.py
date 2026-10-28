@@ -20,6 +20,7 @@ Você deve responder com:
 - regra_atendimento
 - restricoes
 - modificadores
+- filtros_temporais
 - incertezas
 
 
@@ -137,6 +138,22 @@ Caso não existam restrições, utilize lista vazia.
 
 
 ==================================================
+FILTROS TEMPORAIS
+==================================================
+
+Filtros temporais indicam QUANDO a regra se aplica, nao quando o cliente
+prefere receber a visita.
+
+Exemplos:
+- `na segunda`: regra aplicavel somente na segunda-feira.
+- `a partir do dia 16`: regra aplicavel a partir do dia 16 do mes.
+
+Ja `preferencia maior na segunda` indica a PRIORIDADE de visita
+na segunda; e um modificador de preferencia, nao um filtro temporal.
+
+Nao confunda os dois tipos de configuracao, mesmo quando citarem o mesmo dia.
+
+==================================================
 MODIFICADORES
 ==================================================
 
@@ -162,6 +179,7 @@ escopos      -> publico
 condicoes    -> criterios
 frequencia   -> regra_atendimento
 nao_agendar  -> restricoes
+filtros_temporais -> filtros_temporais
 modificadores -> modificadores
 desconhecidos -> incertezas
 
@@ -251,6 +269,9 @@ Não agendar:
 
 Modificadores:
 {modificadores}
+
+Filtros temporais:
+{filtros_temporais}
 
 Cláusulas desconhecidas:
 {desconhecidos}

@@ -40,8 +40,8 @@ class GobrParserSyntaxTests(unittest.TestCase):
         self.assertEqual([
             'fixo', 'roteirizavel',
             'sem choque na rota com time("campo")',
-            'a partir do dia 16',
         ], rule.modificadores)
+        self.assertEqual(['a partir do dia 16'], rule.filtros_temporais)
         self.assertEqual([], rule.desconhecidos)
 
     def test_comentario_nao_e_instrucao(self):

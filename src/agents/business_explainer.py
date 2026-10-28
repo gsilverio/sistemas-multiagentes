@@ -34,6 +34,9 @@ class BusinessExplainerAgent:
         modificadores_formatados = self._format_list(
             interpretation.modificadores
         )
+        filtros_temporais_formatados = self._format_list(
+            interpretation.filtros_temporais
+        )
 
         incertezas_formatadas = self._format_list(
             interpretation.incertezas
@@ -51,6 +54,7 @@ class BusinessExplainerAgent:
             ),
             "restricoes": restricoes_formatadas,
             "modificadores": modificadores_formatados,
+            "filtros_temporais": filtros_temporais_formatados,
             "incertezas": incertezas_formatadas
         })
 
@@ -104,6 +108,7 @@ class BusinessExplainerAgent:
             publico=interpretation.publico,
             criterios=interpretation.criterios,
             comportamento=comportamento,
+            filtros_temporais=interpretation.filtros_temporais,
             revisao=review,
         )
 

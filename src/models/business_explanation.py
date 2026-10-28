@@ -17,4 +17,5 @@ class BusinessExplanation(BaseModel):
     publico: str | None = None
     criterios: list[str] = Field(default_factory=list)
     comportamento: str | None = None
+    filtros_temporais: list[str] = Field(default_factory=list)
     revisao: ExplanationReview | None = None

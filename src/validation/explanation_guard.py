@@ -116,6 +116,26 @@ class ExplanationGuard:
             if re.search(r"\bnao\s+(?:pode|podem|deve|devem)\s+estar\s+agendad\w*", text):
                 issues.append("A proibição foi transformada em estado do cliente.")
 
+        # O dia na preferencia de visita NAO basta para comprovar
+        # que um filtro de execucao foi explicado.
+        sentences = re.split(r"[.!?;\n]+", text)
+        for filtro in parsed.filtros_temporais:
+            normalized = _normalize(filtro)
+            presente_como_filtro = any(
+                re.search(rf"(?<!\w){re.escape(normalized)}(?!\w)", sentence)
+                and re.search(
+                    r"\b(?:aplic\w*|execut\w*|somente|apenas|restrit\w*|filtro\w*)\b",
+                    sentence,
+                )
+                and not re.search(
+                    r"\b(?:nao|nunca)\s+(?:(?:deve\s+)?(?:ser\s+)?|se\s+)(?:aplic\w*|execut\w*)\b",
+                    sentence,
+                )
+                for sentence in sentences
+            )
+            if not presente_como_filtro:
+                issues.append(f'Filtro temporal de execucao nao preservado: "{filtro}".')
+
         for modifier in parsed.modificadores:
             normalized = _normalize(modifier)
             if "preferencia" in normalized and "dias uteis" in normalized:
@@ -151,6 +171,9 @@ class ExplanationGuard:
         if clauses:
             result += " " + "; ".join(clauses)
         result += "."
+
+        for filtro in parsed.filtros_temporais:
+            result += f" A regra deve ser aplicada somente {filtro}."
 
         for modifier in parsed.modificadores:
             if "preferencia" in _normalize(modifier) and "dias uteis" in _normalize(modifier):

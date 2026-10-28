@@ -22,6 +22,11 @@ class SemanticInterpretation(BaseModel):
         description="Restrições ou impedimentos definidos pela regra"
     )
 
+    filtros_temporais: list[str] = Field(
+        default_factory=list,
+        description="Filtros que restringem quando a parametrizacao e aplicada"
+    )
+
     modificadores: list[str] = Field(
         default_factory=list,
         description="Significado comercial dos modificadores encontrados"

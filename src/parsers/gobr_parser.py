@@ -67,8 +67,20 @@ class GobrParser:
             # Preferencia de intensidade pode ter varias linhas:
             # preferencia\n  maior na segunda e\n  menor na terca
             # Guardamos todas sem deduzir pesos ou preencher dias ausentes.
-            if preference_started and self._continua_preferencia(normalized):
+            if preference_started and self._continua_preferencia(
+                normalized,
+                allow_bare_day=(
+                    _sem_acentos(result.modificadores[-1].splitlines()[0]) == "preferencia"
+                ),
+            ):
                 result.modificadores[-1] += "\n" + line
+                continue
+
+            # Filtro temporal restringe QUANDO a regra sera executada.
+            # Nao deve ser confundido com preferencias de agendamento.
+            if self._is_temporal_filter(normalized):
+                result.filtros_temporais.append(line)
+                preference_started = False
                 continue
 
             if normalized.startswith("frequencia "):
@@ -83,7 +95,13 @@ class GobrParser:
 
             if self._is_modifier(line):
                 result.modificadores.append(line)
-                preference_started = normalized == "preferencia"
+                preference_started = (
+                    normalized == "preferencia"
+                    or bool(re.match(
+                        r"^preferencia\s+(?:maior|menor|normal)\s+(?:na|no|nos|nas)\s+",
+                        normalized,
+                    ))
+                )
                 continue
 
             if (
@@ -192,15 +210,32 @@ class GobrParser:
         return (
             normalized.startswith("preferencia ")
             or normalized == "preferencia"
-            or normalized == "na ultima semana"
             or normalized in ("fixo", "roteirizavel")
             or normalized.startswith("sem choque ")
-            or bool(re.fullmatch(r"a partir do dia\s+\d{1,2}", normalized))
         )
 
     @staticmethod
-    def _continua_preferencia(normalized: str) -> bool:
-        return bool(re.match(r"^(?:e\s+)?(?:maior|menor|normal|na|no|nos|nas)\s+", normalized))
+    def _is_temporal_filter(normalized: str) -> bool:
+        """Somente filtros com semantica documentada (manual, capitulo 5)."""
+        if normalized in (
+            "na segunda", "na terca", "na quarta", "na quinta", "na sexta",
+            "no sabado", "no domingo", "todos os dias", "nos dias uteis",
+            "no fim de semana", "na ultima semana", "na primeira semana",
+            "na segunda semana", "na terceira semana", "na quarta semana",
+            "na primeira quinzena", "na segunda quinzena",
+        ):
+            return True
+        return bool(re.fullmatch(r"a partir do dia\s+\d{1,2}", normalized))
+
+    @staticmethod
+    def _continua_preferencia(normalized: str, *, allow_bare_day: bool = False) -> bool:
+        # A preferencia em bloco admite "na terca" isolado; apos uma
+        # preferencia INLINE, essa frase e um filtro temporal independente.
+        if re.match(r"^(?:e\s+)?(?:maior|menor|normal)\s+", normalized):
+            return True
+        if re.match(r"^e\s+(?:na|no|nos|nas)\s+", normalized):
+            return True
+        return allow_bare_day and bool(re.match(r"^(?:na|no|nos|nas)\s+", normalized))
 
     def _looks_like_scope(self, line: str) -> bool:
         # Mesmo uma lista malformada precisa continuar como desconhecida,

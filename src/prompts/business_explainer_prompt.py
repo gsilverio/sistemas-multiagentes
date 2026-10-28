@@ -26,7 +26,9 @@ REGRAS:
 9. Inclua a regra de atendimento quando existir.
 10. Inclua restrições quando existirem.
 11. Inclua modificadores relevantes quando existirem.
-12. Não tente resolver ou inventar o significado de incertezas.
+12. Quando houver filtros temporais, explique que eles limitam os dias
+    de APLICACAO da regra; nao os trate como preferencia de visita.
+13. Não tente resolver ou inventar o significado de incertezas.
 13. Preserve literalmente termos de domínio, nomes de status, ciclos de vida,
 segmentações, carteiras, times e classificações recebidas na interpretação.
 
@@ -77,6 +79,9 @@ Restrições:
 
 Modificadores:
 {modificadores}
+
+Filtros temporais de aplicacao da regra:
+{filtros_temporais}
 
 Incertezas:
 {incertezas}
