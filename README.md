@@ -71,4 +71,9 @@ Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`
 ## Indexação rápida das explicações
 - O notebook inclui as etapas 16 e 17 para criar um índice FAISS persistente com embeddings multilíngues e testar consultas sem chamar o Gemma novamente.
 - Para fechar a entrega rapidamente, `--include-pending` indexa os itens concluídos mesmo quando ainda estão marcados como `indexable: false`; o índice registra esses documentos como `provisional` para permitir reconstrução posterior após revisão.
-- O manual GOBR e a integração RAG/LangGraph continuam sendo a etapa seguinte.
+- O manual GOBR possui um índice FAISS separado em `src/index_manual.py`. Ele deve ser usado primeiro como contexto interno do agente para gerar GOBR; não é necessário expor o texto do manual diretamente ao usuário nesta etapa.
+
+## Indexação interna do manual
+- O PDF de origem é `data/manual/govendas-rules.pdf`.
+- O comando `python -m src.index_manual --pdf data/manual/govendas-rules.pdf --output-dir outputs/manual_index` extrai o texto por página, cria trechos com sobreposição e preserva página/título nos metadados.
+- O notebook do Colab grava o índice do manual no Drive. A integração posterior deve recuperar primeiro o manual e as explicações, gerar a saída GOBR e validá-la com o parser determinístico.

@@ -6,3 +6,5 @@ langgraph>=1,<2
 # Indexação vetorial executada no Colab (usa CUDA quando disponível).
 sentence-transformers>=3,<6
 faiss-cpu>=1.8,<2
+# Extração do PDF do manual antes da indexação.
+pypdf>=5,<7
