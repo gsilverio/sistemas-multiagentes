@@ -211,7 +211,14 @@ def build_index(
 
 
 def search_index(index_dir: Path, query: str, *, k: int = 4) -> list[dict[str, Any]]:
-    """Search a persisted manual index."""
+    """Search a persisted manual index with semantic and lexical ranking.
+
+    FAISS is excellent for concepts, but GOBR also contains exact DSL clauses
+    such as ``nao agendar``.  We therefore retrieve all small-manual
+    candidates, then add a lexical overlap/phrase bonus before returning the
+    top ``k`` results.  This keeps semantic matches while prioritizing an
+    exact syntax occurrence when one exists.
+    """
     if k <= 0:
         return []
     from sentence_transformers import SentenceTransformer
@@ -228,13 +235,35 @@ def search_index(index_dir: Path, query: str, *, k: int = 4) -> list[dict[str, A
         convert_to_numpy=True,
     )
     index = faiss.read_index(str(index_dir / "manual.faiss"))
-    scores, positions = index.search(vector, min(k, index.ntotal))
+    scores, positions = index.search(vector, index.ntotal)
     documents = json.loads((index_dir / "documents.json").read_text(encoding="utf-8"))
-    return [
-        {"score": float(scores[0][i]), **documents[pos]}
-        for i, pos in enumerate(positions[0])
-        if pos >= 0
-    ]
+    query_normalized = normalize_for_embedding(query)
+    query_tokens = set(query_normalized.split())
+    ranked: list[dict[str, Any]] = []
+    for i, pos in enumerate(positions[0]):
+        if pos < 0:
+            continue
+        document = documents[pos]
+        document_normalized = normalize_for_embedding(document["text"])
+        document_tokens = set(document_normalized.split())
+        lexical_score = (
+            len(query_tokens & document_tokens) / len(query_tokens)
+            if query_tokens
+            else 0.0
+        )
+        phrase_bonus = 0.35 if query_normalized in document_normalized else 0.0
+        semantic_score = float(scores[0][i])
+        hybrid_score = semantic_score + 0.25 * lexical_score + phrase_bonus
+        ranked.append(
+            {
+                "score": hybrid_score,
+                "semantic_score": semantic_score,
+                "lexical_score": lexical_score,
+                **document,
+            }
+        )
+    ranked.sort(key=lambda item: item["score"], reverse=True)
+    return ranked[: min(k, len(ranked))]
 
 
 def _cuda_available() -> bool:

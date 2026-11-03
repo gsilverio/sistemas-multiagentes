@@ -2,7 +2,7 @@
 
 O manual é uma fonte de contexto do agente, separada do índice das explicações. Nesta primeira versão ele não responde diretamente ao usuário: a consulta do usuário recupera trechos do manual para orientar a geração da regra GOBR, que continua passando pelo `GobrParser` e pelas validações determinísticas.
 
-O texto original permanece preservado em `documents.json`. Para gerar embeddings e buscar, o indexador usa uma cópia normalizada: remove acentos, pontuação decorativa e eventuais caracteres de substituição `�`. Portanto, `frequência` e `frequencia` recuperam os mesmos trechos sem degradar o texto que poderá ser exibido ou citado depois.
+O texto original permanece preservado em `documents.json`. Para gerar embeddings e buscar, o indexador usa uma cópia normalizada: remove acentos, pontuação decorativa e eventuais caracteres de substituição `�`. Portanto, `frequência` e `frequencia` recuperam os mesmos trechos sem degradar o texto que poderá ser exibido ou citado depois. A consulta também recebe um pequeno bônus literal para cláusulas exatas da DSL, como `nao agendar`, que podem ser subestimadas por uma busca puramente semântica.
 
 Depois de instalar `requirements.txt` e clonar o projeto no Colab:
 
