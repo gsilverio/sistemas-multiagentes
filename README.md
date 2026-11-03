@@ -42,7 +42,7 @@ Na raiz do projeto:
 python -m src.demo_first_delivery
 ```
 
-Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`. A codebase também contém 246 referências `.gobr` em `data/referencias/` e três exemplos adicionais com PDFs e suas regras. Nenhuma indexação foi implementada nesta etapa.
+Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`. A codebase também contém 246 referências `.gobr` em `data/referencias/` e três exemplos adicionais com PDFs e suas regras. A preparação do acervo, a geração incremental e o indexador vetorial das explicações estão disponíveis para execução no Colab.
 
 ## Escopo da limpeza
 
@@ -57,7 +57,7 @@ Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`
 - Dependencias: `pip install -r requirements.txt`.
 - As saídas do Colab são salvas diretamente em `Meu Drive/gobr-agent/outputs/first_delivery_colab`.
 - O Colab apenas executa o pipeline; **o código-fonte continua sendo mantido no Windows e enviado ao GitHub**.
-- A indexação das explicações (segunda entrega) permanece pendente.
+- A execução do lote e a gravação do índice no Drive ainda precisam ser feitas no Colab; o código está em `src/batch_reference_explanations.py` e `src/index_explanations.py`.
 
 
 ## Revisão estrutural das explicações (antes do RAG)
@@ -67,3 +67,8 @@ Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`
 - Verificações offline, sem LLM: `python -m unittest discover -s tests -v`.
 - O notebook atualizado grava esta rodada em `outputs/first_delivery_colab_v2` no Drive, preservando os resultados anteriores. Reinicie a sessão do Colab antes de clonar/rodar o novo código.
 - A revisão estrutural não substitui revisão humana nem validação semântica e não implementa avaliação quantitativa por accuracy.
+
+## Indexação rápida das explicações
+- O notebook inclui as etapas 16 e 17 para criar um índice FAISS persistente com embeddings multilíngues e testar consultas sem chamar o Gemma novamente.
+- Para fechar a entrega rapidamente, `--include-pending` indexa os itens concluídos mesmo quando ainda estão marcados como `indexable: false`; o índice registra esses documentos como `provisional` para permitir reconstrução posterior após revisão.
+- O manual GOBR e a integração RAG/LangGraph continuam sendo a etapa seguinte.

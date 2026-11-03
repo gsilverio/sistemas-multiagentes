@@ -4,27 +4,28 @@ from langgraph.graph import StateGraph, START, END
 
 from src.agents.gobr_interpreter import GobrInterpreterAgent
 from src.agents.business_explainer import BusinessExplainerAgent
-from src.models.rule_interpretation import RuleInterpretation
+from src.models.semantic_interpretation import SemanticInterpretation
+from src.parsers.gobr_parser import GobrParser
 from src.models.business_explanation import BusinessExplanation
 
 
 class ExplanationState(TypedDict):
     gobr: str
-    interpretation: RuleInterpretation | None
+    interpretation: SemanticInterpretation | None
     explanation: BusinessExplanation | None
 
 
 interpreter_agent = GobrInterpreterAgent()
 explainer_agent = BusinessExplainerAgent()
+gobr_parser = GobrParser()
 
 
 def interpret_gobr(
     state: ExplanationState
 ) -> ExplanationState:
 
-    interpretation = interpreter_agent.interpret(
-        state["gobr"]
-    )
+    parsed_rule = gobr_parser.parse(state["gobr"])
+    interpretation = interpreter_agent.interpret(parsed_rule)
 
     return {
         **state,
@@ -43,9 +44,8 @@ def explain_business_rule(
             "A interpretação GOBR não foi gerada."
         )
 
-    explanation = explainer_agent.explain(
-        interpretation
-    )
+    parsed_rule = gobr_parser.parse(state["gobr"])
+    explanation = explainer_agent.explain(interpretation, parsed_rule=parsed_rule)
 
     return {
         **state,
