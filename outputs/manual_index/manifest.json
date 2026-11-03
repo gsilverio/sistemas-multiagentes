@@ -1,0 +1,9 @@
+{
+  "kind": "gobr_manual_index",
+  "count": 64,
+  "pages": 61,
+  "dimension": 384,
+  "embedding_model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "device": "cuda",
+  "source_pdf": "govendas-rules.pdf"
+}

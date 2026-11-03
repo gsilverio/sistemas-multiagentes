@@ -1,0 +1,706 @@
+[
+  {
+    "id": "manual_p001_c01",
+    "text": "......................................................................................................................................\nGovendas Business Rules (GoBR)\nv. 0.89.0\nGuia do Usuário GoBR\n......................................................................................................................................\nGovendas Assistente de Vendas\nInteligente\n2026-09-29",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 1,
+      "trecho": 1,
+      "titulo_pagina": "Govendas Business Rules (GoBR)"
+    }
+  },
+  {
+    "id": "manual_p003_c01",
+    "text": "Índicei\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nÍndice\n.......................................................................................................................................\nÍndice ......................................................................... i\n1. Govendas Business Rules ................................................. 1\n2. A linguagem gorules ....................................................... 3\n3. Regras para times de vendedores ......................................... 5\n4. Regras para carteiras e segmentações de clientes ...................... 8\n5. Regras para filtros temporais ............................................. 18\n6. Regras para filtros de clientes ............................................ 22\n7. Regras para parâmetros das carteiras de clientes ...................... 38\n8. Regras para alertas de clientes ........................................... 47\n9. Regras para tags de clientes ............................................. 55\n10. Gramática da Linguagem gorules (versão 1.0) .......................... 57",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 3,
+      "trecho": 1,
+      "titulo_pagina": "Índicei"
+    }
+  },
+  {
+    "id": "manual_p004_c01",
+    "text": "Índiceii\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 4,
+      "trecho": 1,
+      "titulo_pagina": "Índiceii"
+    }
+  },
+  {
+    "id": "manual_p005_c01",
+    "text": "1 GovendasBusinessRules1\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n1 Govendas Business Rules\n.......................................................................................................................................\nO Govendas Business Rules (GoBR) é um sistema de regras de negócio que permite:\n• Construir e organizar carteiras de clientes para equipes de vendedores;\n• Parametrizar o comportamento de atendimento dos clientes segundo as\nregras comerciais do distribuidor;\n• Realizar análise de eventos complexos (como rupturas de venda,\ninadimplência e campanhas) baseados nessas mesmas regras;\n• Automatizar a execução dessas regras em horários pré-definidos ou sob\ndemanda, garantindo que o Govendas reflita dinamicamente as estratégias\ncomerciais do distribuidor.\nEssas regras são processadas durante a geração da agenda ou em outros momentos\nprogramados, proporcionando maior flexibilidade e dinamismo para que o Govendas se adeque\nàs necessidades específicas de cada distribuidor.\n1.1 Por que usar o GoBR?\nO GoBR é utilizado no momento de planejar ou mapear as ações comerciais do distribuidor. Suas\nprincipais vantagens são:\n1. Grande poder analítico: acessa dados completos de comportamento dos clientes (recência\nde visita, recência de compra, inadimplência, ticket médio, etc.) para embasar decisões de\nnegócio.\n2. Acesso completo a vendedores e carteiras: permite fazer a melhor distribuição dos ativos\nde venda entre os times.\n3. Alta flexibilidade: mapeia inúmeras regras comerciais de forma simples e customizável para\ncada distribuidor.\n4. Autonomia operacional: as regras podem ser alteradas e executadas a qualquer momento\nsem necessidade de customizações por parte da equipe de engenharia.\n1.2 Por que o GoBR é simples?",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 5,
+      "trecho": 1,
+      "titulo_pagina": "1 GovendasBusinessRules1"
+    }
+  },
+  {
+    "id": "manual_p005_c02",
+    "text": "merciais de forma simples e customizável para\ncada distribuidor.\n4. Autonomia operacional: as regras podem ser alteradas e executadas a qualquer momento\nsem necessidade de customizações por parte da equipe de engenharia.\n1.2 Por que o GoBR é simples?\n1. Porque permite descrever as regras em uma linguagem próxima do discurso comercial\ndo distribuidor, sem necessidade de programação.\n2. Porque um único conjunto de regras pode mapear centenas de combinações complexas\nde clientes e vendedores.\n3. Porque oferece flexibilidade não só na definição das regras, mas também na forma como elas\nsão aplicadas a conjuntos de vendedores e clientes.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 5,
+      "trecho": 2,
+      "titulo_pagina": "1 GovendasBusinessRules1"
+    }
+  },
+  {
+    "id": "manual_p006_c01",
+    "text": "1 GovendasBusinessRules2\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n1.3 Como utilizar o GoBR?\nAtualmente o GoBR é acessado pela Tela de Administração Govendas (requer VPN interna).\nPara configurar um conjunto de regras são necessários:\n1. Um nome descritivo para o conjunto de regras.\n2. Um tipo de execução, que determina quando as regras serão processadas:\nTipo Código Quando executa\nDAILY 2 Toda madrugada, antes de gerar\nas agendas\nHOURLY 3 A cada hora\nWEEKLY 4 Uma vez por semana, no fim de\nsemana\nDETACHED 5 Sob demanda (execução\nmanual)\nONLUNCH 6 Entre 12:00 e 14:00\nDAWN 7 Entre 08:00 e 10:00\nDARK 8 Entre 16:00 e 18:00\nHALFANHOUR 9 A cada 30 minutos\nSHORTLY 10 A cada 15 minutos\n1. O ID da empresa à qual a regra pertence.\n2. Se a regra está habilitada ou não.\n3. O texto com as regras escritas na linguagem gorules.\nA combinação do tipo da regra com as configurações internas permite criar comportamentos\nmuito distintos: carteiras que se atualizam diariamente, alertas que disparam a cada hora,\nparametrizações que só se aplicam nos finais de semana, etc.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 6,
+      "trecho": 1,
+      "titulo_pagina": "1 GovendasBusinessRules2"
+    }
+  },
+  {
+    "id": "manual_p007_c01",
+    "text": "2 Alinguagemgorules3\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n2 A linguagem gorules\n.......................................................................................................................................\nA linguagem gorules é uma linguagem de domínio específico (DSL — Domain Specific Language)\ncriada para aproximar o contexto comercial dos distribuidores da configuração técnica do\nGovendas. Ela funciona como uma ponte de comunicação entre o discurso da equipe de vendas\ne o motor de regras do sistema.\nO processador da linguagem gorules é o coração do programa GoBR, sendo executado sempre\nque as regras precisam ser aplicadas — seja para gerar uma agenda, parametrizar clientes ou\ndisparar alertas.\n2.1 Exemplos de regras de negócio que a linguagem gorules consegue\nexpressar\nA linguagem gorules foi desenvolvida para mapear regras comerciais reais. Alguns exemplos:\n• “Os vendedores de campo devem visitar todos os clientes ativos dentro do mês.”\n• “Um cliente ativo é aquele que comprou nos últimos 90 dias.”\n• “Os televendas devem ligar para todos os clientes visitados pelos vendedores de campo no\ndia posterior à visita, somente se houver venda.”\n• “Os vendedores do supervisor X que atendem a cidade Y devem visitar seus clientes em um\nperíodo máximo de 7 dias.”\n• “Um cliente ativo independente do vendedor não deve ficar mais de 15 dias sem atendimento.”\n• “Na primeira sexta-feira de todo mês, os televendas devem ligar para os inativos dos\nvendedores de campo.”\n2.2 Estrutura geral de um arquivo gorules\nTodo arquivo gorules começa com a declaração de versão e pode conter até quatro categorias\nde regras, usadas em sequência:",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 7,
+      "trecho": 1,
+      "titulo_pagina": "2 Alinguagemgorules3"
+    }
+  },
+  {
+    "id": "manual_p008_c01",
+    "text": "2 Alinguagemgorules4\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nversion 1.0\n# 1. Definição de times de vendedores\ntime \"nome do time\":\nvendedores <seleção>\n# 2. Definição de segmentações (opcional)\nsegmentacao \"nome da segmentação\":\nclientes <seleção>\nquando <filtros>\n# 3. Definição de carteiras OU parametrizações OU alertas OU tags\ncarteira \"nome da carteira\":\nclientes <seleção>\nquando <filtros>\nAs categorias disponíveis de regras são:\nCategoria Propósito\ntime Define grupos de vendedores que compartilham as\nmesmas regras comerciais\nsegmentacao Define carteiras virtuais de clientes para uso auxiliar\n(não geram agenda)\ncarteira Define a carteira definitiva de clientes dos\nvendedores (utilizada para gerar agendas)\nparametros Define parâmetros de atendimento (frequência,\npreferência de dias, roteirização, etc.)\nalertas Gera alertas para vendedores, supervisores e\ngestores baseados no comportamento dos clientes\ntags Faz marcações nos clientes para facilitar filtros e\nsegmentações",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 8,
+      "trecho": 1,
+      "titulo_pagina": "2 Alinguagemgorules4"
+    }
+  },
+  {
+    "id": "manual_p009_c01",
+    "text": "3 Regrasparatimesdevendedores5\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n3 Regras para times de vendedores\n.......................................................................................................................................\nO primeiro passo em qualquer conjunto de regras gorules é definir os times de venda. Um time\né um grupo de vendedores que compartilham o mesmo conjunto de regras comerciais. O mais\ncomum em distribuidores é organizar os times em torno dos supervisores, mas um time pode ser\nformado de qualquer maneira.\n3.1 Estrutura básica de um time\nversion 1.0\ntime \"supervisor marcos\":\nvendedores todostelevendas\n• A linha version 1.0 é obrigatória e deve aparecer no início de cada arquivo de regras.\n• A palavra-chave time define o início de um bloco de time, seguida de um nome entre aspas\nduplas.\n• O nome do time é uma referência que será usada em outras partes das regras (em\ncarteiras, parâmetros e alertas). Escolha um nome descritivo.\n• A palavra-chave vendedores define qual conjunto de vendedores pertence ao time.\nAtenção: o # é utilizado para inserir comentários em qualquer ponto das regras. Tudo após # na\nmesma linha é ignorado pelo processador.\n3.2 Múltiplos times no mesmo arquivo\nÉ possível e muito comum definir vários times em um mesmo conjunto de regras:\nversion 1.0\ntime \"supervisor marcos\":\nvendedores todostelevendas\ntime \"supervisora maria\":\nvendedores todosdecampo\ntime \"vendedor avulso\":\nvendedores porid(\"1020\", \"1021\")",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 9,
+      "trecho": 1,
+      "titulo_pagina": "3 Regrasparatimesdevendedores5"
+    }
+  },
+  {
+    "id": "manual_p010_c01",
+    "text": "3 Regrasparatimesdevendedores6\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nNeste exemplo: - O time \"supervisor marcos\" contém todos os vendedores do tipo televendas.\n- O time \"supervisora maria\" contém todos os vendedores de campo. - O time \"vendedor\navulso\" contém apenas os vendedores com os IDs \"1020\" e \"1021\".\n3.3 Funções de seleção de vendedores\nA seleção de vendedores é feita por meio das seguintes funções, usadas após a palavra-chave\nvendedores:\nFunção Descrição\ntodos Seleciona todos os vendedores cadastrados na\nempresa no Govendas\ntodostelevendas Seleciona apenas os vendedores do tipo\ntelevendas\ntodosdecampo Seleciona apenas os vendedores do tipo campo\n(presencial)\nporid(\"id1\", \"id2\", ...) Seleciona vendedores específicos pelos seus IDs\nno sistema, passados como strings separadas por\nvírgula\n3.3.1 Opções de refinamento (modificadores opcionais)\nAs funções todos, todostelevendas e todosdecampo aceitam os seguintes modificadores\nopcionais, nesta ordem:\nModificador Descrição\ndos supervisores(\"id1\",\n\"id2\", ...)\nRestringe a seleção apenas aos vendedores que\npertencem aos supervisores especificados pelos\nseus IDs\ndo supervisor(\"id\") Variante singular para um único supervisor\nativados Inclui apenas vendedores habilitados para gerar\nagendas no Govendas\ninativados Inclui apenas vendedores desabilitados no\nGovendas (útil para regras de limpeza ou análise)",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 10,
+      "trecho": 1,
+      "titulo_pagina": "3 Regrasparatimesdevendedores6"
+    }
+  },
+  {
+    "id": "manual_p011_c01",
+    "text": "3 Regrasparatimesdevendedores7\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nmenos(\"id1\", \"id2\", ...) Exclui da seleção os vendedores com os IDs\nespecificados\nImportante: ativados e inativados referem-se ao status cadastral do vendedor no Govendas,\nou seja, se ele está habilitado ou não para gerar agendas. Não confundir com ativo/inativo de\nclientes.\nAtenção (em desenvolvimento): ainda não foram implementadas regras como: “cadastrados no\nGovendas”, “não cadastrados no Govendas”, “com muitos clientes”, “com poucos clientes”, “junto\na supervisor com poucos vendedores”, etc.\n3.4 Exemplo completo com modificadores\nversion 1.0\ntime \"supervisor marcos\":\nvendedores todostelevendas\nvendedores todosdecampo\ndos supervisores(\"13\",\"14\")\nativados\nmenos(\"345\",\"567\",\"432\")\nNeste exemplo, o time \"supervisor marcos\" é composto por: - Todos os vendedores televendas\n(sem restrição de supervisor ou status). - Todos os vendedores de campo que pertencem aos\nsupervisores com IDs \"13\" e \"14\", que estejam ativados no Govendas, excluindo os vendedores\n\"345\", \"567\" e \"432\".\nPerceba que um mesmo time pode ter múltiplas linhas vendedores, cada uma com suas próprias\nrestrições. Eles são combinados de forma aditiva.\n3.5 Cláusulas e restrições para definir times\n• Repetição entre times: o mesmo vendedor pode aparecer em times diferentes. Isso é\npermitido e útil quando um vendedor precisa seguir regras de mais de um contexto comercial.\n• Unicidade por time: dentro de um mesmo time, um vendedor só é contado uma vez, mesmo\nque apareça em múltiplas linhas vendedores.\n• Referências únicas: os nomes dos times devem ser distintos entre si no mesmo arquivo.\n• Vendedores cadastrados: todos os vendedores referenciados devem estar cadastrados no\nGovendas.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 11,
+      "trecho": 1,
+      "titulo_pagina": "3 Regrasparatimesdevendedores7"
+    }
+  },
+  {
+    "id": "manual_p012_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes8\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n4 Regras para carteiras e segmentações declientes\n.......................................................................................................................................\n4.1 O que são carteiras e segmentações?\nApós definir os times, o próximo passo é associar grupos de clientes a esses times. Existem\ndois mecanismos para isso:\n4.1.1 Carteira\nA carteira é o conjunto definitivo de clientes de um vendedor. Ela é utilizada pelo Gerador\nde Agendas do Govendas para determinar quais clientes cada vendedor deve atender em\ndeterminado período. O GoBR não exclui clientes nem monta agendas diretamente — ele apenas\nconstrói as carteiras, que são então consumidas pelo gerador de agendas.\n4.1.2 Segmentação\nA segmentação é um agrupamento auxiliar de clientes que não é utilizado para gerar agendas\ndiretamente. Segmentações são úteis quando se precisa: - Criar subconjuntos de clientes para\nusar como base em carteiras ou parâmetros; - Fazer parametrizações para um grupo específico\nsem afetar o agendamento principal; - Criar tags para grupos de clientes com características\nparticulares.\nResumo prático: use carteira quando os clientes precisam aparecer na agenda do vendedor.\nUse segmentacao quando precisa de um grupo de clientes para regras auxiliares sem gerar\nagenda.\n4.2 Carteiras exclusivas vs. carteiras livres\nExiste ainda um segundo tipo de carteira chamada carteira livre:\nTipo Comportamento\ncarteira \"nome\": Carteira exclusiva: os clientes incluídos nela são\nremovidos do pool disponível para carteiras\ndefinidas posteriormente no mesmo arquivo. Isso\nevita que o mesmo cliente apareça em múltiplas\ncarteiras de times diferentes.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 12,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes8"
+    }
+  },
+  {
+    "id": "manual_p013_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes9\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\ncarteira livre \"nome\": Carteira não-exclusiva: os clientes incluídos não\nsão removidos do pool disponível. Os mesmos\nclientes podem aparecer simultaneamente em\noutras carteiras.\n4.3 Exemplos de uso de carteiras\n4.3.1 Cenário 1 — Carteira fixa com ruptura de positivação\nO distribuidor quer que os televendas do supervisor Marcos atendam: 1. Seus clientes fixos. 2.\nClientes em ruptura de positivação há mais de 90 dias que estão na carteira da supervisora Maria\n(campo).\nversion 1.0\ntime \"superv marcos\":\nvendedores todostelevendas\ntime \"superv maria\":\nvendedores todosdecampo\ncarteira \"televendas fixa com ruptura de campo\":\nclientes carteirafixa(\"superv marcos\")\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\nResultado: cada vendedor televendas do supervisor Marcos terá em sua carteira seus clientes\nfixos mais os clientes do time da supervisora Maria que não compram há mais de 90 dias. Os\nclientes em ruptura que já pertencem à carteira fixa de algum televendas podem aparecer nas\nduas carteiras (carteira fixa do televendas original + carteira de ruptura do televendas de ruptura).\n4.3.2 Cenário 2 — Filtro adicional sobre os clientes com quando\nAlém de selecionar os clientes, é possível filtrar o resultado com a cláusula quando:",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 13,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes9"
+    }
+  },
+  {
+    "id": "manual_p014_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes10\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nversion 1.0\ntime \"superv marcos\":\nvendedores todostelevendas\ntime \"superv maria\":\nvendedores todosdecampo\ncarteira \"televendas fixa com ruptura de campo\":\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\nclientes carteirafixa(\"superv marcos\")\nquando recencia de visita entre 10 dias e 90 dias\nO filtro quando recencia de visita entre 10 dias e 90 dias na linha 13 garante que\napenas clientes cuja última visita ocorreu entre 10 e 90 dias atrás serão incluídos. Filtros com\nquando podem ser combinados com e:\nquando recencia de visita entre 10 dias e 90 dias\ne adimplentes\nAtenção: há diversas regras de filtragem de clientes (ver seção Regras para Filtros de Clientes).\nElas podem ser combinadas com e.\n4.3.3 Cenário 3 — Separando carteiras para controle de exclusividade\nQuando os clientes em ruptura devem pertencer apenas à carteira do vendedor de ruptura (e não\ntambém à carteira fixa), usa-se carteiras separadas:",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 14,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes10"
+    }
+  },
+  {
+    "id": "manual_p015_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes11\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nversion 1.0\ntime \"superv marcos\":\nvendedores todostelevendas\ntime \"superv maria\":\nvendedores todosdecampo\ncarteira \"televendas fixa\":\nclientes carteirafixa(\"superv marcos\")\ncarteira \"televendas com ruptura de campo\":\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\nAo separar em duas carteiras, os clientes incluídos na primeira carteira \"televendas fixa\" não\nestarão disponíveis para a segunda carteira \"televendas com ruptura de campo\". A ordem\ndas carteiras importa!\nSe a preferência deve ser para a ruptura (ou seja, a ruptura tem prioridade sobre a carteira fixa),\nbasta inverter a ordem:\ncarteira \"televendas com ruptura de campo\":\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\ncarteira \"televendas fixa\":\nclientes carteirafixa(\"superv marcos\")",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 15,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes11"
+    }
+  },
+  {
+    "id": "manual_p016_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes12\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n4.3.4 Cenário 4 — Múltiplos times com carteiras\nversion 1.0\ntime \"superv marcos\":\nvendedores todostelevendas\ntime \"superv maria\":\nvendedores todosdecampo\ntime \"vendedor avulso\":\nvendedores porid(\"1020\")\n# Televendas recebem clientes fixos + ruptura de campo\ncarteira \"televendas fixa com ruptura de campo\":\nclientes carteirafixa(\"superv marcos\")\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\n# Vendedor avulso recebe clientes em ruptura de visita do campo\ncarteira \"vendedor 1020\":\nclientes ruptura(\"superv maria\" para \"vendedor avulso\")\nde visita(1 mes)\n# Campo recebe sua carteira fixa com o que sobrou\ncarteira \"campo com carteira fixa\":\nclientes carteirafixa(\"superv maria\")\nO que acontece neste exemplo:\n• O vendedor 1020 só recebe clientes da supervisora Maria que estão em ruptura de visita\nhá mais de 1 mês e que não foram incluídos na carteira dos televendas. Sua carteira pode\neventualmente ficar vazia.\n• O time de campo recebe apenas os clientes que sobraram depois que os televendas e o\nvendedor avulso receberam os seus.\nAtenção: se as duas últimas carteiras estivessem na ordem inversa (campo primeiro, depois\nvendedor 1020), a carteira do campo tomaria todos os clientes via carteirafixa e o vendedor\n1020 ficaria sempre sem clientes, pois todos já teriam sido alocados.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 16,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes12"
+    }
+  },
+  {
+    "id": "manual_p017_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes13\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n4.4 Exemplos de uso de carteiras livres\nAs carteiras livres são úteis quando um conjunto de clientes deve estar em uma carteira, mas\nsem impedir que esses mesmos clientes apareçam em outras carteiras.\nversion 1.0\ntime \"superv marcos\":\nvendedores todostelevendas\ntime \"superv maria\":\nvendedores todosdecampo\n# Carteira livre: os clientes em ruptura entram nos televendas,\n# mas continuam disponíveis para outras carteiras também.\ncarteira livre \"televendas com ruptura de campo\":\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\n# A carteira fixa do campo inclui todos os clientes fixos,\n# mesmo os que já entraram na carteira livre acima.\ncarteira \"campo fixo\":\nclientes carteirafixa(\"superv maria\")\nNeste exemplo, os clientes em ruptura aparecem na carteira dos televendas (carteira livre) e\npodem também aparecer na carteira fixa do campo — sem que uma carteira exclua a outra.\n4.5 Exemplos de uso de segmentações\nSegmentações são usadas para criar agrupamentos auxiliares de clientes. No exemplo abaixo,\ncria-se uma segmentação dos clientes adimplentes da supervisora Maria:",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 17,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes13"
+    }
+  },
+  {
+    "id": "manual_p018_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes14\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nversion 1.0\ntime \"superv marcos\":\nvendedores todostelevendas\ntime \"superv maria\":\nvendedores todosdecampo\ntime \"vendedor avulso\":\nvendedores porid(\"1020\")\n# Segmentação auxiliar: apenas clientes adimplentes da carteira fixa\nsegmentacao \"carteiras adimplentes da superv maria\":\nclientes carteirafixa(\"superv maria\")\nquando adimplentes\n# Carteira de televendas com ruptura sobre os clientes fixos do campo\ncarteira \"televendas fixa com ruptura de campo\":\nclientes carteirafixa(\"superv marcos\")\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\n# Carteira livre usando a segmentação (somente adimplentes)\ncarteira livre \"campo com carteira fixa\":\nclientes segmentados(\"carteiras adimplentes da superv maria\")\n# Carteira do vendedor avulso usando ruptura da segmentação\ncarteira \"vendedor 1020\":\nclientes ruptura da segmentacao(\"carteiras adimplentes da superv maria\" para \"vendedor avulso\")\nde visita(1 mes)\nNeste exemplo, somente os clientes adimplentes são incluídos na carteira fixa de campo. Para\no vendedor 1020, usa-se ruptura da segmentacao para pegar os clientes do segmento que\nestão em ruptura de visita — algo impossível de fazer sem a segmentação como intermediária.\nAtenção: na criação de uma carteira só é permitida a inclusão de uma única segmentação\ncomo fonte de clientes. Na criação de outras segmentações, é permitida a inclusão de várias\nsegmentações.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 18,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes14"
+    }
+  },
+  {
+    "id": "manual_p019_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes15\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n4.6 Conjunto de funções para selecionar clientes\nA seleção de clientes é feita por meio das seguintes funções, usadas após a palavra-chave\nclientes:\nFunção Descrição\ncarteirafixa(<<time>>) Seleciona os clientes da carteira fixa (portfólio\npermanente) de cada vendedor do time informado\ncarteiraacessivel(<<time>>) Seleciona os clientes da carteira acessível de cada\nvendedor do time\ncarteiraruptura(<<time>>) Seleciona os clientes da carteira de ruptura pré-\ncalculada de cada vendedor do time\nportfolio(<<time>>) Seleciona o portfólio completo dos vendedores do\ntime\ninativos(<<time>>, <<tempo de\ninatividade>>)\nSeleciona clientes inativos há pelo menos o tempo\nespecificado\nsegmentados(<<segmentacao>>) Seleciona os clientes pertencentes a uma\nsegmentação já definida\nruptura(<<time_origem>> para\n<<time_destino>>)\nSeleciona clientes do time de origem que estão em\nruptura e os associa ao time de destino\nruptura da\nsegmentacao(<<segmentacao>> para\n<<time>>)\nSeleciona clientes de uma segmentação que estão\nem ruptura e os associa ao time de destino\ntodos(<<time>>) Seleciona todos os clientes do sistema para o time\n4.6.1 Opções para a função ruptura\nA ruptura pode ser configurada para detectar diferentes tipos de situação:\nOpção Descrição\nde positivacao(<<tempo>>) Cliente sem compra/positivação há pelo menos o\ntempo especificado",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 19,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes15"
+    }
+  },
+  {
+    "id": "manual_p020_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes16\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nde positivacao(<<tempo>>) ou\nprospects\nIdem, incluindo também os prospects (clientes que\nnunca compraram)\nde visita(<<tempo>>) Cliente sem visita há pelo menos o tempo\nespecificado\nde visita(<<tempo>>) ou prospects Idem, incluindo prospects\nde inativos(<<time>>, <<tempo>>) Clientes inativos de um time específico há pelo\nmenos o tempo especificado\nde inativos(<<time>>, <<tempo>>)\nou prospects\nIdem, incluindo prospects\nÉ possível combinar mais de uma opção de ruptura:\ncarteira \"ruptura de campo\":\nclientes ruptura(\"superv maria\" para \"superv marcos\")\nde positivacao(90 dias)\ne de visita(30 dias)\nNeste exemplo, apenas clientes que estão simultaneamente em ruptura de positivação (90 dias)\ne ruptura de visita (30 dias) serão incluídos.\n4.7 Cláusulas e restrições para carteiras e segmentações\n• Evitar regras em excesso: toda regra deve ser aplicada a um time, não diretamente a um\nvendedor individual. Isso garante escalabilidade e evita manutenção complexa.\n• Regras incrementais: as regras de carteira apenas adicionam clientes — nunca os excluem\ndiretamente. A exclusão ocorre de forma indireta, pela ordem das carteiras.\n• Repetição de clientes em carteiras normais: clientes podem aparecer em carteiras de\nvendedores diferentes dentro da mesma carteira (ex.: dois televendas diferentes podem\nreceber o mesmo cliente em ruptura, se ele pertencer às carteiras de ambos).\n• Sem repetição entre carteiras normais consecutivas: clientes que já foram atribuídos a\numa carteira anterior não são incluídos nas carteiras seguintes (exceto em carteiras livres).\n• Carteiras livres: não causam exclusão de clientes para carteiras subsequentes.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 20,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes16"
+    }
+  },
+  {
+    "id": "manual_p020_c02",
+    "text": "ão entre carteiras normais consecutivas: clientes que já foram atribuídos a\numa carteira anterior não são incluídos nas carteiras seguintes (exceto em carteiras livres).\n• Carteiras livres: não causam exclusão de clientes para carteiras subsequentes.\n• Dependências: uma segmentação pode ser criada a partir de vários times e/ou várias\nsegmentações. Uma carteira pode ser criada a partir de vários times ou de uma única\nsegmentação.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 20,
+      "trecho": 2,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes16"
+    }
+  },
+  {
+    "id": "manual_p021_c01",
+    "text": "4 Regrasparacarteirasesegmentaçõesdeclientes17\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n• A ordem importa: a sequência em que as carteiras são definidas determina quais clientes\nficam disponíveis para cada uma delas (com exceção das carteiras livres).\n• Referências únicas: os nomes das carteiras e das segmentações devem ser distintos entre\nsi.\nPadrão automático: caso um time seja usado em parâmetros ou alertas sem que uma carteira\ncorrespondente tenha sido definida, o sistema assume automaticamente a carteirafixa\ndaquele time.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 21,
+      "trecho": 1,
+      "titulo_pagina": "4 Regrasparacarteirasesegmentaçõesdeclientes17"
+    }
+  },
+  {
+    "id": "manual_p022_c01",
+    "text": "5 Regrasparafiltrostemporais18\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n5 Regras para filtros temporais\n.......................................................................................................................................\nOs filtros temporais permitem restringir quando uma regra de parametrização ou alerta deve ser\nexecutada. Eles são aplicados logo após a referência ao time ou carteira, usando a estrutura\nnatural da linguagem.\n5.1 Como usar filtros temporais\nna carteira(\"televendas\")\nno dia 2 e no dia 12 e\nno domingo e na segunda e\nna primeira semana e\nno segundo semestre\nNeste exemplo, a parametrização ou alerta só será executado se o dia for no dia 2 ou dia 12, e\nno domingo ou segunda-feira, na primeira semana do mês, durante o segundo semestre do\nano. Todos os filtros são combinados com e.\nPara alertas, é possível adicionar um filtro de horário:\nna carteira(\"televendas\")\nnos dias uteis e de hora em hora a partir de '07:00'\nNeste caso, o alerta só disparará em dias úteis, a cada hora, a partir das 7h da manhã.\nRegra de aplicação: os filtros devem ser escritos sempre nesta ordem: (1) dia do mês → (2) dia\nda semana → (3) semana do mês → (4) mês do ano → (5) horário. Não é obrigatório colocar todos.\n5.2 Filtros de dia do mês\nFiltro Descrição\nno dia 10 Apenas no dia 10 de cada mês\nno ultimo dia do mês Apenas no ultimo dia do mês\nantes do dia 20 Apenas entre os dias 1 e 19 do mês\ndepois do dia 15 Apenas entre os dias 16 e o último dia do mês",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 22,
+      "trecho": 1,
+      "titulo_pagina": "5 Regrasparafiltrostemporais18"
+    }
+  },
+  {
+    "id": "manual_p023_c01",
+    "text": "5 Regrasparafiltrostemporais19\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\na partir do dia 12 Apenas entre os dias 12 e o último dia do mês\nentre os dias 12 e 30 apenas entre os dias 12 e 30 do mês\n5.3 Filtros de dia da semana\nFiltro Descrição\nna segunda Apenas às segundas-feiras\nna terça Apenas às terças-feiras\nna quarta Apenas às quartas-feiras\nna quinta Apenas às quintas-feiras\nna sexta Apenas às sextas-feiras\nno sabado Apenas aos sábados\nno domingo Apenas aos domingos\ntodos os dias Todos os dias da semana\nnos dias uteis De segunda a sexta-feira\nno fim de semana Sábado e domingo\n5.4 Filtros de semana do mês\nFiltro Descrição\nna primeira semana Dias 1 ao 7 do mês\nna segunda semana Dias 8 ao 14 do mês\nna terceira semana Dias 15 ao 21 do mês\nna quarta semana Dias 22 ao 28 do mês",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 23,
+      "trecho": 1,
+      "titulo_pagina": "5 Regrasparafiltrostemporais19"
+    }
+  },
+  {
+    "id": "manual_p024_c01",
+    "text": "5 Regrasparafiltrostemporais20\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nna ultima semana Últimos 7 dias do mês\nna primeira quinzena Dias 1 ao 15 do mês\nna segunda quinzena Dias 16 ao fim do mês\n5.5 Filtros de mês do ano\nOs filtros de mês permitem especificar meses individuais ( em janeiro, em fevereiro, …, em\ndezembro) ou períodos maiores:\nFiltro Meses abrangidos\nno primeiro bimestre Janeiro e fevereiro\nno segundo bimestre Março e abril\nno terceiro bimestre Maio e junho\nno quarto bimestre Julho e agosto\nno quinto bimestre Setembro e outubro\nno sexto bimestre Novembro e dezembro\nno primeiro trimestre Janeiro a março\nno segundo trimestre Abril a junho\nno terceiro trimestre Julho a setembro\nno quarto trimestre Outubro a dezembro\nno primeiro semestre Janeiro a junho\nno segundo semestre Julho a dezembro\n5.6 Filtros de horário (somente para alertas)\nOs filtros de horário se aplicam exclusivamente a regras de alertas e permitem controlar o\nmomento exato do disparo:",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 24,
+      "trecho": 1,
+      "titulo_pagina": "5 Regrasparafiltrostemporais20"
+    }
+  },
+  {
+    "id": "manual_p025_c01",
+    "text": "5 Regrasparafiltrostemporais21\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nFiltro Descrição\nàs 'hh:mm' Dispara no horário exato especificado (janela de até\n15 minutos)\nàs 'hh:mm' e às 'hh:mm' Dispara em múltiplos horários específicos\nde hora em hora Dispara a cada hora, o dia todo\nde hora em hora entre 'hh:mm' e\n'hh:mm'\nDispara a cada hora dentro do intervalo\nespecificado\nde hora em hora a partir de\n'hh:mm'\nDispara a cada hora a partir do horário especificado\nObs.: só é permitido usar uma das regras de horário por vez ( às ou de hora em hora).\nObs.: Se a checagem ocorre a cada 15 minutos e o filtro é às '15:00', o evento será lançado\nse o horário atual estiver entre 15:00 e 15:15.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 25,
+      "trecho": 1,
+      "titulo_pagina": "5 Regrasparafiltrostemporais21"
+    }
+  },
+  {
+    "id": "manual_p026_c01",
+    "text": "6 Regrasparafiltrosdeclientes22\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n6 Regras para filtros de clientes\n.......................................................................................................................................\nOs filtros de clientes são usados com a palavra-chave quando para restringir quais clientes de\numa carteira, time ou segmentação serão afetados por uma regra de carteira, parametrização ou\nalerta. Múltiplos filtros podem ser combinados com e.\nquando adimplentes\ne ativos para o vendedor\ne recencia de visita entre 10 dias e 90 dias\nA seguir, os principais grupos de filtros disponíveis:\n6.1 Filtros de atividade e inatividade\nEstes filtros determinam o estado do cliente em relação às compras e visitas recebidas:\nFiltro Descrição\nativos Clientes considerados ativos pelos critérios padrão\ndo sistema\nativos para o vendedor Clientes ativos segundo o histórico do vendedor\nespecífico\nativos para a empresa Clientes ativos segundo o histórico de qualquer\nvendedor da empresa\ninativos Clientes considerados inativos pelos critérios\npadrão\ninativos para o vendedor Clientes sem compra com o vendedor específico há\ntempo suficiente para serem inativos\ninativos para a empresa Clientes sem compra com nenhum vendedor da\nempresa\ninatividade de <<N>> dias Clientes sem compra há pelo menos N dias\n(«tempo»)\ninatividade global de <<N>> dias Clientes sem compra com a empresa toda há pelo\nmenos N dias («tempo»)\nsem venda ou prospects Clientes que nunca compraram\nunica compra com a empresa Clientes que só compraram uma única vez com a\nempresa",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 26,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes22"
+    }
+  },
+  {
+    "id": "manual_p027_c01",
+    "text": "6 Regrasparafiltrosdeclientes23\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nunica compra com o vendedor Clientes que só compraram uma única vez com o\nvendedor\nprospects do vendedor Clientes que nunca compraram com o vendedor\nespecífico\nprospects da empresa Clientes que nunca compraram com a empresa\ntem venda do vendedor\n<<condicional de tempo>>\nClientes que compraram do vendedor no período\nespecificado sem necessariamente ter sido a última\ncompra\nnão tem venda <<condicional de\ntempo>>\nClientes que não tem venda de nenhum vendedor\ndo mesmo grupo no período especificado\ntem venda da empresa <<condicional\nde tempo>>\nClientes que compraram de qualquer vendedor no\nperíodo especificado\ntem <<N>>% de visita remota\n<<tempo>>\nCliente que tiveram pelo menos N% de visitas\nremotas em relação as presenciais no tempo\nespecificado\ntem <<N>>% de visita incerta\n<<tempo>>\nCliente que tiveram pelo menos N% de visitas que\nnão se sabe ser foram remotas ou presenciais no\ntempo especificado\natividade global de <<tempo>> Se o cliente comprou no tempo especificado\natividade do vendedor de <<tempo>> Se o cliente comprou do vendedor no tempo\nespecificado\natividade de <<tempo>> Se o cliente comprou de algum vendedor do grupo\nno tempo especificado\nAs opções venda podem ser: do vendedor ou da empresa.\nOpções para <<tempo>> estão abaixo.\nAs opções de <<condicional de tempo>> estão abaixo.\n6.2 Filtros de recência de visita ou positivação (compra)\nFiltro Descrição",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 27,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes23"
+    }
+  },
+  {
+    "id": "manual_p028_c01",
+    "text": "6 Regrasparafiltrosdeclientes24\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nrecencia de visita <<condicional\nde tempo>>\nClientes cuja última visita ocorreu no intervalo\nespecificado por algum vendedor do mesmo grupo\ndo vendedor que tem o cliente na carteira\nrecencia de positivação global ... Clientes cuja última positivação ocorreu no intervalo\nespecificado por qualquer vendedor da empresa\nrecencia de visita do vendedor ... Clientes cuja última visita ocorreu no intervalo\nespecificado foi do vendedor que tem o cliente na\ncarteira\nfora da recencia de visita\n<<condicional de tempo>>\nClientes cuja última visita ocorreu fora do intervalo\nespecificado por algum vendedor do mesmo grupo\ndo vendedor que tem o cliente na carteira\nfora da recencia de visita\nglobal ...\nClientes cuja última visita ocorreu fora do intervalo\nespecificado por qualquer vendedor da empresa\nfora da recencia de positivação do\nvendedor ...\nClientes cuja última positivação ocorreu fora do\nintervalo especificado foi do vendedor que tem o\ncliente na carteira\nAs duas opções são possíveis: visita ou positivação.\nAs opções de <<condicional de tempo>> estão abaixo.\n6.3 Filtros financeiros\nFiltro Descrição\nadimplentes Clientes sem pendências financeiras em aberto\ninadimplentes Clientes com pendências financeiras em aberto\ntem credito Clientes com crédito disponível\nnão tem credito Clientes sem crédito disponível\ncom limite de R$ <<valor>> de\ncredito\nClientes com limite de crédito maior ou igual ao\nvalor especificado\ncom R$ <<valor>> de credito Clientes com pelo menos o valor especificado de\ncrédito",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 28,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes24"
+    }
+  },
+  {
+    "id": "manual_p029_c01",
+    "text": "6 Regrasparafiltrosdeclientes25\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\ncom menos de R$ <<valor>> de\ncredito disponivel\nClientes com crédito disponível abaixo do valor\nespecificado\ncom <<N>>% de credito Clientes com a porcentagem de crédito, em relação\nao limite, maior ou igual a especificada\ncom ticket medio maior que R$\n<<valor>>\nClientes com ticket médio acima do valor\ncom ticket medio igual a R$\n<<valor>>\nClientes com ticket médio igual ao valor\ntotal faturado no <<periodo>> com\na empresa maior que R$ <<valor>>\nClientes com faturamento acima do valor no período\ntotal faturado no <<periodo>> com\na empresa menor que R$ <<valor>> e\nmaior que R$ <<valor>>\nClientes com faturamento dentro dos valores no\nperíodo\nmedia faturada no <<periodo>> com\na empresa menor que R$ <<valor>> e\nmaior que R$ <<valor>>\nClientes com faturamento medio por mês no\nperíodo dentro dos valores especificados\nPara os filtros de ticket médio e faturamento, o parâmetro ou indefinido pode ser adicionado\nao final para incluir também os clientes cujo valor é desconhecido no sistema. Também podem\nser combinados maior que, menor que e igual a utilizando um e.\nO <<periodo>> pode ser: mês, bimestre, trimestre, semestre e ano\n6.4 Filtros de agenda\nEstes filtros verificam se o cliente já está ou não presente em agendas passadas:\nFiltro Descrição\nna agenda de hoje O cliente está na agenda padrão de hoje («tempo\nfixo»)\nna agenda do vendedor de ontem O cliente estava agendado para o vendedor ontem\nna agenda na semana O cliente foi agendado na semana atual\nfora da agenda de hoje O cliente não está agendado para hoje",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 29,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes25"
+    }
+  },
+  {
+    "id": "manual_p030_c01",
+    "text": "6 Regrasparafiltrosdeclientes26\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nna agenda do vendedor de hoje O cliente está na agenda do vendedor específico\nhoje\nna agenda global de hoje O cliente está na agenda de qualquer vendedor hoje\nfora da agenda padrão em 5 dias O cliente não foi agendado na agenda padrão nos\núltimos 5 dias («tempo»)\nna agenda de ruptura de hoje Na agenda de ruptura do dia\nna agenda complementar de hoje Na agenda complementar do dia\nagendavel O cliente está marcado como agendável, ou seja,\nestá parametrizado para agendar\nnão agendavel O cliente está marcado como não agendável, ou\nseja, está parametrizado para não agendar\nreagendado O cliente foi reagendado para algum vendedor do\ngrupo de vendedores\nnão reagendado para a empresa O cliente não foi reagendado por nenhum vendedor\nda empresa\nAs opções de agenda são: padrão, ruptura e complementar. Se não for especificada será\nconsiderada a agenda padrão (default). As opções de reagendado podem ser: para o vendedor\nou para a empresa.\nPodem ser utilizados o <<tempo>> ou ‘«tempo fixo»’ para definição do período de análise valorado\nou fixo, respectivamente.\n6.5 Filtros de localização e classificação\nFiltro Descrição\nnome da cidade igual(\"cidade1\",\n\"cidade2\")\nClientes na cidade especificada\nnome do bairro diferente(...) Clientes em bairro diferente da especificada\nuf do estado contém(\"SP\", \"MG\") Clientes cujo nome da UF do estado contém o texto\ninformado\nnome da rota inicia com(...) Clientes cujo nome da rota começa com o texto\ninformado",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 30,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes26"
+    }
+  },
+  {
+    "id": "manual_p031_c01",
+    "text": "6 Regrasparafiltrosdeclientes27\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nconteudo da nota igual(...) Clientes cujo conteudo da nota é igual a um dos\nvalores especificados\nnome da nota contém(...) Clientes cujo nome da nota contém um dos textos\nespecificados\no rótulo diferente(...) Clientes cujo rótulo de classificação é diferente de\ntodos os valores especificados\ncnae igual(...) Clientes cujo id do cnae mapeado pelo govendas é\nigual a um dos ids especificados\ncnae da receita igual(...) Clientes cujo id do cnae que consta na receita\nfederal é igual a um dos ids especificados\ncnae do erp igual(...) Clientes cujo id do cnae mapeado no ERP é igual a\num dos ids especificados\nnome do cnae da receita inicia\ncom(...)\nClientes cujo nome do cnae que consta na receita\nfederal começa com um dos textos informados\nstatus na receita federal definido\ncomo ativa\nEmpresa ativa na Receita Federal\nstatus na receita federal definido\ncomo suspensa\nEmpresa suspensa\nstatus na receita federal definido\ncomo inapta\nEmpresa inapta\nstatus na receita federal definido\ncomo baixada\nEmpresa baixada\npessoa fisica Apenas clientes pessoa física (CPF)\npessoa juridica Apenas clientes pessoa jurídica (CNPJ)\ncliente principal O registro é o cliente principal (não é filial)\ncliente filial O registro é uma filial\nexcluidos Clientes marcados como excluídos do sistema\nnão excluidos Clientes que não estão excluídos\nbloqueados Clientes bloqueados para atendimento\nnão bloqueados Clientes que não estão bloqueados para\natendimento",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 31,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes27"
+    }
+  },
+  {
+    "id": "manual_p032_c01",
+    "text": "6 Regrasparafiltrosdeclientes28\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\ntem coordenada confiavel Cliente com geolocalização validada\nnão tem coordenada confiavel Cliente com geolocalização ausente ou não\nconfiável\nAs opções para todos os filtros com textos são: ìgual, diferente, contém e inicia com\n6.6 Filtros de classificação por id\nFiltro Descrição\nramo de atividade igual(\"1\", \"12\") Filtro por id do ramo de atividade comercial igual a\num dos valores\ncódigo da rota diferente(\"4\", \"7\",\n\"14\")\nFiltro por código da rota diferente dos valores\nid do cliente igual(...) Filtra por ID(s) específico(s) do cliente\nid do cliente principal\ndiferente(...)\nFiltro por id do cliente principal diferente do\nespecificado\ntipo de pagamento igual(...) Filtra por id de pagamento igual a um dos valores\ntipo de cobranca diferente(...) Filtra por id de cobrança diferente dos valores\nAs opções para todos os filtros com id são: são: ìgual e diferente\n6.7 Filtros de curva ABC e ciclo de vida\nFiltro Descrição\ncurva A com a empresa Clientes da curva A de faturamento com a empresa\ncurva B com a empresa Clientes da curva B de faturamento com a empresa\ncurva C com a empresa Clientes da curva C de faturamento com a empresa\ncurva A com o vendedor Clientes da curva A com o vendedor específico",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 32,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes28"
+    }
+  },
+  {
+    "id": "manual_p033_c01",
+    "text": "6 Regrasparafiltrosdeclientes29\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nno ciclo de vida ativo com o\nvendedor\nCliente ativo no ciclo de vida do vendedor, fez\nalguma compra\nno ciclo de vida inativo com a\nempresa\nCliente inativo no ciclo de vida da empresa\nno ciclo de vida prospect com o\nvendedor\nCliente prospect no ciclo de vida do vendedor\nno ciclo de vida ativado com o\nvendedor\nCliente que fez uma compra com o vendedor\nquando era prospect\nno ciclo de vida reativado com a\nempresa\nCliente que fez uma compra com qualquer vendedor\nquando estava inativo\nAs opções para os filtros são com a empresa ou com o vendedor.\n6.8 Filtros de frequência e parâmetros\nFiltro Descrição\nnão tem parametro Cliente sem nenhuma parametrização configurada\nnão tem parametro manual Cliente sem parametrização feita manualmente por\num usuário\nfora da frequencia de venda ou\nmaior que <<N>> dias\nCliente com recência atual fora da frequência de\nvenda calculada, ou com uma recência atual maior\nque N dias («tempo»)\nfora da frequencia de venda\nindicada <<condicional de tempo>>\nCliente com recência fora da frequência de\nvenda estipulada como ideal analizando as\nmovimentações dentro do período de tempo\nespecificado\nfrequencia historica maior que\n<<N>> dias\nA frequência histórica do cliente é maior que N dias\n(«tempo»)\nfrequencia historica menor que\n<<N>> dias ou indefinida\nA frequência histórica do cliente é menor que N dias\nou não foi possível ser calculada\nfrequencia historica entre <<N>>\ndias e <<Y>> dias\nA frequência histórica do cliente está no intervalor\nque N dias e Y dias",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 33,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes29"
+    }
+  },
+  {
+    "id": "manual_p034_c01",
+    "text": "6 Regrasparafiltrosdeclientes30\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\natendimentos <<N>>% menor que o\nparametrizado\nVolume de atendimentos abaixo do esperado\natendimentos <<N>>% maior que o\nparametrizado\nVolume de atendimentos acima do esperado\na ultima positivacao <<N>>% menor\nque o ticket medio\nA última venda foi menor que o ticket médio\na ultima positivacao <<N>>% maior\nque o ticket medio\nA última venda foi maior que o ticket médio\nparametro de frequencia <<N>>%\nmenor que o previsto\nA parametrização atual tem frequência menor que a\nprevista/calculada\nparametro de frequencia <<N>>%\nmaior que o previsto\nA parametrização ataul tem frequência maior que a\nprevista/calculada\nO filtro “fora da frequencia de venda” tem as opções indicada e ou maior que. O filtro “frequencia\nhistorica” pode incluir a opção indefinida.\nOpções para <<tempo>> estão abaixo.\nAs opções de <<condicional de tempo>> estão abaixo.\n6.9 Filtros de segmentação (contido/não contido)\nFiltro Descrição\ncontido na segmentacao(\"nome1\",\n\"nome2\")\nO cliente pertence às segmentações especificadas\nnão contido na segmentacao(\"nome\") O cliente não pertence à segmentação especificada\n6.10 Filtros de ruptura\nFiltro Descrição\nem ruptura global do bimestre Cliente sem compra entre 30 dias e 60 dias",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 34,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes30"
+    }
+  },
+  {
+    "id": "manual_p035_c01",
+    "text": "6 Regrasparafiltrosdeclientes31\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nem ruptura global do trimestre Cliente sem compra entre 61 dias e 90 dias\nem ruptura global do semestre Clientes sem compra entre 91 dias e 180 dias\nem ruptura global do ano Cliente sem compra entre 181 dias e 365 dias\nsem contato no ultimo agendamento Cliente que na última vez que foi agendado mas\nnão teve contato por nenhum vendedor do grupo\ncom contato no ultimo agendamento\npara o vendedor\nCliente que na última vez que foi agendado teve\ncontato pelo vendedor\nsem contato nos ultimos <<N>>\nagendamentos para a empresa\nCliente que nas últimas N vezes que foi agendado\nnão teve contato por qualquer vendedor\nOpções para com\\sem contato são: para o vendedor ou para a empresa.\n6.11 Outros filtros úteis\nFiltro Descrição\npositivado de hoje O cliente foi positivado hoje\n(«tempo» ou «tempo fixo»)\natendimento remoto em\n5 dias\nO cliente teve atendimento\nremoto no últimos 5 dias\nsem perfil com o\nvendedor\nO cliente não está marcado para\nnão agendar para o vendedor\nou foi excluído ou consta como\nbaixado na receita federal\nsem perfil com a\nempresa\nO cliente não está marcado\npara não agendar para qualquer\nvendedor ou foi excluído ou\nconsta como baixado na receita\nfederal\ntotal de compras com\no vendedor maior que\n<<N>>\nClientes com pelo menos N\ncompras com o vendedor\ntotal de compras com\na empresa menor que\n<<N>> ou indefinido\nClientes com no máximo N\ncompras com a empresa ou o\nvalor não foi calculado",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 35,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes31"
+    }
+  },
+  {
+    "id": "manual_p036_c01",
+    "text": "6 Regrasparafiltrosdeclientes32\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\ncompras no mês com\no vendedor maior que\n<<N>>\nClientes com pelo menos N\ncompras com o vendedor no\nperíodo expecificado («periodo»)\ncompras no semestre\ncom a empresa\nmenor que <<N>> ou\nindefinido\nClientes com no máximo N\ncompras com a empresa ou\no valor não foi calculado no\nperíodo especificado\nqueda de faturamento\nmenor que <<N>>%\nClientes que tiveram queda no\nfaturamento até N%\nqueda de faturamento\nmaior que <<N>>%\nClientes que tiveram queda no\nfaturamento acima de N%\ncadastrado faz 90 dias Clientes que foram cadastrados\nno ERP em no mínimo 90 dias\n(«tempo»)\ncadastrado a partir do\ndia '2026-02-10'\nClientes que foram cadastrados\napós um dia especificado\nelegivel Clientes que não são excluídos,\nque estão ativos e que estão\nmarcados para agendar\nelegivel incluindo\nroteirizavel\nClientes que não são excluídos,\nque estão ativos, que estão\nmarcados para agendar e que\nestão marcados para roteirizar\ndata da próxima visita\ndo representante em 2\nsemanas\nclientes cuja data de visita\nmapeada no ERP de um\nvendedor externo será somente\ndaqui a 2 semanas («tempo» ou\n«tempo futuro»)\ndata da última visita\ndo representante na\nsemana anterior\nclientes cuja data de visita\nmapeada no ERP de um\nvendedor externo foi na semana\npassada\ns\ndata da rota no mês\nanterior\nClientes cuja data de rota\ncompreendem somente o mês\nanterior\ndata da rota futura em\n5 dias a frente\nClientes cuja data de rota está\nsomente após 5 dias a partir de\nhoje",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 36,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes32"
+    }
+  },
+  {
+    "id": "manual_p037_c01",
+    "text": "6 Regrasparafiltrosdeclientes33\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\ndata da rota futura do\nvendedor nos próximos\n2 dias\nClientes cuja data de rota está\nnos próximos 2 dias e esta rota\nestá associado ao vendedor ao\nqual pertence o cliente\nO total de compras e o compras tem como opções: maior que, menor que, ou indefinido\nou maior que <<N>> e menor que <<N>>\nPodem ser utilizados o <<tempo>>, <<tempo fixo>> ou <<tempo futuro>> para definição do\nperíodo de análise valorado, fixo ou futuro, respectivamente.\nO <<periodo>> pode ser: mês, bimestre, trimestre, semestre e ano\n6.11.1 Opções para tempo\nO tempo é uma regra que referencia um período\nCondicional\n<<N>> anos\n<<N>> semestres\n<<N>> trimestres\n<<N>> bimestres\n<<N>> meses\n<<N>> semanas\n<<N>> dias\n6.11.2 Opções para tempo fixo\nO tempo fixo são períodos fixos de tempo já pré-definidos, sem a necessidade de um valor\nacompanhando.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 37,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes33"
+    }
+  },
+  {
+    "id": "manual_p038_c01",
+    "text": "6 Regrasparafiltrosdeclientes34\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nCondicional\ndo dia\nna semana\nna quinzena\nno mês\nno bimestre\nno trimestre\nno semestre\nno ano\nde ontem\nna semana anterior\nna quinzena anterior\nno mês anterior\nno bimestre anterior\nno trimestre anterior\nno semestre anterior\nno ano anterior\n6.12 Opções para condicionais de tempo\nCondicional Descrição\nem <<N>> anos dentro do intervalo de anos especificados\nem <<N>> semestres dentro do intervalo dos semestres especificados",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 38,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes34"
+    }
+  },
+  {
+    "id": "manual_p039_c01",
+    "text": "6 Regrasparafiltrosdeclientes35\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nem <<N>> trimestres dentro do intervalo dos trimestres especificados\nem <<N>> bimestres dentro do intervalo dos bimestres especificados\nem <<N>> meses dentro do intervalo dos meses especificados\nem <<N>> semanas dentro do intervalo dos semanas especificados\nem <<N>> dias dentro do intervalo dos dias especificados\nem <<N>> horas dentro do intervalo dos horas especificados\nem <<N>> minutos dentro do intervalo dos minutos especificados\nhá <<N>> anos atras dentro do intervalo que é anterior aos anos\nespecificados\nhá <<N>> anos atras dentro do intervalo que é anterior aos anos\nespecificados\nhá <<N>> semestres atras dentro do intervalo que é anterior aos semestres\nespecificados\nhá <<N>> trimestres atras dentro do intervalo que é anterior aos trimestres\nespecificados\nhá <<N>> bimestres atras dentro do intervalo que é anterior aos bimestres\nespecificados\nhá <<N>> meses atras dentro do intervalo que é anterior aos meses\nespecificados\nhá <<N>> semanas atras dentro do intervalo que é anterior aos semanas\nespecificados\nhá <<N>> dias atras dentro do intervalo que é anterior aos dias\nespecificados\nna manhã dentro do intervalo da parte da manhã\nna tarde dentro do intervalo da parte da tarde\nna noite dentro do intervalo da parte da noite\nno dia no dia atual\nontem intervalo que compreende o dia de ontem\nna semana intervalo que compreende a semana atual",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 39,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes35"
+    }
+  },
+  {
+    "id": "manual_p040_c01",
+    "text": "6 Regrasparafiltrosdeclientes36\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nna quinzena intervalo que compreende a quinzena atual\nno mês intervalo que compreende o mês atual\nno bimestre intervalo que compreende o bimestre atual\nno trimestre intervalo que compreende o trimestre atual\nno semestre intervalo que compreende o semestre atual\nno ano intervalo que compreende o ano atual\nentre <<tempo>> e <<tempo>> intervalo de tempo definido\nentre <<data>> e <<data>> intervalo de data especificada\n6.13 Opções para condicionais de tempo em tempo futuro ou intervalo no\npassado\nCondicional Descrição\nnos proximos <<N>> anos dentro do intervalo de agora e N anos\nnos proximos <<N>> semestres dentro do intervalo de agora e N semestres\nnos proximos <<N>> trimestres dentro do intervalo de agora e N trimestres\nnos proximos <<N>> bimestres dentro do intervalo de agora e N bimestres\nnos proximos <<N>> meses dentro do intervalo de agora e N meses\nnos proximos <<N>> semanas dentro do intervalo de agora e N semanas\nnos proximos <<N>> dias dentro do intervalo de agora e N dias\nnos proximos <<N>> horas dentro do intervalo de agora e N horas\nnos proximos <<N>> minutos dentro do intervalo de agora e N minutos\nem <<N>> anos a frente dentro do período que começa após N anos a frente\nem <<N>> semestres a frente dentro do período que começa após N semestres a\nfrente",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 40,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes36"
+    }
+  },
+  {
+    "id": "manual_p041_c01",
+    "text": "6 Regrasparafiltrosdeclientes37\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nem <<N>> trimestres a frente dentro do período que começa após N trimestres a\nfrente\nem <<N>> bimestres a frente dentro do período que começa após N bimestres a\nfrente\nem <<N>> meses a frente dentro do período que começa após N meses a\nfrente\nem <<N>> semanas a frente dentro do período que começa após N semanas a\nfrente\nem <<N>> dias a frente dentro do período que começa após N dias a frente\nde ontem dentro de um interfalo que compreende somente o\ndia de ontem\nna semana anterior dentro de um intervalo que compreende somente a\nsemana anterior\nna quinzena anterior dentro de um intervalo que compreende somente a\nquinzena anterior\nno mês anterior dentro de um intervalo que compreende somente a\nmês anterior\nno bimestre anterior dentro de um intervalo que compreende somente a\nbimestre anterior\nno trimestre anterior dentro de um intervalo que compreende somente a\ntrimestre anterior\nno semestre anterior dentro de um intervalo que compreende somente a\nsemestre anterior\nno ano anterior dentro de um intervalo que compreende somente a\nano anterior\nA «data» pode ser descrita das seguintes formas: ‘yyyy-mm-dd’ e ‘dd-mm-yyyy’.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 41,
+      "trecho": 1,
+      "titulo_pagina": "6 Regrasparafiltrosdeclientes37"
+    }
+  },
+  {
+    "id": "manual_p042_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes38\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n7 Regras para parâmetros das carteiras de clientes\n.......................................................................................................................................\nA parametrização define como cada cliente deve ser atendido: com qual frequência, em quais\ndias da semana, se deve ser incluído em rota presencial, etc. Sem regras de parametrização no\nGoBR, cada vendedor precisaria configurar manualmente cada um de seus clientes no Govendas\n— um trabalho inviável em carteiras grandes.\nCom o GoBR é possível criar regras de parametrização predefinidas, que são aplicadas\nautomaticamente e podem ser sobrescritas pelos ajustes finos dos vendedores e supervisores\nquando necessário.\nImportante: a parametrização feita pelo GoBR não sobrepõe a parametrização realizada\nmanualmente pelo usuário no Govendas. Ela se aplica apenas a clientes que ainda não possuem\nparametrização manual ou que foram parametrizados exclusivamente pelo GoBR em execuções\nanteriores.\n7.1 Estrutura de uma regra de parametrização\nUma regra de parâmetros segue sempre este fluxo:\n1. Definir a fonte de clientes — referencia uma carteira, segmentação ou time já definidos.\n2. Definir filtros temporais (opcional) — restringe o dia de aplicação da parametrização.\n3. Definir filtros de clientes (opcional) — filtra os clientes com base em condições comerciais.\n4. Definir os parâmetros de atendimento — frequência, preferência de dias, roteirização,\nfixação, etc.\n5. Definir regras de conflito (opcional) — evita que dois times atendam o mesmo cliente no\nmesmo dia.\n7.2 Valores de preferência de dia da semana\nA preferência de dias da semana é um valor numérico atribuído a cada dia, onde:",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 42,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes38"
+    }
+  },
+  {
+    "id": "manual_p042_c02",
+    "text": "eirização,\nfixação, etc.\n5. Definir regras de conflito (opcional) — evita que dois times atendam o mesmo cliente no\nmesmo dia.\n7.2 Valores de preferência de dia da semana\nA preferência de dias da semana é um valor numérico atribuído a cada dia, onde:\nValor Significado\n0 Não deve visitar neste dia\n1 Menor preferência (pode visitar, mas é prioridade\nbaixa)\n2 Preferência normal\n3 Maior preferência (dia prioritário para a visita)",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 42,
+      "trecho": 2,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes38"
+    }
+  },
+  {
+    "id": "manual_p043_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes39\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n7.3 Exemplos de uso\n7.3.1 Exemplo 1 — Parametrização semanal básica\nversion 1.0\ntime \"time alberto\":\nvendedores todostelevendas ativados\ncarteira \"carteira fixa\":\nclientes carteirafixa(\"time alberto\")\nparametros \"semanal para o alberto\":\nda carteira(\"carteira fixa\")\nquando inatividade de 90 dias\nfrequencia semanal()\nTodos os clientes inativos há 90 dias na carteira fixa dos televendas ativados recebem uma\nparametrização de frequência semanal (7 dias). Os dias da semana recebem o valor padrão: 1 de\nsegunda a sexta, 0 no sábado e domingo.\n7.3.2 Exemplo 2 — Parametrizando preferência de dia da semana\nparametros \"mensal alberto com preferencia\":\nda carteira(\"carteira fixa\")\nquando inatividade de 90 dias\nfrequencia mensal()\npreferencia na segunda e na terça\nClientes inativos há 90+ dias recebem frequência mensal (30 dias) e preferência de visita com\nvalor 2 na segunda e na terça. Os demais dias ficam com valor 0.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 43,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes39"
+    }
+  },
+  {
+    "id": "manual_p044_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes40\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n7.3.3 Exemplo 3 — Preferência com intensidades diferentes por dia\nparametros \"mensal alberto com intensidades\":\nda carteira(\"carteira fixa\")\nquando inatividade de 90 dias\nfrequencia mensal()\npreferencia\nmaior na segunda e\nmenor na terça e\nnormal na quinta e\nna sexta-feira e\nmenor no sábado\nResultado: segunda = 3, quinta e sexta = 2, terça e sábado = 1, quarta e domingo = 0.\nOs modificadores de intensidade são: - maior → valor 3 - normal (ou ausência de modificador)\n→ valor 2 - menor → valor 1\n7.3.4 Exemplo 4 — Remoção de agendamento\nparametros \"remover inativos da agenda\":\nda carteira(\"carteira fixa\")\nquando inatividade de 90 dias\nnao agendar\nOs clientes inativos há 90+ dias são marcados para não aparecerem na agenda.\nAtenção: a remoção de agendamento é uma parametrização exclusiva — não é possível definir\nfrequência ou preferência de dias na mesma regra que usa nao agendar.\n7.3.5 Exemplo 5 — Parâmetros dinâmicos (aproveitando configurações do usuário)\nMuitas vezes não se quer sobrescrever o parâmetro do vendedor, apenas complementá-lo:\nparametros \"frequencia do vendedor + preferencia nos uteis\":\nda carteira(\"carteira fixa\")\nquando inatividade de 90 dias\nfrequencia do vendedor\npreferência nos dias úteis",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 44,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes40"
+    }
+  },
+  {
+    "id": "manual_p045_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes41\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n• frequencia do vendedor → usa a frequência configurada pelo próprio vendedor no\nGovendas para cada cliente. Se o vendedor não configurou, usa o padrão de 7 dias.\n• preferência nos dias úteis → define preferência 2 de segunda a sexta, independente\ndo que o vendedor configurou.\n7.3.6 Exemplo 6 — Cascata de fallbacks para frequência\nparametros \"frequencia com fallback\":\nda carteira(\"carteira fixa\")\nquando inatividade de 90 dias\nfrequencia do vendedor ou de qualquer vendedor ou de 35 dias\npreferência do historico ou remover\n• frequencia do vendedor ou de qualquer vendedor ou de 35 dias : usa a\nfrequência do vendedor específico. Se não tiver, usa a frequência configurada por qualquer\noutro vendedor para aquele cliente. Se nenhum vendedor configurou, aplica 35 dias.\n• preferência do historico ou remover : calcula a preferência de dia com base\nno histórico de visitas. Se não houver histórico suficiente, não parametriza (remove a\nconfiguração desse parâmetro).\n7.3.7 Exemplo 7 — Parametrização com restrição temporal\nparametros \"semanal dias uteis\":\nda carteira(\"carteira fixa\")\nnos dias úteis\nquando inatividade de 90 dias\nfrequencia semanal()\npreferencia na segunda e na terça\nO filtro nos dias úteis garante que essa parametrização só será aplicada quando a regra\nexecutar em dias úteis. Se executar em sábado ou domingo, a parametrização é ignorada para\nesta passagem.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 45,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes41"
+    }
+  },
+  {
+    "id": "manual_p046_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes42\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n7.3.8 Exemplo 8 — Evitando conflitos entre televendas e campo\nparametros \"televendas sem choque com campo\":\nda carteira(\"carteira televendas\")\nquando inatividade de 90 dias\nfrequencia do vendedor ou de qualquer vendedor ou de 35 dias\npreferência do historico ou nos dias uteis\nsem choque na carteira(\"carteira campo\")\nA cláusula sem choque na carteira(\"carteira campo\") garante que a preferência de dias\ndos televendas não coincida com a dos vendedores de campo para os mesmos clientes. Isso evita\nque o cliente receba ligação e visita presencial no mesmo dia.\nÉ possível refinar o controle de choque com filtros adicionais:\nsem choque na rota e na pasta do time(\"time maria\")\n• na rota → considera apenas clientes roteirizáveis do time da Maria.\n• fora da rota → considera apenas clientes não roteirizáveis.\n• na pasta → considera apenas os clientes dentro da mesma pasta dos vendedores.\n7.3.9 Exemplo 9 — Configuração de semana pivot\nA semana pivot restringe a partir de qual semana do mês o cliente pode aparecer na agenda:\nparametros \"pivot segunda semana\":\nda carteira(\"carteira televendas\")\nquando inatividade de 90 dias\nfrequencia do vendedor ou de 35 dias\nrestrito a partir da segunda semana\npreferência do historico ou nos dias uteis\nCom restrito a partir da segunda semana , o cliente só poderá aparecer na agenda a\npartir da segunda segunda-feira do mês.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 46,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes42"
+    }
+  },
+  {
+    "id": "manual_p047_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes43\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n7.3.10 Exemplo 10 — Configuração de roteirização e parâmetros fixos\nparametros \"campo roteirizavel fixo\":\nda carteira(\"carteira campo\")\nquando inatividade de 90 dias\nfrequencia do vendedor ou de 35 dias\npreferência do historico ou nos dias uteis\nroteirizavel\nfixo\n• roteirizavel → o cliente é incluído na otimização de rota de visita presencial.\n• fixo → a parametrização é marcada como fixa, criando uma restrição mais rígida no uso de\nfrequência e preferência pelo gerador de agendas.\nPadrão: se nenhuma dessas opções for especificada, o cliente é não roteirizavel e não fixo.\n7.3.11 Exemplo 11 — Limpando parametrizações existentes\nlimpar parametros \"remover parametrizacao\":\nda carteira(\"carteira fixa\")\nRemove as parametrizações dinâmicas já aplicadas pelo GoBR para os clientes da carteira. Útil\npara resetar configurações antes de reaplicar regras atualizadas.\n7.4 Conjunto de regras para frequência\n7.4.1 Frequência fixa por período\nRegra Frequência equivalente\ndiaria() 1 dia\nsemanal() 7 dias\nquinzenal() 15 dias\nquinzenal('dd-mm-yyyy') 15 dias a partir da data pivot",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 47,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes43"
+    }
+  },
+  {
+    "id": "manual_p048_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes44\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nmensal() 30 dias\nbimestral() 60 dias\nbimestral('dd-mm-yyyy') 60 dias a partir da data pivot\ntrimestral() 90 dias\nsemestral() 180 dias\nanual() 365 dias\nde <<N>> dias N dias exatos\n7.4.2 Modificadores de limite para frequência fixa\nModificador Descrição\nno máximo semanal() A frequência não pode ser maior que 7 dias\nno mínimo mensal() A frequência não pode ser menor que 30 dias\n7.4.3 Frequência dinâmica (baseada em dados existentes)\nRegra Descrição\ndo govendas Usa a frequência padrão do Govendas\ndo vendedor Usa a frequência configurada pelo vendedor para o\ncliente\ndo vendedor menos <<N>> dias Frequência do vendedor decrementada de N dias\ndo vendedor mais <<N>> dias Frequência do vendedor acrescida de N dias\ndo historico Calcula a frequência com base no histórico de\nvisitas\nde qualquer vendedor Usa a frequência configurada por qualquer\nvendedor para aquele cliente",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 48,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes44"
+    }
+  },
+  {
+    "id": "manual_p049_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes45\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nde ativos da empresa Usa a frequência média dos clientes ativos da\nempresa\nde inativos da empresa Usa a frequência média dos clientes inativos da\nempresa\nde ativos do vendedor Usa a frequência média dos clientes ativos do\nvendedor\nde inativos do vendedor Usa a frequência média dos clientes inativos do\nvendedor\nremover Remove a configuração de frequência existente\n7.5 Conjunto de regras para restrição de semana (restrito)\nRegra Descrição\na partir da primeira semana Desde a primeira semana do mês\na partir da segunda semana A partir da segunda semana\na partir da terceira semana A partir da terceira semana\na partir da quarta semana A partir da quarta semana\nate a primeira semana Somente na primeira semana\nate a segunda semana Até a segunda semana\nate a terceira semana Até a terceira semana\nate a quarta semana Até a quarta semana\n7.6 Cláusulas e restrições para parâmetros\n• Regras incrementais: as regras de parâmetros criam ou atualizam configurações, nunca as\nexcluem diretamente (exceto limpar parametros).",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 49,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes45"
+    }
+  },
+  {
+    "id": "manual_p050_c01",
+    "text": "7 Regrasparaparâmetrosdascarteirasdeclientes46\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n• Sem repetição: clientes parametrizados em uma regra anterior não são reprocessados por\nregras subsequentes. A ordem importa.\n• Referências únicas: os nomes dos blocos de parâmetros devem ser distintos.\n• Evitar regras demais: parametrizações devem ser feitas para times ou carteiras inteiras, não\npara vendedores individuais.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 50,
+      "trecho": 1,
+      "titulo_pagina": "7 Regrasparaparâmetrosdascarteirasdeclientes46"
+    }
+  },
+  {
+    "id": "manual_p051_c01",
+    "text": "8 Regrasparaalertasdeclientes47\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n8 Regras para alertas de clientes\n.......................................................................................................................................\nOs alertas permitem criar um canal de comunicação ativo com os usuários do Govendas,\nnotificando-os sobre eventos relevantes nos clientes de suas carteiras. Eles fazem parte da\niniciativa do Supervisor Digital e têm como objetivo impulsionar vendedores e gestores a tomar\nações baseadas em dados.\nUm alerta é acionado quando uma condição específica (o gatilho) é detectada para um ou mais\nclientes, dentro de um determinado período de tempo.\nImportante: não é possível combinar regras de parametrização e alertas no mesmo conjunto\nde regras. A temporalidade de aplicação das parametrizações é naturalmente diferente da\ntemporalidade de detecção dos eventos.\n8.1 Estrutura de uma regra de alerta\nUma regra de alerta segue as seguintes etapas:\n1. Definir os clientes — referencia carteiras ou times.\n2. Definir filtros temporais — controla quando o alerta pode ser emitido.\n3. Definir filtros de clientes (opcional) — restringe o conjunto de clientes monitorados.\n4. Definir o gatilho — condição que aciona o alerta (com onde).\n5. Definir informações adicionais — dados que acompanham o alerta (com informe).\n6. Definir a descrição (opcional) — texto explicativo do alerta, com suporte a variáveis.\n7. Definir o alvo — quem recebe o alerta (vendedor, supervisor ou gestor).\n8. Definir canais de entrega — Govendas app e/ou WhatsApp.\n9. Definir tags (opcional) — marcações para classificar o alerta.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 51,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes47"
+    }
+  },
+  {
+    "id": "manual_p052_c01",
+    "text": "8 Regrasparaalertasdeclientes48\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n8.2 Exemplo completo de alerta\nversion 1.0\ntime \"campo e televendas\":\nvendedores todos\nalerta \"Whatsapp: Ruptura de positivação na agenda de hoje\":\ndo time(\"campo e televendas\")\nnos dias uteis e de hora em hora a partir de '07:00'\nquando ativos para o vendedor\ne adimplentes\ne na agenda de hoje\ne recencia de visita entre 10 dias e 90 dias\nonde nao tem venda em 21 dias\ninforme com 15 vendedores e com 5 clientes\ne com o nome do supervisor\ne com o codigo do vendedor\ne com o nome do vendedor\ne com o codigo do cliente\ne com o nome do cliente\ndescreva com o texto(\"\nHá clientes em ruptura de positivacao de 21 dias.\nAnalisado em $datahora$.\n\")\nentregue para gestor e redirecione(\"vagner@govendas.com\")\npelos canais govendas() e whatsapp(\"ruptura_vendedor_template1\")\ne template com os valores(\n'$totalclientes$',\n'10',\n'21',\n'$nomeusuario$',\n'https://app.govendas.com/#/notificacao/{{id}}'\n)\nAnálise linha a linha: - do time(...) → analisa clientes de todos os vendedores. - nos dias\nuteis e de hora em hora a partir de '07:00' → a cada hora, somente em dias úteis,\napós as 7h. - quando ... e na agenda de hoje e recencia de visita entre 10 dias\ne 90 dias → filtra apenas clientes ativos, adimplentes, que estão na agenda de hoje e tiveram",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 52,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes48"
+    }
+  },
+  {
+    "id": "manual_p053_c01",
+    "text": "8 Regrasparaalertasdeclientes49\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nvisita nos últimos 10 a 90 dias. - onde nao tem venda em 21 dias → o gatilho: dispara o\nalerta se o cliente não teve venda nos últimos 21 dias. - informe com 15 vendedores e com 5\nclientes e ... → o alerta agrupa até 15 vendedores e exibe até 5 clientes por vendedor, com\nos atributos especificados. - descreva com o texto(...) → mensagem textual do alerta, com\nvariável $datahora$. - entregue para gestor → o alerta é enviado para o perfil de gestor.\n- pelos canais govendas() e whatsapp(...) → entregue tanto no app Govendas quanto\nvia WhatsApp com template específico.\n8.3 Tipos de evento (informe)\nO tipo de evento define como as informações são agrupadas e exibidas:\nTipo Regra Descrição\nCUSTOM_TABLE informe Tabela customizável com\natributos definidos manualmente\nCLIENT informe da carteira Evento por cliente, com atributos\ndo vendedor adicionados\nautomaticamente\nITINER informe da agenda Evento por item de agenda,\ncom atributos do vendedor\nadicionados automaticamente\nSUMMARIZED_SALESMAN informe resumo do\nsupervisor\nResumo agrupado por supervisor\n(atributos fixos)\nSUMMARIZED_SUPERVISOR informe resumo do\ngestor\nResumo agrupado por gestor\n(atributos fixos)\n8.4 Gatilhos disponíveis (onde)\n8.4.1 Gatilhos de visita e venda\nGatilho Descrição",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 53,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes49"
+    }
+  },
+  {
+    "id": "manual_p054_c01",
+    "text": "8 Regrasparaalertasdeclientes50\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\ntem venda em <<N>> dias O cliente teve venda nos últimos N dias\nnão tem venda em <<N>> dias O cliente não teve venda nos últimos N dias\ntem visita em <<N>> dias O cliente teve visita nos últimos N dias\nnão tem visita em <<N>> dias O cliente não teve visita nos últimos N dias\ntem venda do vendedor em <<N>>\ndias\nO cliente teve venda com o vendedor específico\nnão tem venda do vendedor em <<N>>\ndias\nO cliente não teve venda com o vendedor específico\ntem visita da empresa em <<N>>\ndias\nO cliente teve visita de qualquer vendedor da\nempresa\nnão tem visita da empresa em <<N>>\ndias\nO cliente não teve visita de nenhum vendedor da\nempresa\n8.4.2 Gatilhos de frequência e parametrização\nGatilho Descrição\nfora da frequencia de venda ou\nmaior que <<N>> dias\nO cliente está fora da frequência de venda\nparametrizada\nfora da frequencia de venda\nindicada ou maior que <<N>> dias\nConsidera a frequência indicada pelo histórico\natendimento <<N>>% menor que o\nparametrizado\nVolume de atendimentos abaixo do esperado\nnão tem parametro O cliente não tem nenhum parâmetro configurado\nnão tem parametro manual O cliente não tem parametrização manual\nparametro de frequencia <<N>>%\nmenor que o previsto\nFrequência parametrizada abaixo da prevista",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 54,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes50"
+    }
+  },
+  {
+    "id": "manual_p055_c01",
+    "text": "8 Regrasparaalertasdeclientes51\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n8.4.3 Gatilhos de qualidade de atendimento\nGatilho Descrição\ntem <<N>>% de visita remota em\n<<periodo>>\nPercentual de visitas remotas no período\ntem <<N>>% de visita incerta em\n<<periodo>>\nPercentual de visitas com localização incerta\nultima positivacao <<N>>% menor\nque o ticket medio\nÚltima venda abaixo do ticket médio\nnão tem coordenada confiavel Sem geolocalização válida\n8.4.4 Gatilhos de produtos\nGatilho Descrição\ntem produtos com promoções\nsugeridas\nHá produtos com promoção sugerida para o cliente\ntem produtos sugeridos Há produtos sugeridos para o cliente\n8.5 Variáveis disponíveis para textos e templates\nAs variáveis são usadas nas seções descreva com o texto(...) e template com os\nvalores(...), sempre envoltas por $:\n8.5.1 Variáveis fixas\nVariável Descrição\n$data$ Data atual\n$hora$ Hora atual",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 55,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes51"
+    }
+  },
+  {
+    "id": "manual_p056_c01",
+    "text": "8 Regrasparaalertasdeclientes52\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n$datahora$ Data e hora atual\n8.5.2 Variáveis do usuário alvo do evento\nVariável Descrição\n$nomeusuario$ Nome completo do usuário que recebe o alerta\n$primeironomeusuario$ Primeiro nome do usuário\n$emailusuario$ E-mail do usuário\n$telefoneusuario$ Telefone do usuário\n$tipousuario$ Tipo de usuário (vendedor, supervisor, gestor)\n$diasparainativos$ Dias configurados para considerar um cliente inativo\n$maximovisitas$ Máximo de visitas configurado\n$idvendedor$ ID do vendedor\n$tipovendedor$ Tipo do vendedor (campo, televendas)\n$semagenda$ Se o usuário está sem agenda\n8.5.3 Variáveis dos clientes do evento\nVariável Descrição\n$totalclientes$ Total de clientes no evento\n$totalagendados$ Total de clientes agendados\n$totalvendedores$ Total de vendedores no evento\n$somaticketmedio$ Soma dos tickets médios dos clientes",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 56,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes52"
+    }
+  },
+  {
+    "id": "manual_p057_c01",
+    "text": "8 Regrasparaalertasdeclientes53\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n$idusuario$ ID do usuário\n8.5.4 Variáveis de produtos\nVariável Descrição\n$totalprodutos$ Total de produtos no evento\n$totalcondicoes$ Total de condições de produtos\n$qtddeclientes$ Quantidade de clientes nos produtos\n8.6 Canais de entrega\nCanal Sintaxe Descrição\nGovendas App govendas() Notificação interna no aplicativo\nGovendas\nWhatsApp whatsapp(\"nome_do_template\")Mensagem via WhatsApp\nusando um template pré-\naprovado\nPara WhatsApp, os valores das variáveis do template são passados com: e template\ncom os valores( '$totalclientes$', '10', '$nomeusuario$', 'https://\napp.govendas.com/#/...' )\n8.7 Alvos do alerta (entregue)\nAlvo Descrição\npara o vendedor O alerta é entregue ao vendedor da carteira",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 57,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes53"
+    }
+  },
+  {
+    "id": "manual_p058_c01",
+    "text": "8 Regrasparaalertasdeclientes54\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\npara o supervisor O alerta é entregue ao supervisor dos vendedores\npara o gestor O alerta é entregue ao gestor\nÉ possível também redirecionar o alerta para um e-mail específico com e\nredirecione(\"email@exemplo.com\").\nObs.: para que os nomes de supervisores e vendedores apareçam nos alertas, eles precisam\nestar cadastrados no Govendas.\n8.8 Cláusulas e restrições para alertas\n• Regras por time ou carteira: um alerta nunca é criado diretamente para um vendedor\nindividual.\n• O gatilho define a prioridade: os clientes são ordenados pela temporalidade do gatilho.\n• Eventos não-exclusivos: um mesmo cliente pode acionar múltiplos alertas diferentes,\nindependentemente.\n• A ordem não importa: diferente das carteiras, a ordem dos alertas não afeta o resultado.\n• Referências únicas: os nomes dos alertas devem ser distintos, inclusive entre conjuntos de\nregras diferentes da mesma empresa.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 58,
+      "trecho": 1,
+      "titulo_pagina": "8 Regrasparaalertasdeclientes54"
+    }
+  },
+  {
+    "id": "manual_p059_c01",
+    "text": "9 Regrasparatagsdeclientes55\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n9 Regras para tags de clientes\n.......................................................................................................................................\nAs tags permitem fazer marcações nos clientes de forma a facilitar filtros, segmentações e análises\ndentro do Govendas 2.0. Existem dois tipos de tags:\n• Tag de contexto: define uma marcação baseada em uma condição (gatilho)\nsobre os clientes.\n• Tag nomeada: define uma marcação baseada em uma tag de contexto já\ncriada, podendo ser descrita com um texto.\nAtenção: a funcionalidade de tags está em expansão contínua. Os gatilhos disponíveis para tags\nsão distintos dos gatilhos de alertas.\n9.1 Gatilhos disponíveis para tags de contexto\nGatilho Descrição\ntem produtos e <filtro de\nprodutos>\nO cliente tem produtos que atendem ao filtro\nespecificado\ntem produtos sugeridos e <filtro\nde sugestão>\nO cliente tem sugestões de produtos\ntem fornecedores e <filtro> O cliente tem fornecedores que atendem ao filtro\ntem fornecedores sugeridos e\n<filtro>\nO cliente tem sugestões de fornecedores\ntem rotas O cliente pertence a alguma rota\ntem cidades O cliente está em alguma cidade cadastrada\ntem estados O cliente pertence a algum estado\ntem ramo de atividade O cliente tem ramo de atividade definido\ntem classificacao O cliente tem classificação definida\ntem plano de pagamento O cliente tem plano de pagamento\ntem plano de cobrança O cliente tem plano de cobrança\ntem feedbacks e <filtro de\nfeedback>\nO cliente tem feedbacks de atendimento no período",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 59,
+      "trecho": 1,
+      "titulo_pagina": "9 Regrasparatagsdeclientes55"
+    }
+  },
+  {
+    "id": "manual_p060_c01",
+    "text": "9 Regrasparatagsdeclientes56\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n9.1.1 Filtros de produtos para tags\nFiltro Descrição\nrecencia de venda entre <<N>> dias\ne <<M>> dias\nProdutos com venda recente no intervalo\nnão tem venda em <<N>> dias Produtos sem venda há N dias\nem ruptura Sugestões de produto do tipo ruptura\nno momento certo Sugestões do tipo “momento certo”\nmais vendidos Sugestões dos produtos mais vendidos\nprimeira compra Sugestões para primeira compra\nskus não vendidos SKUs que o cliente ainda não comprou\nprioritarios Produtos prioritários\ntodas as sugestões Todos os tipos de sugestão\n9.1.2 Filtros de feedbacks para tags\nFiltro Descrição\nno ultimo atendimento No atendimento mais recente\nnos ultimos <<N>> atendimentos Nos N atendimentos mais recentes\naparece <<N>> vezes nos ultimos\n<<M>> atendimentos\nAparece N vezes nos últimos M atendimentos",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 60,
+      "trecho": 1,
+      "titulo_pagina": "9 Regrasparatagsdeclientes56"
+    }
+  },
+  {
+    "id": "manual_p061_c01",
+    "text": "1 0 GramáticadaLinguagemgorules(versão1.0)57\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\n10 Gramática da Linguagem gorules (versão 1.0)\n.......................................................................................................................................\nA gramática formal define a estrutura sintática completa da linguagem gorules. Ela é implementada\ncomo uma gramática ANTLR e é o que o processador do GoBR usa para interpretar os conjuntos\nde regras.\nEstrutura de alto nível:\ngorules:\nversion\n(\nregrapadrao |\ntimes segmentacoes\n(\ncarteiras |\nparametros |\ncarteiras parametros |\nalertas |\ncarteiras alertas |\ntags |\ncarteiras tags\n)\n)\nend\nIsso significa que um arquivo gorules válido deve sempre começar com version 1.0, definir pelo\nmenos um time, e então conter uma das combinações: somente carteiras, somente parâmetros,\ncarteiras com parâmetros, somente alertas, carteiras com alertas, somente tags, ou carteiras com\ntags.\nTipos básicos da linguagem:\nTipo Formato Exemplos\nString \"texto entre aspas\nduplas\"\n\"supervisor marcos\"\nInteiro Sequência de dígitos 90, 30\nReal Dígitos com . ou , 3.5, 100,00\nHora 'hh:mm' '07:00', '18:30'\nData DMY 'dd-mm-yyyy' '01-01-2025'\nData YMD 'yyyy-mm-dd' '2025-01-01'",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 61,
+      "trecho": 1,
+      "titulo_pagina": "1 0 GramáticadaLinguagemgorules(versão1.0)57"
+    }
+  },
+  {
+    "id": "manual_p062_c01",
+    "text": "1 0 GramáticadaLinguagemgorules(versão1.0)58\n© 2 0 2 6 , GovendasAssistentedeVendasInteligente•ALLRIGHTSRESERVED.\nTag @nometag @ruptura, @inativo\nVariável Identificador frequenciaBase\nRegras lexicais importantes: - Comentários são introduzidos por # e se estendem até o final\nda linha. - A linguagem suporta caracteres acentuados do português ( á, ã, ç, é, etc.). - Strings\naceitam letras, números, espaços e símbolos especiais (exceto \"). - Nomes de variáveis começam\ncom letra e podem conter letras e números. - Tags de clientes começam com @ e usam apenas\nletras minúsculas e números.",
+    "metadata": {
+      "source": "gobr_manual",
+      "arquivo_origem": "govendas-rules.pdf",
+      "pagina": 62,
+      "trecho": 1,
+      "titulo_pagina": "1 0 GramáticadaLinguagemgorules(versão1.0)58"
+    }
+  }
+]
