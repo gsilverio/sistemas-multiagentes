@@ -76,4 +76,5 @@ Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`
 ## Indexação interna do manual
 - O PDF de origem é `data/manual/govendas-rules.pdf`.
 - O comando `python -m src.index_manual --pdf data/manual/govendas-rules.pdf --output-dir outputs/manual_index` extrai o texto por página, cria trechos com sobreposição e preserva página/título nos metadados.
+- O texto original é mantido com acentos; apenas a cópia usada nos embeddings é normalizada sem acentos e sem glifos inválidos, para tornar a busca tolerante a diferenças de digitação.
 - O notebook do Colab grava o índice do manual no Drive. A integração posterior deve recuperar primeiro o manual e as explicações, gerar a saída GOBR e validá-la com o parser determinístico.

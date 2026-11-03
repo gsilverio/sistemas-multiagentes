@@ -1,6 +1,6 @@
 import unittest
 
-from src.index_manual import chunk_text, documents_from_pages
+from src.index_manual import chunk_text, documents_from_pages, normalize_for_embedding
 
 
 class ManualIndexTests(unittest.TestCase):
@@ -21,6 +21,11 @@ class ManualIndexTests(unittest.TestCase):
         self.assertEqual("manual_p002_c01", docs[0]["id"])
         self.assertEqual(2, docs[0]["metadata"]["pagina"])
         self.assertEqual("govendas-rules.pdf", docs[0]["metadata"]["arquivo_origem"])
+
+    def test_embedding_normalization_preserves_search_terms_without_accents(self):
+        normalized = normalize_for_embedding("Frequência de atendimento — não agendar")
+        self.assertEqual("frequencia de atendimento nao agendar", normalized)
+        self.assertNotIn("�", normalized)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import unicodedata
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -24,6 +25,24 @@ def clean_text(text: str) -> str:
         if line:
             lines.append(_repair_spaced_line(line))
     return "\n".join(lines)
+
+
+def normalize_for_embedding(text: str) -> str:
+    """Create a search-only representation tolerant to accents and bad glyphs.
+
+    The original ``text`` is never replaced. This normalized form is used only
+    to make queries such as ``frequencia`` and ``frequência`` land near the
+    same manual passage, and to discard a real U+FFFD replacement glyph when a
+    PDF font has no Unicode mapping.
+    """
+    text = text.replace("\ufffd", " ")
+    decomposed = unicodedata.normalize("NFKD", text)
+    without_accents = "".join(
+        character for character in decomposed
+        if not unicodedata.combining(character)
+    )
+    without_symbols = re.sub(r"[^\w\s@#<>+\-]", " ", without_accents.casefold())
+    return re.sub(r"\s+", " ", without_symbols).strip()
 
 
 def _repair_spaced_line(line: str) -> str:
@@ -164,7 +183,7 @@ def build_index(
     device = "cuda" if _cuda_available() else "cpu"
     model = SentenceTransformer(model_name, device=device)
     vectors = model.encode(
-        [doc["text"] for doc in documents],
+        [normalize_for_embedding(doc["text"]) for doc in documents],
         normalize_embeddings=True,
         convert_to_numpy=True,
         show_progress_bar=True,
@@ -203,7 +222,11 @@ def search_index(index_dir: Path, query: str, *, k: int = 4) -> list[dict[str, A
         manifest["embedding_model"],
         device="cuda" if _cuda_available() else "cpu",
     )
-    vector = model.encode([query], normalize_embeddings=True, convert_to_numpy=True)
+    vector = model.encode(
+        [normalize_for_embedding(query)],
+        normalize_embeddings=True,
+        convert_to_numpy=True,
+    )
     index = faiss.read_index(str(index_dir / "manual.faiss"))
     scores, positions = index.search(vector, min(k, index.ntotal))
     documents = json.loads((index_dir / "documents.json").read_text(encoding="utf-8"))
