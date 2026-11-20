@@ -191,6 +191,24 @@ class GuardaTests(unittest.TestCase):
         self.assertIn("O texto proíbe agendar, mas a regra não tem `nao agendar`.",
                       self._problemas(BOA + " Eles não devem ser agendados."))
 
+    def test_justificativa_inventada_reprovada(self):
+        # Saídas reais do gemma3:12b no primeiro teste no Colab (regra_001_001 e 001_002).
+        gobr = ('parametros "x":\n    da carteira("empresa toda")\n    quando inativos para o vendedor\n'
+                '    frequencia de inativos da empresa')
+        _, rascunho = rascunho_de_gobr(gobr)
+        colab = ('Essa regra define como vamos abordar os clientes da carteira "empresa toda" que estão inativos '
+                 'para o vendedor. Ela garante que esses clientes sejam contatados com a mesma frequência que a '
+                 'média dos inativos da empresa. Assim, asseguramos um acompanhamento consistente, mesmo para '
+                 'aqueles que não compram diretamente com o vendedor há algum tempo. O objetivo é manter o '
+                 'relacionamento e identificar possíveis oportunidades de retomada.')
+        problemas = verificar(rascunho, colab, gobr=gobr).problemas
+        self.assertTrue(any("justificativa" in p for p in problemas))
+        bom = ('Os clientes da carteira "empresa toda" que estão inativos para o vendedor devem ser atendidos '
+               'com a frequência média dos clientes inativos da empresa.')
+        self.assertEqual([], verificar(rascunho, bom, gobr=gobr).problemas)
+        longo = bom + " Esses clientes são acompanhados de perto pela equipe comercial em todas as visitas." * 4
+        self.assertTrue(any("caracteres" in p for p in verificar(rascunho, longo, gobr=gobr).problemas))
+
     def test_mencao_a_implementacao(self):
         self.assertTrue(any("implementação" in p for p in self._problemas("Esta regra GOBR: " + BOA)))
 
@@ -298,6 +316,20 @@ class LoteTests(unittest.TestCase):
         self.assertEqual((3, 1), (stats["concluidas_nesta_execucao"], stats["bloqueadas_nesta_execucao"]))
         self.assertEqual("sem-llm", stats["model"])
         self.assertEqual(3, len((self.out / "explicacoes.jsonl").read_text(encoding="utf-8").splitlines()))
+
+    def test_blocos_repetidos_reaproveitam_explicacao(self):
+        repetido = dict(self.rules[0], id="regra_002_001", nome="Outro nome",
+                        gobr=self.rules[0]["gobr"].replace('"Caso 1"', '"Outro nome"'))
+        self._gravar([self.rules[0], repetido, self.rules[1]])
+        self.respostas += [self._boa(1), self._boa(2)]
+        stats = self._rodar(limit=2)
+        self.assertEqual((2, 1), (stats["concluidas_nesta_execucao"], stats["reaproveitadas_nesta_execucao"]))
+        self.assertEqual(2, len(self.llm.chamadas))
+        item = read_previous(self.out / "items/regra_002_001.json")
+        self.assertEqual(("regra_001_001", "Outro nome"), (item["reaproveitada_de"], item["explicacao"]["nome"]))
+        self.assertEqual(self._boa(1), item["explicacao"]["texto"])
+        # Retomada: o item reaproveitado é tratado como concluído.
+        self.assertEqual(3, self._rodar(limit=2)["ignoradas_concluidas"])
 
     def test_rejeita_ids_duplicados(self):
         self._gravar([self.rules[0], self.rules[0]])

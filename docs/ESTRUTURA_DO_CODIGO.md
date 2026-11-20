@@ -197,8 +197,10 @@ explicação: o LLM só reescreve isso.
 ### `src/explicacao/guarda.py` — `verificar(rascunho, texto) -> ResultadoGuarda`
 Confere um texto contra o rascunho: nomes literais, todos os números da
 regra presentes e nenhum número novo, chaves de cada fato, `nao agendar`
-como proibição (e nenhuma proibição inventada), `ou` preservado e nenhuma
-menção à implementação. O próprio rascunho passa no guard nos 1.698 blocos
+como proibição (e nenhuma proibição inventada), `ou` preservado, nenhuma
+menção à implementação e nenhuma justificativa inventada ("o objetivo é...",
+"estratégia", "vamos..."; erro visto no primeiro teste com o `gemma3:12b`),
+nem texto muito mais longo que o rascunho. O próprio rascunho passa no guard nos 1.698 blocos
 traduzíveis do acervo (há um teste para isso). Aplicado às 59 explicações
 antigas, aprova só 20 (`python -m src.pipelines.avaliar_explicacoes
 data/avaliacao/explicacoes_baseline_v1.jsonl`).
@@ -232,7 +234,9 @@ Scripts de lote, todos `python -m src.pipelines.<nome>`:
   regra vira `items/<id>.json`; reexecutar pula o que já foi feito) e
   consolida tudo em `explicacoes.jsonl`. A assinatura de cada item usa o
   modelo e um hash dos arquivos do explicador, então mudar outras partes do
-  código não refaz o trabalho. Com Ollama no Colab; `--sem-llm` roda local.
+  código não refaz o trabalho. Blocos com o mesmo corpo (só o nome muda)
+  reaproveitam a explicação: no acervo são 1.202 chamadas ao LLM em vez de
+  1.698. Com Ollama no Colab; `--sem-llm` roda local.
 - `avaliar_explicacoes`: passa o guard num JSONL de explicações e mostra
   quantas foram aprovadas e o motivo das reprovações.
 

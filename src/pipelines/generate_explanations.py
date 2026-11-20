@@ -120,6 +120,17 @@ def fingerprint(rule: dict[str, Any], *, model: str, num_ctx: int, versao: str) 
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def chave_corpo(gobr: str) -> str:
+    """Identifica blocos com o mesmo corpo (só o nome no cabeçalho muda).
+
+    O acervo tem 1.700 blocos e só 1.204 corpos distintos; a explicação não
+    cita o nome da regra, então blocos repetidos reaproveitam a mesma.
+    """
+    from src.gobr.grammar import normalizar
+    corpo = gobr.strip().splitlines()[1:]
+    return hashlib.sha256(normalizar(" ".join(corpo)).encode("utf-8")).hexdigest()
+
+
 def consolidar(output_dir: Path) -> Path:
     """Junta os itens concluídos em `explicacoes.jsonl`, em ordem de id."""
     destino = output_dir / "explicacoes.jsonl"
@@ -155,6 +166,19 @@ class ReferenceBatchRunner:
             self.explicador = self.explicador_factory()
         return self.explicador
 
+    @staticmethod
+    def _registro(rule: dict[str, Any], signature: str, versao: str, model: str, num_ctx: int,
+                  revision: str, attempts: int) -> dict[str, Any]:
+        return {
+            "id": rule["id"], "nome": rule.get("nome"), "arquivo_origem": rule.get("arquivo_origem"),
+            "indice": rule.get("indice"), "linha_inicio": rule.get("linha_inicio"),
+            "linha_fim": rule.get("linha_fim"), "gobr": rule["gobr"],
+            "referencias_nao_resolvidas": rule.get("referencias_nao_resolvidas", []),
+            "fingerprint": signature, "pipeline_version": PIPELINE_VERSION,
+            "versao_explicador": versao, "model": model, "num_ctx": num_ctx,
+            "code_revision": revision, "attempt": attempts, "created_at_utc": utc_now(),
+        }
+
     def run(
         self, *, input_path: Path, output_dir: Path, limit: int = 3, max_attempts: int = 2,
         model: str = "gemma3:12b", num_ctx: int = 4096, versao: str | None = None,
@@ -171,21 +195,26 @@ class ReferenceBatchRunner:
             "total_regras": len(rules), "simuladas": 0, "concluidas_nesta_execucao": 0,
             "falhas_nesta_execucao": 0, "bloqueadas_nesta_execucao": 0,
             "ignoradas_concluidas": 0, "ignoradas_tentativas": 0, "ignoradas_bloqueadas": 0,
+            "reaproveitadas_nesta_execucao": 0,
             "metodos_nesta_execucao": {}, "dry_run": dry_run, "model": model, "num_ctx": num_ctx,
             "versao_explicador": versao, "revision": revision,
             "executed_at_utc": utc_now(), "output_dir": str(output_dir),
         }
         executed = 0
+        # corpo do bloco → (id, explicação) já concluída nesta pasta
+        por_corpo: dict[str, tuple[str, dict[str, Any]]] = {}
         for rule in rules:
             rule_id = rule["id"]
             output = items_dir / f"{rule_id}.json"
             signature = fingerprint(rule, model=model, num_ctx=num_ctx, versao=versao)
             previous = read_previous(output)
             matches = previous is not None and previous.get("fingerprint") == signature
+            corpo = chave_corpo(rule["gobr"])
             if not force and matches:
                 status = previous.get("status")
                 if status == "completed":
                     stats["ignoradas_concluidas"] += 1
+                    por_corpo.setdefault(corpo, (rule_id, previous["explicacao"]))
                     continue
                 if status == "blocked":
                     stats["ignoradas_bloqueadas"] += 1
@@ -193,6 +222,18 @@ class ReferenceBatchRunner:
                 if status == "failed" and previous.get("attempt", 0) >= max_attempts:
                     stats["ignoradas_tentativas"] += 1
                     continue
+            if corpo in por_corpo and not dry_run:
+                # Mesmo corpo de um bloco já explicado: copia, sem chamar o LLM
+                # e sem contar no limite do lote.
+                origem, explicacao = por_corpo[corpo]
+                record = self._registro(rule, signature, versao, model, num_ctx, revision, 1)
+                record.update(status="completed", reaproveitada_de=origem,
+                              explicacao={**explicacao, "nome": rule.get("nome") or explicacao.get("nome")},
+                              elapsed_seconds=0.0)
+                atomic_write_json(output, record)
+                stats["reaproveitadas_nesta_execucao"] += 1
+                print(f"[completed] {rule_id} | reaproveitada de {origem}", flush=True)
+                continue
             if limit and executed >= limit:
                 break
             executed += 1
@@ -202,15 +243,7 @@ class ReferenceBatchRunner:
                 continue
             attempts = int(previous.get("attempt", 0)) + 1 if matches and not force and previous else 1
             started = time.monotonic()
-            record: dict[str, Any] = {
-                "id": rule_id, "nome": rule.get("nome"), "arquivo_origem": rule.get("arquivo_origem"),
-                "indice": rule.get("indice"), "linha_inicio": rule.get("linha_inicio"),
-                "linha_fim": rule.get("linha_fim"), "gobr": rule["gobr"],
-                "referencias_nao_resolvidas": rule.get("referencias_nao_resolvidas", []),
-                "fingerprint": signature, "pipeline_version": PIPELINE_VERSION,
-                "versao_explicador": versao, "model": model, "num_ctx": num_ctx,
-                "code_revision": revision, "attempt": attempts, "created_at_utc": utc_now(),
-            }
+            record = self._registro(rule, signature, versao, model, num_ctx, revision, attempts)
             try:
                 explicacao = self._carregar(sem_llm).explicar(rule["gobr"])
                 dados = explicacao.model_dump(mode="json")
@@ -221,6 +254,7 @@ class ReferenceBatchRunner:
                     stats["bloqueadas_nesta_execucao"] += 1
                 else:
                     record["status"] = "completed"
+                    por_corpo.setdefault(corpo, (rule_id, dados))
                     stats["concluidas_nesta_execucao"] += 1
                     metodo = dados["metodo"]
                     stats["metodos_nesta_execucao"][metodo] = stats["metodos_nesta_execucao"].get(metodo, 0) + 1

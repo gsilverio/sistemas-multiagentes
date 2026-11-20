@@ -11,6 +11,8 @@ Verificações (todas determinísticas, sobre texto normalizado):
    aparece proibição de agendar em regra que não tem `nao agendar`.
 5. Cada `ou` lógico da regra continua no texto.
 6. O texto não fala da implementação (GOBR, JSON, parser...).
+7. O texto não acrescenta justificativa, objetivo ou benefício ("o objetivo
+   é...", "estratégia", "vamos...") e não é muito mais longo que o rascunho.
 
 Não prova correção semântica: é uma rede de segurança contra omissões e
 alucinações, que são os erros observados na linha de base.
@@ -35,6 +37,18 @@ _ESTADO_AGENDADO = re.compile(
     r"|\bnao\s+(?:pode|podem|deve|devem)\s+estar\s+agendad"
 )
 _IMPLEMENTACAO = re.compile(r"\b(?:gobr|json|parser|dsl|ast|regex|rascunho)\b|bloco\s+parametros")
+# Justificativas, objetivos e benefícios: a regra diz O QUE fazer, nunca POR QUE.
+# Observado nos primeiros testes com gemma3:12b ("O objetivo é manter o
+# relacionamento", "alinhamos com a estratégia da empresa").
+_JUSTIFICATIVA = re.compile(
+    r"\bobjetivo\b|\bfinalidade\b|\bproposito\b|\bestrategi\w*|\boportunidade\w*|\brelacionamento\b"
+    r"|\bfideliz\w*|\bengaj\w*|\bretencao\b|\breter\b|\brecuperar\b|\baumentar\b|\bmaximiz\w*"
+    r"|\bconsistente\b|\badequad[oa]\b|\binteresse\b|\bassegur\w*|\bgarant\w*"
+    r"|\bvamos\b|\bnos\s+(?:vamos|queremos|buscamos)\b|\bpriorizamos\b|\balinhamos\b|\bbuscamos\b"
+    r"|\bdessa\s+forma\b|\bdesta\s+forma\b|\bcom\s+isso\b|\bisso\s+permite\b|\bassim,"
+)
+# Folga sobre o tamanho do rascunho antes de considerar que o texto acrescenta conteúdo.
+FATOR_TAMANHO, FOLGA_TAMANHO = 1.5, 120
 
 
 def _numeros(texto: str) -> set[str]:
@@ -93,6 +107,15 @@ def verificar(rascunho: Rascunho, texto: str, *, gobr: str | None = None) -> Res
 
     if _IMPLEMENTACAO.search(t):
         problemas.append("O texto menciona a implementação (GOBR, JSON, parser...).")
+
+    if m := _JUSTIFICATIVA.search(t):
+        problemas.append(f'O texto acrescenta justificativa ou objetivo que a regra não tem ("{m.group(0)}"); '
+                         "descreva apenas o que a regra faz.")
+
+    limite = FATOR_TAMANHO * len(rascunho.texto) + FOLGA_TAMANHO
+    if len(texto.strip()) > limite:
+        problemas.append(f"O texto tem {len(texto.strip())} caracteres, bem mais que o rascunho "
+                         f"({len(rascunho.texto)}); provavelmente acrescenta informação.")
 
     return ResultadoGuarda(not problemas, problemas)
 

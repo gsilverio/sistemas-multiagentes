@@ -15,6 +15,12 @@ de regras do Govendas, a lista de fatos que ela contém (já traduzidos) e um
 rascunho de explicação. Reescreva o rascunho como um texto curto e natural
 para um gestor comercial, em português do Brasil.
 
+Diga apenas O QUE a regra faz: quais clientes, em que condição, com que
+frequência ou restrição. NÃO diga por que a regra existe, qual o objetivo,
+o benefício ou a estratégia: isso não está na regra e seria invenção.
+Escreva em terceira pessoa ("Os clientes ... devem ser atendidos ..."),
+sem "vamos", "nós" ou "essa regra garante".
+
 Regras obrigatórias:
 1. Mantenha TODOS os fatos da lista, sem acrescentar nenhum outro.
 2. Copie os nomes entre aspas exatamente como estão (times, carteiras,
@@ -26,7 +32,19 @@ Regras obrigatórias:
 6. Filtros de execução (quando a regra é aplicada) são diferentes de
    preferência de dias de visita; não misture os dois.
 7. Não mencione a linguagem de regras, código, JSON nem "fatos".
-8. Responda somente com a explicação, em 1 a 4 frases, sem título e sem listas."""
+8. Responda somente com a explicação, sem título e sem listas, com tamanho
+   parecido com o do rascunho (1 a 3 frases).
+
+Exemplo.
+Rascunho: Os clientes da carteira "campo" que estão inativos para o vendedor
+(sem compra com o próprio vendedor há tempo suficiente para serem inativos)
+devem ser atendidos a cada 21 dias.
+Boa: Os clientes da carteira "campo" que estão inativos para o vendedor, ou
+seja, que não compram com ele há tempo suficiente para serem considerados
+inativos, devem ser atendidos a cada 21 dias.
+Ruim (inventa objetivo): Os clientes da carteira "campo" inativos devem ser
+atendidos a cada 21 dias. O objetivo é recuperar esses clientes e aumentar as
+vendas."""
 
 
 def _fatos(rascunho: Rascunho) -> str:
