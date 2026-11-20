@@ -7,7 +7,7 @@ suportado permanece em `desconhecidos` para impedir indexacao silenciosa.
 import re
 import unicodedata
 
-from src.models.gobr_parsed_rule import (
+from src.gobr.ast import (
     GobrParsedRule,
     ParsedCondition,
     ParsedScope,

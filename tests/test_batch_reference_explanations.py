@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock
 
-from src.batch_reference_explanations import (
+from src.pipelines.generate_explanations import (
     ReferenceBatchRunner, load_rules, read_previous,
 )
 from src.models.business_explanation import BusinessExplanation, ExplanationReview

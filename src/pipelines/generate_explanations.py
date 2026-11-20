@@ -1,8 +1,8 @@
 """Geração incremental de explicações GOBR para revisão, sem indexação.
 
 Uso local (sem GPU):
-    python -m src.prepare_references
-    python -m src.batch_reference_explanations --dry-run --limit 3
+    python -m src.pipelines.prepare_references
+    python -m src.pipelines.generate_explanations --dry-run --limit 3
 
 No Colab, configure OLLAMA_BASE_URL, GOBR_LLM_MODEL e GOBR_LLM_NUM_CTX
 antes de executar, apontando --output-dir para o Drive montado.
@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from src.parsers.gobr_parser import GobrParser
+from src.gobr.parser import GobrParser
 
 PIPELINE_VERSION = "gobr-reference-batch-v1"
 SAFE_ID = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$")
@@ -54,7 +54,7 @@ def load_rules(path: Path) -> list[dict[str, Any]]:
     """Valida a estrutura mínima do JSONL antes de iniciar uma inferência."""
     if not path.is_file():
         raise FileNotFoundError(
-            f"Arquivo {path} ausente. Execute python -m src.prepare_references."
+            f"Arquivo {path} ausente. Execute python -m src.pipelines.prepare_references."
         )
     rules: list[dict[str, Any]] = []
     seen: set[str] = set()

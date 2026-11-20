@@ -1,6 +1,6 @@
 """Build a persistent FAISS index from generated GOBR explanations.
 
-The Colab notebook runs this after ``batch_reference_explanations``.  By
+The Colab notebook runs this after ``src.pipelines.generate_explanations``.  By
 default only explicitly approved items are indexed.  ``--include-pending`` is
 an intentional fast path for the coursework smoke test; it keeps the review
 status in metadata so the index can be rebuilt later after editorial review.

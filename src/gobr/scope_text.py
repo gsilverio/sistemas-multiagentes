@@ -4,7 +4,7 @@ Uma lista de nomes dentro de uma cláusula não recebe um operador lógico
 sintético. `e`/`ou` só são reproduzidos entre cláusulas diferentes.
 """
 
-from src.models.gobr_parsed_rule import ParsedScope
+from src.gobr.ast import ParsedScope
 
 
 def _nomes(valores: list[str]) -> str:

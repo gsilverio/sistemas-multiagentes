@@ -1,4 +1,0 @@
-parametros "Não agendar filiais":
-    do time("televendas")
-    quando é o cliente filial
-    nao agendar

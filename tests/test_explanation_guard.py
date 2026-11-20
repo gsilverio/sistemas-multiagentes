@@ -2,7 +2,7 @@
 
 import unittest
 
-from src.parsers.gobr_parser import GobrParser
+from src.gobr.parser import GobrParser
 from src.validation.explanation_guard import ExplanationGuard
 
 

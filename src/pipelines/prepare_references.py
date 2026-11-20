@@ -5,8 +5,8 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
-from src.parsers.gobr_rule_extractor import GobrRuleExtractor
-from src.parsers.gobr_parser import GobrParser
+from src.gobr.extractor import GobrRuleExtractor
+from src.gobr.parser import GobrParser
 
 
 def main() -> None:

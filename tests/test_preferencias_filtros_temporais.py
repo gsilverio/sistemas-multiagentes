@@ -6,9 +6,9 @@ Nao realizam inferencia de LLM e nao calculam accuracy.
 import unittest
 from pathlib import Path
 
-from src.models.gobr_parsed_rule import GobrParsedRule
-from src.parsers.gobr_parser import GobrParser
-from src.parsers.gobr_rule_extractor import GobrRuleExtractor
+from src.gobr.ast import GobrParsedRule
+from src.gobr.parser import GobrParser
+from src.gobr.extractor import GobrRuleExtractor
 from src.validation.explanation_guard import ExplanationGuard
 
 
@@ -93,20 +93,16 @@ class PreferenciasEFiltrosTemporaisTests(unittest.TestCase):
         regra = GobrParsedRule.model_validate({"nome": "Teste", "modificadores": []})
         self.assertEqual([], regra.filtros_temporais)
 
-    def test_seis_exemplos_da_primeira_entrega_sem_alteracao_estrutural(self):
-        pasta = Path("outputs/first_delivery")
+    def test_acervo_completo_sem_clausulas_desconhecidas(self):
+        pasta = Path("data/referencias")
         if not pasta.exists():
-            self.skipTest("Resultados da primeira entrega nao incluidos")
-        cases = [
-            {"id": path.parent.name, "gobr": path.read_text(encoding="utf-8")}
-            for path in sorted(pasta.glob("*/input.gobr"))
-        ]
-        self.assertEqual(6, len(cases))
-        for caso in cases:
-            with self.subTest(id=caso['id']):
-                regra = self.parser.parse(caso['gobr'])
-                self.assertEqual([], regra.desconhecidos)
-                self.assertEqual([], regra.filtros_temporais)
+            self.skipTest("Acervo nao incluido")
+        blocos = GobrRuleExtractor().extract_directory(pasta)
+        self.assertEqual(1699, len(blocos))
+        for bloco in blocos:
+            regra = self.parser.parse(bloco.gobr)
+            if regra.desconhecidos:
+                self.fail(f"{bloco.id}: {regra.desconhecidos}")
 
 
 if __name__ == "__main__":

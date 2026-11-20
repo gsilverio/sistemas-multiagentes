@@ -35,28 +35,14 @@ Se a pasta já é um repositório Git, **não repita** `git init` nem `git remot
 4. Instale as dependências.
 5. Instale e inicie o Ollama dentro do Colab.
 6. Baixe `gemma3:12b` (~8,2 GB).
-7. Execute a primeira regra e confira o Drive (`Meu Drive > gobr-agent > outputs > first_delivery_colab`).
-8. Verifique `ollama ps` para checar a utilização da GPU.
-9. (Opcional) libere a execução dos seis exemplos.
+7. Verifique `ollama ps` para checar a utilização da GPU.
+8. Siga as células seguintes para extrair as regras, gerar explicações em lote e montar os índices no Drive (`Meu Drive > gobr-agent > outputs`).
 
-**Importante**: nunca faça `git push` no Colab como fluxo principal. Faça alterações no Windows, envie para o GitHub, depois execute novamente a célula de clone no Colab. O conteúdo de `/content` é temporário, enquanto o Drive é persistente.
+**Importante**: nunca faça `git push` no Colab como fluxo principal. Faça alterações no Windows, envie para o GitHub, **reinicie a sessão do Colab** e execute novamente a célula de clone. O conteúdo de `/content` é temporário, enquanto o Drive é persistente.
 
-## 5. Envio da entrega
-O link do repositório contém os arquivos de código e o notebook. A execução no Colab não é necessária para avaliar o GitHub, mas quem executar o notebook precisará da própria GPU/sessão e acesso ao Ollama para repetir as saídas. Os resultados da primeira entrega que já estavam versionados continuam disponíveis em `outputs/first_delivery/`.
-
-## 6. Limites conhecidos
+## 5. Limites conhecidos
 - O plano gratuito do Colab não garante GPU, disponibilidade de T4 ou duração da sessão; consulte a FAQ oficial: https://research.google.com/colaboratory/intl/pt-BR/faq.html.
 - A instalação e o download do modelo terão de ser refeitos quando a máquina virtual do Colab for substituída.
-- O trabalho ainda **não implementa indexação ou RAG**: esta adaptação prepara o ambiente para a segunda entrega.
-- Alguns `.gobr` de `data/referencias/` contêm mais de um bloco `parametros`. O parser atual foi validado com os exemplos da primeira entrega, **não para processamento automático dos 246 arquivos como uma regra por arquivo**. Primeiro devemos extrair cada bloco e tratar `desconhecidos`/modelagem antes de indexar.
-- `src/graph/explanation_graph.py` tem divergência de tipos herdada, não é invocado no notebook desta fase.
+- `pending_review` nas explicações significa que as verificações estruturais passaram, **não que a explicação foi aprovada para o RAG**. `needs_review` indica problemas detectados e uso do fallback determinístico.
 
-
-## Atualização da revisão das explicações (v2)
-1. Faça `git add .`, `git commit -m "Revisa explicacoes GOBR"` e `git push` no Windows.
-2. No Colab, abra a versão atualizada de `notebooks/gobr_colab.ipynb` pelo GitHub ou carregue o arquivo novo. **Reinicie a sessão** antes de clonar novamente o projeto para evitar que Python use módulos antigos já importados.
-3. Execute as células na sequência, até os seis exemplos da etapa 9; o destino atualizado é `Meu Drive/gobr-agent/outputs/first_delivery_colab_v2`.
-4. Na etapa 10, salve os metadados referentes a esta execução.
-5. Verifique o objeto `revisao` em cada `explanation.json` e em `summary.json`. O status `pending_review` significa que as invariantes passaram, **não que a explicação foi aprovada para o RAG**. `needs_review` indica problemas detectados e uso de fallback, e contém `rascunho_llm` e `problemas`.
-
-No Windows, rode `python -m unittest discover -s tests -v` para executar verificações estruturais **sem GPU, sem Ollama e sem accuracy**. A validação estrutural é conservadora: não garante interpretação semântica correta.
+No Windows, `python -m unittest discover -s tests -v` executa as verificações estruturais **sem GPU e sem Ollama**.

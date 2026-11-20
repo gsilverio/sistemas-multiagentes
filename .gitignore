@@ -22,3 +22,7 @@ outputs/reference_explanations/
 Thumbs.db
 .vscode/
 .idea/
+
+# Copias locais baixadas do Drive e pacote original do enunciado
+outputs/outputs-*/
+docs/trabalho.zip

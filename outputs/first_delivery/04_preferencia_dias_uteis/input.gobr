@@ -1,4 +1,0 @@
-parametros "Regra Padrao da Empresa Customizavel: Atendimento semanal":
-    da carteira("empresa perola")
-    frequencia semanal()
-    preferencia nos dias uteis

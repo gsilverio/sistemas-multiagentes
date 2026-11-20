@@ -1,80 +1,54 @@
-# GOBR — Geração de explicações (primeira entrega)
+# GOBR — agente multiagente para parametrização do goVendas
 
-Este projeto usa `GobrParser`, `GobrInterpreterAgent` e `BusinessExplainerAgent` para traduzir parametrizações GOBR em explicações comerciais.
+Agente conversacional que recebe uma imagem ou descrição de regras comerciais e gera as
+regras na DSL GOBR, apontando falhas na modelagem. Usa apenas modelos open source
+(Ollama) e LangGraph.
 
-## Pré-requisitos
+- Arquitetura, agentes e etapas: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
+- Enunciado: [`docs/enunciado.pdf`](docs/enunciado.pdf)
+- Execução no Colab: [`notebooks/gobr_colab.ipynb`](notebooks/gobr_colab.ipynb) e
+  [`docs/COLAB_PASSO_A_PASSO.md`](docs/COLAB_PASSO_A_PASSO.md)
+- Estado das entregas 1 a 4 antes da reestruturação: tag `entregas-1-a-4`
 
-- Python com `pydantic`, `langchain-core`, `langchain-ollama` e `langgraph` instalados.
-- Ollama em execução.
-
-A codebase original não acompanha arquivo de dependências com versões fixadas; esta alteração mantém as importações existentes.
-
-## Modelo
-
-Por padrão, os dois agentes usam **`gemma3:12b`**. Para baixar no Ollama:
+## Instalação
 
 ```powershell
+pip install -r requirements.txt
 ollama pull gemma3:12b
 ```
 
-Parâmetros opcionais (PowerShell, na sessão atual):
+Variáveis opcionais: `GOBR_LLM_MODEL` (padrão `gemma3:12b`), `GOBR_LLM_NUM_CTX`
+(padrão `4096`) e `OLLAMA_BASE_URL` (padrão `http://localhost:11434`).
+
+## Comandos
+
+Testes (sem GPU e sem Ollama):
 
 ```powershell
-$env:GOBR_LLM_MODEL = "gemma3:12b"
-$env:GOBR_LLM_NUM_CTX = "4096"
-$env:OLLAMA_BASE_URL = "http://localhost:11434"
+python -m unittest discover -s tests -v
 ```
 
-Se a máquina tiver cerca de 6 GB de VRAM e o 12B estiver lento, uma alternativa maior que o antigo 4B é:
+Extrair os 1.699 blocos `parametros` das referências e diagnosticar o parser:
 
 ```powershell
-ollama pull qwen3:8b
-$env:GOBR_LLM_MODEL = "qwen3:8b"
+python -m src.pipelines.prepare_references
 ```
 
-O modelo 12B ocupa mais de 8 GB somente em pesos quantizados, além de memória de execução; pode utilizar RAM/CPU fora da GPU.
-
-## Demonstração
-
-Na raiz do projeto:
+Gerar explicações em lote (pensado para o Colab, com retomada incremental):
 
 ```powershell
-python -m src.demo_first_delivery
+python -m src.pipelines.generate_explanations --input outputs/generated/regras_extraidas.jsonl --limit 3
 ```
 
-Mantêm-se os seis exemplos e os arquivos de saída em `outputs/first_delivery/`. A codebase também contém 246 referências `.gobr` em `data/referencias/` e três exemplos adicionais com PDFs e suas regras. A preparação do acervo, a geração incremental e o indexador vetorial das explicações estão disponíveis para execução no Colab.
+Indexar o manual e as explicações:
 
-## Escopo da limpeza
+```powershell
+python -m src.rag.manual_index --pdf data/manual/govendas-rules.pdf --output-dir outputs/manual_index
+```
 
-- Removidos os scripts de avaliação quantitativa de `src/evaluation/` e os dados de teste de `tests/fixtures/`.
-- Preservados os scripts de demonstração e teste manual de fluxo (`src/test_*.py`).
-- A implementação de LangGraph em `src/graph/explanation_graph.py` já tinha uma divergência de tipos anterior às alterações (passa uma string ao interpretador, que espera um objeto `GobrParsedRule`); deve ser corrigida antes de utilizá-la na próxima entrega.
+```powershell
+python -m src.rag.explanation_index --items-dir <pasta items> --output-dir <pasta do índice>
+```
 
-## Execucao no Colab (mantendo Windows + GitHub)
-
-- Notebook: [`notebooks/gobr_colab.ipynb`](notebooks/gobr_colab.ipynb).
-- Guia para iniciantes: [`docs/COLAB_PASSO_A_PASSO.md`](docs/COLAB_PASSO_A_PASSO.md).
-- Dependencias: `pip install -r requirements.txt`.
-- As saídas do Colab são salvas diretamente em `Meu Drive/gobr-agent/outputs/first_delivery_colab`.
-- O Colab apenas executa o pipeline; **o código-fonte continua sendo mantido no Windows e enviado ao GitHub**.
-- A execução do lote e a gravação do índice no Drive ainda precisam ser feitas no Colab; o código está em `src/batch_reference_explanations.py` e `src/index_explanations.py`.
-
-
-## Revisão estrutural das explicações (antes do RAG)
-- `src/validation/explanation_guard.py` verifica elementos da AST contra o texto final: nomes de escopo, operadores lógicos, condições, frequência, restrição `nao agendar` e modificadores.
-- Quando detecta divergências, gera uma explicação conservadora, extraída da AST, e marca `revisao.status = "needs_review"`; também preserva o `rascunho_llm` e as causas. Caso contrário, marca `pending_review` — **nenhuma explicação é aprovada automaticamente para indexação**.
-- Os seis exemplos usam `explainer.explain(interpretation, parsed_rule=parsed)` para fornecer o GOBR original. Chamadas legadas sem `parsed_rule` continuam possíveis, mas retornam `needs_review`.
-- Verificações offline, sem LLM: `python -m unittest discover -s tests -v`.
-- O notebook atualizado grava esta rodada em `outputs/first_delivery_colab_v2` no Drive, preservando os resultados anteriores. Reinicie a sessão do Colab antes de clonar/rodar o novo código.
-- A revisão estrutural não substitui revisão humana nem validação semântica e não implementa avaliação quantitativa por accuracy.
-
-## Indexação rápida das explicações
-- O notebook inclui as etapas 16 e 17 para criar um índice FAISS persistente com embeddings multilíngues e testar consultas sem chamar o Gemma novamente.
-- Para fechar a entrega rapidamente, `--include-pending` indexa os itens concluídos mesmo quando ainda estão marcados como `indexable: false`; o índice registra esses documentos como `provisional` para permitir reconstrução posterior após revisão.
-- O manual GOBR possui um índice FAISS separado em `src/index_manual.py`. Ele deve ser usado primeiro como contexto interno do agente para gerar GOBR; não é necessário expor o texto do manual diretamente ao usuário nesta etapa.
-
-## Indexação interna do manual
-- O PDF de origem é `data/manual/govendas-rules.pdf`.
-- O comando `python -m src.index_manual --pdf data/manual/govendas-rules.pdf --output-dir outputs/manual_index` extrai o texto por página, cria trechos com sobreposição e preserva página/título nos metadados.
-- O texto original é mantido com acentos; apenas a cópia usada nos embeddings é normalizada sem acentos e sem glifos inválidos, para tornar a busca tolerante a diferenças de digitação.
-- O notebook do Colab grava o índice do manual no Drive. A integração posterior deve recuperar primeiro o manual e as explicações, gerar a saída GOBR e validá-la com o parser determinístico.
+O índice do manual versionado em `outputs/manual_index` usa
+`paraphrase-multilingual-MiniLM-L12-v2` e um trecho por página; será refeito na etapa 3.

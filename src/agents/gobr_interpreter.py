@@ -2,8 +2,8 @@ import json
 
 from src.llm_config import create_llm
 
-from src.models.gobr_parsed_rule import GobrParsedRule
-from src.models.scope_text import scope_subject
+from src.gobr.ast import GobrParsedRule
+from src.gobr.scope_text import scope_subject
 from src.models.semantic_interpretation import SemanticInterpretation
 from src.prompts.gobr_interpreter_prompt import GOBR_INTERPRETER_PROMPT
 

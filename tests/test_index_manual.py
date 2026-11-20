@@ -1,6 +1,6 @@
 import unittest
 
-from src.index_manual import chunk_text, documents_from_pages, normalize_for_embedding
+from src.rag.manual_index import chunk_text, documents_from_pages, normalize_for_embedding
 
 
 class ManualIndexTests(unittest.TestCase):

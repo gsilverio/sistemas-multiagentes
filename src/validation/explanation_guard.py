@@ -4,8 +4,8 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 
-from src.models.gobr_parsed_rule import GobrParsedRule, ParsedCondition, ParsedScope
-from src.models.scope_text import scope_subject
+from src.gobr.ast import GobrParsedRule, ParsedCondition, ParsedScope
+from src.gobr.scope_text import scope_subject
 
 
 def _normalize(value: str) -> str:

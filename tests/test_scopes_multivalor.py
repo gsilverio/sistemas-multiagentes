@@ -3,9 +3,9 @@
 import json
 import unittest
 
-from src.models.gobr_parsed_rule import ParsedScope
-from src.models.scope_text import scope_subject
-from src.parsers.gobr_parser import GobrParser
+from src.gobr.ast import ParsedScope
+from src.gobr.scope_text import scope_subject
+from src.gobr.parser import GobrParser
 from src.validation.explanation_guard import ExplanationGuard
 
 

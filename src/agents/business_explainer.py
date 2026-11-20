@@ -1,7 +1,7 @@
 from src.llm_config import create_llm
 
 from src.models.business_explanation import BusinessExplanation, ExplanationReview
-from src.models.gobr_parsed_rule import GobrParsedRule
+from src.gobr.ast import GobrParsedRule
 from src.validation.explanation_guard import ExplanationGuard
 from src.models.semantic_interpretation import SemanticInterpretation
 from src.prompts.business_explainer_prompt import BUSINESS_EXPLAINER_PROMPT

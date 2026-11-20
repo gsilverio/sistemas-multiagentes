@@ -13,7 +13,7 @@ O arquivo `.faiss` não é um banco relacional com tabelas. Ele é uma estrutura
 ## Reprodução
 
 ```powershell
-python -m src.index_manual `
+python -m src.rag.manual_index `
   --pdf data/manual/govendas-rules.pdf `
   --output-dir outputs/manual_index
 ```

@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from src.index_explanations import load_documents
+from src.rag.explanation_index import load_documents
 
 
 class ExplanationIndexTests(unittest.TestCase):
