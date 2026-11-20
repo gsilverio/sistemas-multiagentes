@@ -1,0 +1,11 @@
+{
+  "kind": "gobr_exemplos",
+  "count": 1202,
+  "embedding_model": "intfloat/multilingual-e5-small",
+  "dimension": 384,
+  "blocos": 1700,
+  "metodos": {
+    "rascunho": 1202
+  },
+  "explicacoes": null
+}

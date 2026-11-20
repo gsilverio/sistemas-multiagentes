@@ -13,6 +13,7 @@ src/
 │   ├── parser.py          texto de um bloco `parametros` → GobrParsedRule
 │   ├── extractor.py       arquivo .gobr → lista de blocos + definições usadas
 │   ├── vocabulary.py      vocabulário de condições `quando` (acervo + manual)
+│   ├── assinatura.py      chaves de agrupamento: mesmo corpo / mesma forma de regra
 │   └── scope_text.py      escopos da AST → texto em português
 ├── validation/            VERIFICAÇÕES — determinísticas, sem LLM
 │   └── gobr_validator.py  arquivo GOBR inteiro → relatório de erros/avisos
@@ -24,14 +25,18 @@ src/
 │   └── explicador.py      GOBR → rascunho → 1 chamada LLM → guard
 ├── prompts/               prompts dos agentes
 │   └── explicador_prompt.py
-├── rag/                   INDEXAÇÃO E BUSCA (sentence-transformers + FAISS)
-│   ├── manual_index.py    PDF do manual → índice vetorial
-│   └── explanation_index.py  explicações geradas → índice vetorial
+├── rag/                   RECUPERAÇÃO HÍBRIDA (BM25 + embeddings, RRF)
+│   ├── busca_hibrida.py   BM25, embeddings, fusão RRF, índice persistido
+│   ├── manual.py          PDF do manual → um documento por seção numerada
+│   ├── exemplos.py        acervo + explicações → um documento por corpo de regra
+│   └── recuperador.py     buscar_manual() / buscar_exemplos() (API dos agentes)
 ├── pipelines/             SCRIPTS DE LOTE (python -m ...)
 │   ├── prepare_references.py  acervo → regras_extraidas.jsonl + diagnóstico
 │   ├── build_vocabulary.py    acervo → data/vocabulario/condicoes.json
 │   ├── generate_explanations.py  regras → explicações (LLM no Colab; --sem-llm local)
-│   └── avaliar_explicacoes.py    JSONL de explicações → relatório do guard
+│   ├── avaliar_explicacoes.py    JSONL de explicações → relatório do guard
+│   ├── construir_indices.py      manual + acervo → outputs/rag/{manual,exemplos}
+│   └── avaliar_recuperacao.py    consultas de referência → acerto@k e MRR
 └── llm_config.py          cria o ChatOllama (modelo, URL, contexto)
 
 data/
@@ -39,9 +44,9 @@ data/
 ├── exemplos/      3 regras comerciais em PDF + o GOBR correspondente
 ├── manual/        govendas-rules.pdf (manual da linguagem)
 ├── vocabulario/   condicoes.json (gerado; versionado)
-└── avaliacao/     explicações antigas, usadas como linha de base
+└── avaliacao/     linha de base das explicações + consultas de avaliação do RAG
 tests/             testes unitários (rodam sem LLM e sem GPU)
-outputs/manual_index/  índice do manual já gerado (será refeito na etapa 3)
+outputs/rag/       índices de recuperação gerados (versionados)
 notebooks/gobr_colab.ipynb  execução das partes pesadas no Colab
 ```
 
@@ -52,7 +57,7 @@ notebooks/gobr_colab.ipynb  execução das partes pesadas no Colab
 | `src/gobr/*`, `src/validation/*`, testes | ✅ | ✅ |
 | `prepare_references`, `build_vocabulary`, `avaliar_explicacoes` | ✅ | ✅ |
 | `src/explicacao/*`, `generate_explanations --sem-llm` | ✅ (~10 s para o acervo) | ✅ |
-| Indexação (`src/rag/*`) | possível, lento (CPU) | ✅ recomendado (GPU) |
+| Índices e busca (`src/rag/*`, `construir_indices`) | ✅ (~2 min em CPU com embeddings; BM25 instantâneo) | ✅ |
 | Agentes com LLM, `generate_explanations` | ❌ (pouca VRAM) | ✅ |
 
 ## Conceitos do domínio
@@ -218,12 +223,35 @@ Regras com trechos sem tradução não vão ao LLM (ele tenderia a inventar).
 O agente recebe só o GOBR (verificação cega: na etapa 4 ele confere o
 Gerador sem ver a descrição original). `usar_llm=False` gera só o rascunho.
 
-### `src/rag/`
-`manual_index.py` extrai o texto do PDF por página, divide em trechos com
-sobreposição e indexa com `paraphrase-multilingual-MiniLM-L12-v2` + FAISS;
-`search_index()` busca e dá um bônus para termos exatos da DSL.
-`explanation_index.py` faz o mesmo com as explicações geradas. Ambos serão
-unificados com busca híbrida e novos chunks na etapa 3.
+### `src/rag/` — recuperação híbrida (etapa 3)
+Dois índices, ambos em `outputs/rag/<nome>/` (`documents.json`,
+`manifest.json`, `vetores.npy`):
+
+- **manual** (`manual.py`): uma entrada por **seção numerada** do manual
+  (98 no total, ex.: `6.11.1 Opções para tempo`), não por página. O título
+  só é aceito se continuar a numeração (evita que `5 dias` vire seção),
+  cabeçalhos e rodapés de página são descartados, a indentação dos exemplos
+  é mantida, e o texto começa pelo caminho da seção ("6 Regras para filtros
+  de clientes > 6.11 Outros filtros úteis > ..."). Metadados: `secao`,
+  `construcao` (time, carteira_segmentacao, filtro_temporal,
+  filtro_cliente, parametros, alerta, tag, gramatica) e `paginas`.
+- **exemplos** (`exemplos.py`): uma entrada por **corpo distinto** de regra
+  do acervo (1.202; os blocos repetidos ficam em `ids_iguais`), com o GOBR,
+  as definições de time/carteira usadas e a explicação: a do LLM quando
+  aprovada pelo guard, senão o rascunho. O BM25 indexa também o GOBR.
+  Metadados `assinatura` (forma da regra, sem números) e `construcoes`
+  (`nao_agendar`, `frequencia_dinamica`, `modificador_preferencia`...).
+
+`busca_hibrida.py` implementa o BM25 (sem dependência nova), os embeddings
+(`intfloat/multilingual-e5-small`, opcional) e a fusão por Reciprocal Rank
+Fusion. Sem sentence-transformers ou sem vetores, a busca cai para BM25 e o
+resultado diz `modo="bm25"`.
+
+`recuperador.py` é o que os agentes usam:
+- `buscar_manual(consulta, k=4, construcao=None)` → `TrechoManual`
+  (com `citacao()` para citar seção e página);
+- `buscar_exemplos(consulta, k=3, exigir=(), diversificar=True)` →
+  `Exemplo`; `diversificar` não devolve duas regras com a mesma forma.
 
 ### `src/pipelines/`
 Scripts de lote, todos `python -m src.pipelines.<nome>`:
@@ -242,6 +270,13 @@ Scripts de lote, todos `python -m src.pipelines.<nome>`:
   a etapa 12 do notebook reinicia o Ollama e continua.
 - `avaliar_explicacoes`: passa o guard num JSONL de explicações e mostra
   quantas foram aprovadas e o motivo das reprovações.
+- `construir_indices`: gera os dois índices de `outputs/rag/`. Usa
+  `data/explicacoes/explicacoes_v2.jsonl` se existir (explicações do LLM);
+  `--sem-vetores` gera só o BM25.
+- `avaliar_recuperacao`: roda as consultas de
+  `data/avaliacao/recuperacao.json` (30 do manual, 18 de exemplos, parte
+  delas tirada das descrições reais em `data/exemplos/*.pdf`) e compara
+  BM25, denso e híbrido (acerto@1, acerto@k, MRR).
 
 ## Fluxo de dados atual
 
@@ -255,7 +290,7 @@ blocos parametros + definições ──GobrParser──► GobrParsedRule (AST)
    ▼                                       rascunho (fatos + texto)
 data/vocabulario/condicoes.json                   │ AgenteExplicador (LLM, Colab) + guard
    │                                              ▼
-   │                                       explicacoes.jsonl ──► RAG (etapa 3), fine-tuning (etapa 6)
+   │                                       explicacoes.jsonl ──► construir_indices ──► outputs/rag (etapa 3); fine-tuning (etapa 6)
    │
    ▼
 GobrValidator ◄── qualquer GOBR (do usuário ou gerado pelo agente)

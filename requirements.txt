@@ -3,8 +3,7 @@
 pydantic>=2,<3
 langchain-ollama>=1,<2
 langgraph>=1,<2
-# Indexação vetorial executada no Colab (usa CUDA quando disponível).
+# Embeddings da busca híbrida (opcional: sem eles a busca usa só BM25).
 sentence-transformers>=3,<6
-faiss-cpu>=1.8,<2
 # Extração do PDF do manual antes da indexação.
 pypdf>=5,<7

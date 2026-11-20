@@ -27,6 +27,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
+from src.gobr.assinatura import chave_corpo  # blocos com o mesmo corpo reaproveitam a explicação
+
 PIPELINE_VERSION = "gobr-explicador-v2"
 SAFE_ID = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$")
 RAIZ = Path(__file__).resolve().parents[2]
@@ -151,17 +153,6 @@ def verificar_ollama(url: str | None = None, timeout: float = 5) -> None:
 def _falhou_por_infra(item: dict[str, Any]) -> bool:
     erro = item.get("error") or {}
     return item.get("status") == "failed" and falha_de_infra(erro.get("type", ""), erro.get("message", ""))
-
-
-def chave_corpo(gobr: str) -> str:
-    """Identifica blocos com o mesmo corpo (só o nome no cabeçalho muda).
-
-    O acervo tem 1.700 blocos e só 1.204 corpos distintos; a explicação não
-    cita o nome da regra, então blocos repetidos reaproveitam a mesma.
-    """
-    from src.gobr.grammar import normalizar
-    corpo = gobr.strip().splitlines()[1:]
-    return hashlib.sha256(normalizar(" ".join(corpo)).encode("utf-8")).hexdigest()
 
 
 def consolidar(output_dir: Path) -> Path:

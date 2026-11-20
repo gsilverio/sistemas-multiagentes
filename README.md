@@ -66,15 +66,18 @@ Conferir explicações com o guard (aqui, a linha de base antiga):
 python -m src.pipelines.avaliar_explicacoes data/avaliacao/explicacoes_baseline_v1.jsonl
 ```
 
-Indexar o manual e as explicações:
+Gerar os índices de recuperação (manual por seção + exemplos do acervo) em
+`outputs/rag/`. Usa `data/explicacoes/explicacoes_v2.jsonl` se existir; com
+`--sem-vetores`, só BM25:
 
 ```powershell
-python -m src.rag.manual_index --pdf data/manual/govendas-rules.pdf --output-dir outputs/manual_index
+python -m src.pipelines.construir_indices
 ```
+
+Medir a recuperação (BM25 × denso × híbrido):
 
 ```powershell
-python -m src.rag.explanation_index --items-dir <pasta items> --output-dir <pasta do índice>
+python -m src.pipelines.avaliar_recuperacao --erros
 ```
 
-O índice do manual versionado em `outputs/manual_index` usa
-`paraphrase-multilingual-MiniLM-L12-v2` e um trecho por página; será refeito na etapa 3.
+Buscar no código: `from src.rag.recuperador import buscar_manual, buscar_exemplos`.
