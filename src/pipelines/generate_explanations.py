@@ -120,6 +120,39 @@ def fingerprint(rule: dict[str, Any], *, model: str, num_ctx: int, versao: str) 
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+_INFRA = re.compile(r"Connect|Timeout|RemoteProtocol|ResponseError|ReadError")
+# Falhas seguidas de infraestrutura antes de interromper o lote.
+MAX_FALHAS_INFRA = 3
+# Código de saída quando o Ollama não responde (o notebook reinicia e tenta de novo).
+CODIGO_OLLAMA_INDISPONIVEL = 3
+
+
+class OllamaIndisponivel(RuntimeError):
+    """O servidor do modelo não responde; o lote para em vez de marcar falhas."""
+
+
+def falha_de_infra(tipo: str, mensagem: str = "") -> bool:
+    """Erro do servidor (Ollama fora do ar, timeout), não da regra."""
+    return bool(_INFRA.search(tipo)) or "connection refused" in mensagem.lower()
+
+
+def verificar_ollama(url: str | None = None, timeout: float = 5) -> None:
+    import urllib.request
+    base = (url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")).rstrip("/")
+    try:
+        with urllib.request.urlopen(f"{base}/api/version", timeout=timeout) as resposta:
+            if resposta.status == 200:
+                return
+    except Exception as exc:
+        raise OllamaIndisponivel(f"Ollama não responde em {base}: {exc}") from exc
+    raise OllamaIndisponivel(f"Ollama não responde em {base}.")
+
+
+def _falhou_por_infra(item: dict[str, Any]) -> bool:
+    erro = item.get("error") or {}
+    return item.get("status") == "failed" and falha_de_infra(erro.get("type", ""), erro.get("message", ""))
+
+
 def chave_corpo(gobr: str) -> str:
     """Identifica blocos com o mesmo corpo (só o nome no cabeçalho muda).
 
@@ -183,10 +216,14 @@ class ReferenceBatchRunner:
         self, *, input_path: Path, output_dir: Path, limit: int = 3, max_attempts: int = 2,
         model: str = "gemma3:12b", num_ctx: int = 4096, versao: str | None = None,
         revision: str = "unversioned", dry_run: bool = False, force: bool = False, sem_llm: bool = False,
+        verificar_servico: Callable[[], None] | None = None,
     ) -> dict[str, Any]:
         if limit < 0 or max_attempts < 1 or num_ctx < 1:
             raise ValueError("limit >= 0, max_attempts >= 1 e num_ctx positivo.")
         rules = load_rules(input_path)
+        if verificar_servico and not (sem_llm or dry_run):
+            verificar_servico()  # Falha aqui, antes de tocar em qualquer item.
+        falhas_infra_seguidas = 0
         versao = versao or versao_explicador()
         if sem_llm:
             model, num_ctx = "sem-llm", 0
@@ -219,7 +256,8 @@ class ReferenceBatchRunner:
                 if status == "blocked":
                     stats["ignoradas_bloqueadas"] += 1
                     continue
-                if status == "failed" and previous.get("attempt", 0) >= max_attempts:
+                if (status == "failed" and not _falhou_por_infra(previous)
+                        and previous.get("attempt", 0) >= max_attempts):
                     stats["ignoradas_tentativas"] += 1
                     continue
             if corpo in por_corpo and not dry_run:
@@ -241,7 +279,10 @@ class ReferenceBatchRunner:
                 stats["simuladas"] += 1
                 print(f"[DRY RUN] {rule_id}: {rule.get('nome', '')}")
                 continue
-            attempts = int(previous.get("attempt", 0)) + 1 if matches and not force and previous else 1
+            anteriores = 0
+            if matches and not force and previous and not _falhou_por_infra(previous):
+                anteriores = int(previous.get("attempt", 0))
+            attempts = anteriores + 1
             started = time.monotonic()
             record = self._registro(rule, signature, versao, model, num_ctx, revision, attempts)
             try:
@@ -264,8 +305,21 @@ class ReferenceBatchRunner:
                     "traceback": traceback.format_exc(limit=5),
                 })
                 stats["falhas_nesta_execucao"] += 1
+                if falha_de_infra(type(exc).__name__, str(exc)):
+                    record["attempt"] = 0  # Problema do servidor não consome tentativa da regra.
+                    falhas_infra_seguidas += 1
+                else:
+                    falhas_infra_seguidas = 0
+            else:
+                falhas_infra_seguidas = 0
             record["elapsed_seconds"] = round(time.monotonic() - started, 3)
             atomic_write_json(output, record)
+            if falhas_infra_seguidas >= MAX_FALHAS_INFRA:
+                stats["interrompido"] = f"{falhas_infra_seguidas} falhas seguidas de conexão com o modelo."
+                atomic_write_json(output_dir / "batch_summary.json", stats)
+                consolidar(output_dir)
+                raise OllamaIndisponivel(stats["interrompido"] + " Reinicie o Ollama e rode de novo: "
+                                         "a geração continua de onde parou.")
             metodo = (record.get("explicacao") or {}).get("metodo", "-")
             print(f"[{record['status']}] {rule_id} | {metodo} | tentativa {attempts} | "
                   f"{record['elapsed_seconds']}s", flush=True)
@@ -292,11 +346,15 @@ def main() -> None:
     args = parser.parse_args()
     from src.llm_config import contexto_padrao, modelo_padrao
     output_dir = args.output_dir or Path("outputs/explicacoes_rascunho" if args.sem_llm else "outputs/explicacoes")
-    ReferenceBatchRunner().run(
-        input_path=args.input, output_dir=output_dir, limit=args.limit, max_attempts=args.max_attempts,
-        model=modelo_padrao(), num_ctx=contexto_padrao(), revision=code_revision(),
-        dry_run=args.dry_run, force=args.force, sem_llm=args.sem_llm,
-    )
+    try:
+        ReferenceBatchRunner().run(
+            input_path=args.input, output_dir=output_dir, limit=args.limit, max_attempts=args.max_attempts,
+            model=modelo_padrao(), num_ctx=contexto_padrao(), revision=code_revision(),
+            dry_run=args.dry_run, force=args.force, sem_llm=args.sem_llm, verificar_servico=verificar_ollama,
+        )
+    except OllamaIndisponivel as exc:
+        print(f"\nLOTE INTERROMPIDO: {exc}", flush=True)
+        raise SystemExit(CODIGO_OLLAMA_INDISPONIVEL) from None
 
 
 if __name__ == "__main__":

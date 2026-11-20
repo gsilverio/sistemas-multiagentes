@@ -236,7 +236,10 @@ Scripts de lote, todos `python -m src.pipelines.<nome>`:
   modelo e um hash dos arquivos do explicador, então mudar outras partes do
   código não refaz o trabalho. Blocos com o mesmo corpo (só o nome muda)
   reaproveitam a explicação: no acervo são 1.202 chamadas ao LLM em vez de
-  1.698. Com Ollama no Colab; `--sem-llm` roda local.
+  1.698. Com Ollama no Colab; `--sem-llm` roda local. Antes de começar,
+  confere se o Ollama responde; se a conexão cair no meio (3 falhas
+  seguidas), para com código de saída 3 sem gastar tentativas das regras, e
+  a etapa 12 do notebook reinicia o Ollama e continua.
 - `avaliar_explicacoes`: passa o guard num JSONL de explicações e mostra
   quantas foram aprovadas e o motivo das reprovações.
 

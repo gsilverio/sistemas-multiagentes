@@ -13,7 +13,9 @@ from src.explicacao.guarda import verificar
 from src.explicacao.rascunho import rascunho_de_gobr
 from src.gobr.extractor import GobrRuleExtractor
 from src.gobr.parser import GobrParser
-from src.pipelines.generate_explanations import ReferenceBatchRunner, load_rules, read_previous
+from src.pipelines.generate_explanations import (
+    OllamaIndisponivel, ReferenceBatchRunner, falha_de_infra, load_rules, read_previous,
+)
 
 BLOCO = '''parametros "Ativos":
     da carteira("carteira televendas")
@@ -330,6 +332,35 @@ class LoteTests(unittest.TestCase):
         self.assertEqual(self._boa(1), item["explicacao"]["texto"])
         # Retomada: o item reaproveitado é tratado como concluído.
         self.assertEqual(3, self._rodar(limit=2)["ignoradas_concluidas"])
+
+    def test_ollama_fora_do_ar_interrompe_sem_gastar_tentativas(self):
+        class ConnectError(Exception):  # mesmo nome da exceção do httpx
+            pass
+
+        mais = [dict(self.rules[0], id=f"regra_009_{i:03d}", gobr=f'parametros "x":\n    da carteira("teste")\n'
+                     f'    frequencia de {i + 10} dias') for i in range(4)]
+        self._gravar(self.rules + mais)
+        self.respostas += [self._boa(1)] + [ConnectError("[Errno 111] Connection refused")] * 3
+        with self.assertRaises(OllamaIndisponivel):
+            self._rodar(limit=0)
+        itens = {p.stem: read_previous(p) for p in (self.out / "items").glob("*.json")}
+        self.assertEqual(4, len(itens))  # parou na 3ª falha seguida, não percorreu o resto
+        falhas = [i for i in itens.values() if i["status"] == "failed"]
+        self.assertEqual([0, 0, 0], [i["attempt"] for i in falhas])
+        self.assertIn("interrompido", json.loads((self.out / "batch_summary.json").read_text(encoding="utf-8")))
+        # Com o servidor de volta, as que falharam são refeitas mesmo com max_attempts=1.
+        self.respostas += [self._boa(2), self._boa(3), self._boa(4)] + [self._boa(i + 10) for i in range(4)]
+        stats = self._rodar(limit=0, max_attempts=1)
+        self.assertEqual((7, 0), (stats["concluidas_nesta_execucao"], stats["ignoradas_tentativas"]))
+
+    def test_checagem_previa_do_servidor(self):
+        def fora():
+            raise OllamaIndisponivel("sem servidor")
+        with self.assertRaises(OllamaIndisponivel):
+            self._rodar(limit=0, verificar_servico=fora)
+        self.assertFalse(self.out.exists())
+        self.assertTrue(falha_de_infra("ConnectError") and falha_de_infra("ReadTimeout"))
+        self.assertFalse(falha_de_infra("ValueError", "regra estranha"))
 
     def test_rejeita_ids_duplicados(self):
         self._gravar([self.rules[0], self.rules[0]])
