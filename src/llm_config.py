@@ -1,7 +1,8 @@
 """Configuração central dos LLMs (Ollama) usados pelos agentes GOBR.
 
 Variáveis de ambiente: GOBR_LLM_MODEL (padrão gemma3:12b), GOBR_LLM_NUM_CTX
-(padrão 4096) e OLLAMA_BASE_URL (padrão http://localhost:11434).
+(padrão 4096), OLLAMA_BASE_URL (padrão http://localhost:11434) e, por agente,
+GOBR_MODELO_PERCEPCAO / _GERADOR / _ORQUESTRADOR / _EXPLICADOR.
 """
 
 import os
@@ -13,6 +14,24 @@ def modelo_padrao() -> str:
 
 def contexto_padrao() -> int:
     return int(os.getenv("GOBR_LLM_NUM_CTX", "4096"))
+
+
+PAPEIS = ("percepcao", "gerador", "orquestrador", "explicador")
+
+
+def modelo_para(papel: str) -> str:
+    """Modelo de um agente: `GOBR_MODELO_<PAPEL>` (ex.: GOBR_MODELO_GERADOR) ou o padrão.
+
+    Por padrão todos usam o mesmo modelo, para caber numa T4 sem trocar de
+    modelo a cada chamada (OLLAMA_MAX_LOADED_MODELS=1 no Colab).
+    """
+    if papel not in PAPEIS:
+        raise ValueError(f"Papel desconhecido: {papel}")
+    return os.getenv(f"GOBR_MODELO_{papel.upper()}") or modelo_padrao()
+
+
+def create_llm_para(papel: str, **kwargs):
+    return create_llm(modelo_para(papel), **kwargs)
 
 
 def create_llm(model: str | None = None, *, num_ctx: int | None = None, temperature: float = 0):

@@ -81,3 +81,12 @@ python -m src.pipelines.avaliar_recuperacao --erros
 ```
 
 Buscar no código: `from src.rag.recuperador import buscar_manual, buscar_exemplos`.
+
+Rodar o grafo multiagente (precisa do Ollama; no Colab, etapas 14 e 15 do notebook):
+
+```powershell
+python -m src.grafo.executar --arquivo data/exemplos/RegraMaxlub.pdf --trace
+```
+
+`--interativo` pausa para perguntas; `--orquestrador-sem-llm` usa só as regras;
+`--explicar-com-llm` usa o LLM nas explicações.

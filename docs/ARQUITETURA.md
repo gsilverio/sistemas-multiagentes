@@ -10,47 +10,57 @@ ou no Colab).
 ## Visão geral
 
 ```
-                        ┌────────────────────┐
-              ┌────────►│   ORQUESTRADOR     │◄────────┐
-              │         │ (LLM + guardrails) │         │
-              │         └─────────┬──────────┘         │
-              │   Command(goto=?) │                    │
-   ┌──────────┼──────────┬────────┼─────────┬──────────┼──────────┐
-   ▼          ▼          ▼        ▼         ▼          ▼          ▼
-percepcao  analista  recuperador gerador validador explicador perguntar_usuario
-(subgrafo) (subgrafo) (subgrafo) (subgrafo)  (nó)     (nó)      (interrupt)
-   └──────────┴──────────┴────────┴─────────┴──────────┴──────────┘
-                todos voltam com Command(goto="orquestrador")
+   START ─► inicio ─► ┌────────────────────┐
+                      │   ORQUESTRADOR     │◄──────────────────────────────┐
+                      │ (guardrails + LLM) │                               │
+                      └─────────┬──────────┘                               │
+                Command(goto=?) │                                          │
+   ┌──────────┬──────────┬──────┴─────┬─────────┬──────────┬───────────┐   │
+   ▼          ▼          ▼            ▼         ▼          ▼           ▼   │
+percepcao  analista  perguntar_   recuperador gerador  validador  explicador
+  (LLM)    (regras)   usuario      (RAG)      (LLM)    (regras)   (rascunho/LLM)
+                    (interrupt)                                            │
+   └──────────┴──────────┴────────────┴─────────┴──────────┴───────────┴───┘
+                         todos voltam ao orquestrador
                                   │
                               finalizar ──► END
 ```
 
-O grafo é um **supervisor em estrela** no LangGraph:
+Código em `src/grafo/` (grafo, estado, orquestrador, resposta final) e `src/agents/`
+(um módulo por agente, contratos em `contratos.py`). O grafo é um **supervisor em
+estrela** no LangGraph:
 
-- O **orquestrador** é um LLM que escolhe o próximo nó (`Decisao{proximo, motivo}`) a
-  partir de um *resumo* do estado (flags, contagens, erros), sem ver o conteúdo produzido
-  pelos agentes.
-- **Guardrails em código** verificam pré-condições de cada destino (ex.: só gera GOBR com
-  `RuleSpec` pronto e sem perguntas abertas; só finaliza com validação OK). Se o LLM
-  escolhe um destino inválido, o guardrail corrige e registra no `trace`.
-- Cada agente é um **nó ou subgrafo isolado** com entrada/saída tipadas (Pydantic). O
-  estado interno de um subgrafo não vaza para o grafo principal.
+- **Guardrails em código** (`destinos_permitidos`) dizem quais agentes podem ser chamados
+  em cada momento: só gera GOBR com contexto recuperado e sem pergunta bloqueante aberta;
+  só explica depois da validação; só finaliza com explicação pronta, erro ou impasse.
+- O **orquestrador LLM** escolhe entre os destinos permitidos a partir de um *resumo* do
+  estado (contagens e flags, sem o conteúdo produzido pelos agentes) e responde
+  `{"proximo", "motivo"}`. Só é chamado quando há mais de uma opção válida; a principal é
+  "perguntar ao usuário ou seguir com as suposições". Escolha inválida ou resposta ilegível
+  → vale a regra, e o `trace` registra `origem: "guardrail"`.
+- Cada agente é um **nó isolado** com entrada e saída tipadas (Pydantic): o nó monta a
+  entrada a partir do estado e devolve só os campos que produz. O estado guarda tipos
+  simples (dict/list/str) para o checkpointer serializar.
 - **Verificação cega**: o explicador recebe apenas o GOBR (não a descrição original); o
   analista recebe apenas o `RuleSpec` (não o GOBR). Quem verifica não é influenciado por
   quem produziu.
-- **Memória**: checkpointer (`SqliteSaver`) por `thread_id`; `interrupt()` pausa o grafo
-  para perguntas ao usuário.
+- **Laço de correção**: o validador agrupa os erros por bloco; o gerador refaz só os blocos
+  com erro, recebendo os erros (até 3 gerações).
+- **Memória**: checkpointer por `thread_id` (InMemorySaver nos testes; SqliteSaver na
+  etapa 5). Uma mensagem nova na mesma conversa (ex.: "mude a frequência dos ativos")
+  passa por `inicio`, que zera os campos derivados, e a Percepção relê o histórico todo.
+  `interrupt()` pausa o grafo para perguntas; retoma-se com `Command(resume=...)`.
 
 ## Agentes
 
 | Agente | Entrada | Saída | Modelo |
 |---|---|---|---|
-| Orquestrador | resumo do estado + mensagem | próximo nó + motivo | qwen3:8b |
-| Percepção | imagem / PDF / texto | `RuleSpec` (segmentos: nome, critério, frequência, restrições) | gemma3:12b (visão) |
-| Analista de negócio | `RuleSpec` | problemas + perguntas | verificações determinísticas + LLM para redigir |
-| Recuperador | `RuleSpec` | exemplos similares + trechos do manual | busca híbrida (BM25 + denso) |
-| Gerador GOBR | `RuleSpec` + contexto RAG | GOBR | Qwen3-8B, depois fine-tuning QLoRA |
-| Validador | GOBR | erros acionáveis | determinístico (`src/gobr`) |
+| Orquestrador | resumo do estado + destinos permitidos | próximo nó + motivo | `GOBR_MODELO_ORQUESTRADOR` (padrão: o mesmo modelo) |
+| Percepção | imagem / PDF / texto + respostas do usuário | `RuleSpec` (segmentos: nome, critério, faixa de dias, frequência, restrições) | gemma3:12b (visão) |
+| Analista de negócio | `RuleSpec` | falhas de modelagem, perguntas, ajustes (reordenação) e `RuleSpec` ajustado | determinístico |
+| Recuperador | cada segmento | exemplos similares + trechos do manual | busca híbrida (BM25 + denso) |
+| Gerador GOBR | um segmento + contexto RAG (+ erros, na correção) | um bloco `parametros`; o arquivo é montado em código | `GOBR_MODELO_GERADOR`, depois fine-tuning QLoRA |
+| Validador | GOBR + `RuleSpec` | erros por bloco (sintaxe + conferência com o `RuleSpec`) | determinístico |
 | Explicador | GOBR | explicação comercial | gemma3:12b / qwen3:8b |
 
 ## Estrutura do código
@@ -66,7 +76,7 @@ Descrição de cada pasta, módulo e dos códigos de erro do validador:
 | 1 | Validador GOBR completo (arquivo inteiro, referências, vocabulário de condições) | `GobrValidator.validar(gobr)` com erros acionáveis | ✅ |
 | 2 | Explicador novo (AST → rascunho determinístico → 1 chamada LLM → guard) e geração por bloco | código ✅; 1.698 rascunhos gerados localmente; versão com LLM ⏳ no Colab | ⏳ |
 | 3 | RAG híbrido, re-chunking do manual por construção da linguagem | `buscar_exemplos()` / `buscar_manual()`; índices com rascunhos, refazer com as explicações do LLM | ✅ |
-| 4 | Grafo multiagente com orquestrador supervisor e subgrafos | fluxo ponta a ponta | |
+| 4 | Grafo multiagente com orquestrador supervisor | fluxo ponta a ponta (testado com LLM falso; falta rodar no Colab) | ⏳ |
 | 5 | Memória de contexto + interface Gradio | entrega final | |
 | 6 | Fine-tuning QLoRA do gerador + avaliação comparativa | modelo próprio plugado | |
 
@@ -109,3 +119,27 @@ O texto dos exemplos começa pelo nome da regra: testado sem ele, o MRR do denso
 0,778 para 0,685 (os nomes do acervo descrevem o segmento, ex.: "Inativos (90 dias)").
 Os índices atuais usam os rascunhos determinísticos; serão refeitos com as explicações do
 LLM quando o lote da etapa 2 terminar.
+
+## Grafo (etapa 4)
+
+O **Analista** é determinístico porque as falhas que importam são aritméticas sobre as
+faixas de dias, mais a semântica do GOBR (manual, 7.6: o cliente fica com a **primeira**
+regra que o atende):
+
+| Achado | Exemplo (Maxlub) |
+|---|---|
+| reordenação automática | bloqueios `nao agendar` primeiro, faixas da menor para a maior, "demais clientes" por último |
+| buraco entre faixas | grupos de 0–30 e 45–90 dias: quem está entre 30 e 45 dias fica sem regra |
+| sobreposição | 90–120 e 100–130: a regra de cima vence entre 100 e 120 |
+| sem fallback | última faixa termina em 180 dias e não há regra para os demais (pergunta, com suposição) |
+| sem ação / frequência inválida | pergunta **bloqueante**: não dá para gerar |
+| fora do GOBR | "capacidade de 35 clientes por dia" não se escreve em `parametros` |
+| bloqueio comum ausente | inadimplentes, baixados na Receita Federal (sugestão) |
+
+O **Gerador** escreve um bloco por segmento (a mesma unidade do fine-tuning da etapa 6) e
+o arquivo (`version 1.0`, `time`, blocos na ordem do Analista) é montado em código. O
+**Validador** soma o `GobrValidator` à conferência pela AST: um bloco por segmento,
+`nao agendar` só onde foi pedido, a frequência pedida e os limites da faixa nas condições.
+
+Execução: `python -m src.grafo.executar --arquivo data/exemplos/RegraMaxlub.pdf --trace`
+(precisa do Ollama) ou as etapas 14 e 15 do notebook.

@@ -21,9 +21,25 @@ src/
 │   ├── glossario.py       cada construção GOBR → português (manual cap. 5 a 7)
 │   ├── rascunho.py        AST → fatos + texto completo
 │   └── guarda.py          um texto preserva todos os fatos, e só eles?
-├── agents/                AGENTES COM LLM (nós do grafo na etapa 4)
-│   └── explicador.py      GOBR → rascunho → 1 chamada LLM → guard
-├── prompts/               prompts dos agentes
+├── agents/                AGENTES (um por nó do grafo)
+│   ├── contratos.py       RuleSpec, Segmento, Analise, Conferencia... (Pydantic)
+│   ├── percepcao.py       texto / imagem / PDF → RuleSpec (LLM com visão)
+│   ├── analista.py        RuleSpec → falhas de modelagem + perguntas (sem LLM)
+│   ├── recuperador.py     segmento → exemplos + manual (busca híbrida)
+│   ├── gerador.py         segmento + contexto → bloco parametros (LLM)
+│   ├── validador.py       GOBR + RuleSpec → erros por bloco (sem LLM)
+│   ├── explicador.py      GOBR → rascunho → 1 chamada LLM → guard
+│   └── comum.py           texto da resposta do LLM, extração de JSON
+├── grafo/                 ORQUESTRAÇÃO (LangGraph)
+│   ├── estado.py          Estado do grafo + Agentes (dependências)
+│   ├── orquestrador.py    guardrails (destinos permitidos) + decisão do LLM
+│   ├── grafo.py           construir_grafo(): nós, arestas, interrupt
+│   ├── relatorio.py       resposta final em markdown
+│   └── executar.py        linha de comando
+├── prompts/               prompts dos agentes com LLM
+│   ├── percepcao_prompt.py
+│   ├── gerador_prompt.py
+│   ├── orquestrador_prompt.py
 │   └── explicador_prompt.py
 ├── rag/                   RECUPERAÇÃO HÍBRIDA (BM25 + embeddings, RRF)
 │   ├── busca_hibrida.py   BM25, embeddings, fusão RRF, índice persistido
@@ -58,7 +74,8 @@ notebooks/gobr_colab.ipynb  execução das partes pesadas no Colab
 | `prepare_references`, `build_vocabulary`, `avaliar_explicacoes` | ✅ | ✅ |
 | `src/explicacao/*`, `generate_explanations --sem-llm` | ✅ (~10 s para o acervo) | ✅ |
 | Índices e busca (`src/rag/*`, `construir_indices`) | ✅ (~2 min em CPU com embeddings; BM25 instantâneo) | ✅ |
-| Agentes com LLM, `generate_explanations` | ❌ (pouca VRAM) | ✅ |
+| Grafo com LLM falso (testes) | ✅ | ✅ |
+| Agentes com LLM, grafo de verdade, `generate_explanations` | ❌ (pouca VRAM) | ✅ |
 
 ## Conceitos do domínio
 
@@ -252,6 +269,40 @@ resultado diz `modo="bm25"`.
   (com `citacao()` para citar seção e página);
 - `buscar_exemplos(consulta, k=3, exigir=(), diversificar=True)` →
   `Exemplo`; `diversificar` não devolve duas regras com a mesma forma.
+
+### `src/agents/` e `src/grafo/` — o grafo multiagente (etapa 4)
+Fluxo de uma conversa (detalhes e diagrama em `ARQUITETURA.md`):
+
+1. **Percepção** (`AgentePercepcao.extrair(textos, imagens)`): pede ao LLM um
+   JSON no formato do `RuleSpec`; valida com Pydantic e, se vier inválido,
+   devolve o erro ao modelo uma vez. `ler_anexo()` lê PDF com texto (pypdf)
+   ou imagem (base64 para o modelo com visão).
+2. **Analista** (`AgenteAnalista.analisar(spec)`): reordena os segmentos e
+   aponta buracos, sobreposições, falta de fallback, segmento sem ação,
+   restrições fora do GOBR. Devolve achados, perguntas (bloqueantes ou com
+   suposição) e o `RuleSpec` ajustado.
+3. **Perguntar ao usuário** (nó com `interrupt()`): a resposta vira uma
+   mensagem e a Percepção refaz o `RuleSpec`. Pergunta não bloqueante é
+   feita uma vez; sem resposta, vira suposição na resposta final.
+4. **Recuperador**: para cada segmento, 3 exemplos do acervo (segmentos
+   `nao agendar` só recebem exemplos com `nao agendar`) e 2 trechos do manual.
+5. **Gerador** (`AgenteGerador.gerar`): um bloco por segmento, com os
+   exemplos como pares pergunta/resposta (`gerador_prompt.pedido()` é o
+   formato dos pares de fine-tuning). `limpar_bloco()` tira texto extra,
+   força o nome pedido e normaliza a indentação. `montar_arquivo()` junta
+   `version 1.0`, o `time` e os blocos.
+6. **Validador** (`AgenteValidador.validar(gobr, spec)`): erros do
+   `GobrValidator` + conferência pela AST, agrupados por bloco. Se houver
+   erro, o gerador refaz só aqueles blocos (até 3 gerações).
+7. **Explicador**: o `AgenteExplicador` da etapa 2 em cada bloco válido.
+8. **Finalizar** (`relatorio.montar_resposta`): falhas de modelagem, ajustes,
+   suposições, GOBR com o status da validação e o que cada regra faz.
+
+`Agentes.padrao()` cria os agentes reais (Ollama, modelos por papel em
+`src/llm_config.py`). Os testes (`tests/test_grafo.py`) injetam LLMs falsos
+e cobrem o fluxo completo, o laço de correção, o limite de tentativas, a
+pausa para perguntas, a escolha do orquestrador LLM, o guardrail e uma
+segunda mensagem na mesma conversa.
 
 ### `src/pipelines/`
 Scripts de lote, todos `python -m src.pipelines.<nome>`:
