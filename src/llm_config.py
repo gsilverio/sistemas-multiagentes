@@ -2,7 +2,9 @@
 
 Variáveis de ambiente: GOBR_LLM_MODEL (padrão gemma3:12b), GOBR_LLM_NUM_CTX
 (padrão 4096), OLLAMA_BASE_URL (padrão http://localhost:11434) e, por agente,
-GOBR_MODELO_PERCEPCAO / _GERADOR / _ORQUESTRADOR / _EXPLICADOR.
+GOBR_MODELO_PERCEPCAO / _GERADOR / _ORQUESTRADOR / _EXPLICADOR. Para usar o
+Gerador treinado: GOBR_MODELO_GERADOR=hf:Qwen/Qwen3-4B e
+GOBR_GERADOR_ADAPTADOR=<diretório do adaptador>.
 """
 
 import os
@@ -30,8 +32,22 @@ def modelo_para(papel: str) -> str:
     return os.getenv(f"GOBR_MODELO_{papel.upper()}") or modelo_padrao()
 
 
+_MODELOS_HF: dict = {}
+
+
 def create_llm_para(papel: str, **kwargs):
-    return create_llm(modelo_para(papel), **kwargs)
+    """LLM de um agente. `hf:<modelo>` serve pelo Hugging Face em vez do Ollama;
+    com GOBR_GERADOR_ADAPTADOR=<dir>, aplica o adaptador LoRA do fine-tuning (etapa 6)."""
+    modelo = modelo_para(papel)
+    if modelo.startswith("hf:"):
+        adaptador = os.getenv("GOBR_GERADOR_ADAPTADOR") if papel == "gerador" else None
+        chave = (modelo, adaptador)
+        if chave not in _MODELOS_HF:  # carrega uma vez por processo
+            from src.finetuning.modelo_hf import GeradorHF
+
+            _MODELOS_HF[chave] = GeradorHF(modelo.removeprefix("hf:"), adaptador)
+        return _MODELOS_HF[chave]
+    return create_llm(modelo, **kwargs)
 
 
 def create_llm(model: str | None = None, *, num_ctx: int | None = None, temperature: float = 0):

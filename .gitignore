@@ -31,3 +31,6 @@ docs/trabalho.zip
 
 # Memória das conversas da interface (etapa 5)
 outputs/conversas.sqlite*
+
+# Fine-tuning (etapa 6): dataset e avaliações gerados
+outputs/finetuning/

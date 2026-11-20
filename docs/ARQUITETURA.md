@@ -78,7 +78,7 @@ Descrição de cada pasta, módulo e dos códigos de erro do validador:
 | 3 | RAG híbrido, re-chunking do manual por construção da linguagem | `buscar_exemplos()` / `buscar_manual()`; índices com rascunhos, refazer com as explicações do LLM | ✅ |
 | 4 | Grafo multiagente com orquestrador supervisor | fluxo ponta a ponta (testado com LLM falso; falta rodar no Colab) | ⏳ |
 | 5 | Memória de contexto + interface Gradio | `SqliteSaver` por conversa, chat com anexos, progresso e retomada (testado com LLM falso; falta rodar no Colab) | ⏳ |
-| 6 | Fine-tuning QLoRA do gerador + avaliação comparativa | modelo próprio plugado | |
+| 6 | Fine-tuning QLoRA do gerador + avaliação comparativa | código ✅ (dataset, treino, avaliação, plugue no agente); treino ⏳ no Colab | ⏳ |
 
 ## Linha de base
 
@@ -143,3 +143,22 @@ o arquivo (`version 1.0`, `time`, blocos na ordem do Analista) é montado em có
 
 Execução: `python -m src.grafo.executar --arquivo data/exemplos/RegraMaxlub.pdf --trace`
 (precisa do Ollama) ou as etapas 14 e 15 do notebook.
+
+## Fine-tuning (etapa 6)
+
+O Gerador escreve um bloco `parametros` por segmento, então o fine-tuning aprende essa
+unidade: **descrição comercial → bloco GOBR**, com o mesmo prompt do agente.
+
+- **Dados**: um par por corpo distinto do acervo (1.122 no treino). A descrição é a
+  explicação do bloco: o rascunho determinístico e, quando aprovada pelo guard, a
+  explicação do LLM (dois pares com a mesma resposta). Blocos com GOBR inválido ficam fora.
+- **Teste sem vazamento**: a separação é por forma de regra (`assinatura_estrutural`):
+  as 44 formas do teste (79 pares) não aparecem no treino, nem com outros números. Os 17
+  blocos de `data/exemplos` (clientes reais, fora do acervo) são um segundo teste.
+- **Modelo**: `Qwen/Qwen3-4B` em 4 bits + LoRA r=16 numa T4. O 4B (e não o 8B) cabe na GPU
+  junto com o `gemma3:12b` do Ollama, que os outros agentes continuam usando.
+- **Comparação justa**: base e treinado rodam com o mesmo código, a mesma quantização e o
+  mesmo prompt, com e sem exemplos do RAG. A métrica principal é `ast_igual` (mesma
+  estrutura da referência); também `valido`, `vocabulario_ok`, `numeros_ok` e F1 por linha.
+
+Resultados: `python -m src.finetuning.avaliar --comparar <dir>` (etapa 20 do notebook).

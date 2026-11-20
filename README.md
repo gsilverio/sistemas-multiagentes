@@ -97,3 +97,14 @@ conversas ficam em `outputs/conversas.sqlite` e podem ser retomadas:
 ```powershell
 python -m src.interface.app
 ```
+
+Fine-tuning do Gerador (etapa 6). O dataset roda local; treino e avaliação, no Colab
+(etapas 17 a 21 do notebook):
+
+```powershell
+python -m src.finetuning.dataset
+```
+
+```powershell
+python -m src.finetuning.avaliar --comparar outputs/finetuning/avaliacao
+```

@@ -39,6 +39,11 @@ src/
 ├── interface/             ENTREGA FINAL (etapa 5)
 │   ├── servico.py         ServicoConversa: grafo + memória SQLite + eventos de progresso
 │   └── app.py             interface Gradio (chat, anexos, .gobr, decisões, conversas salvas)
+├── finetuning/            FINE-TUNING DO GERADOR (etapa 6, treino no Colab)
+│   ├── dataset.py         acervo → pares descrição → bloco (treino / teste / real)
+│   ├── modelo_hf.py       GeradorHF (base 4 bits + LoRA) e tokenização dos pares
+│   ├── treinar.py         QLoRA com retomada por checkpoint
+│   └── avaliar.py         métricas e tabela comparativa (base × treinado × Ollama)
 ├── prompts/               prompts dos agentes com LLM
 │   ├── percepcao_prompt.py
 │   ├── gerador_prompt.py
@@ -78,7 +83,8 @@ notebooks/gobr_colab.ipynb  execução das partes pesadas no Colab
 | `src/explicacao/*`, `generate_explanations --sem-llm` | ✅ (~10 s para o acervo) | ✅ |
 | Índices e busca (`src/rag/*`, `construir_indices`) | ✅ (~2 min em CPU com embeddings; BM25 instantâneo) | ✅ |
 | Grafo e interface com LLM falso (testes) | ✅ | ✅ |
-| Agentes com LLM, grafo de verdade, `generate_explanations` | ❌ (pouca VRAM) | ✅ |
+| `src.finetuning.dataset`, avaliação com modelo falso (testes) | ✅ | ✅ |
+| Agentes com LLM, grafo de verdade, `generate_explanations`, treino e avaliação do fine-tuning | ❌ (pouca VRAM) | ✅ |
 
 ## Conceitos do domínio
 
@@ -331,6 +337,29 @@ dos agentes, botão *Seguir com as suposições*, arquivo `.gobr` para baixar,
 tabela de decisões do orquestrador (regra, LLM ou guardrail) e *Conversas
 salvas → Retomar*. `responder()` é a função do chat, testada sem subir o
 servidor.
+
+### `src/finetuning/` — fine-tuning QLoRA do Gerador (etapa 6)
+- `dataset.py`: um par por corpo distinto de bloco do acervo. Entrada:
+  `gerador_prompt.pedido(nome, escopo, descrição)`, o mesmo do agente;
+  descrição = explicação do bloco (no treino, a do LLM e o rascunho viram
+  dois pares). Saída: o bloco normalizado. Fora: blocos com cláusula sem
+  tradução ou GOBR inválido. Treino e teste separados por assinatura
+  estrutural (~10% das formas só no teste); `data/exemplos` vira o conjunto
+  `real`. Metade dos pares de treino leva 2 exemplos recuperados (BM25) do
+  próprio treino, para o modelo funcionar com e sem RAG. Gera
+  `treino.jsonl`, `teste.jsonl`, `real.jsonl` e `resumo.json`.
+- `modelo_hf.py`: `GeradorHF` com `invoke(mensagens)` igual ao ChatOllama;
+  serve o base e o treinado com o mesmo código e quantização.
+  `tokenizar_par()` usa o chat template com `enable_thinking=False` e põe
+  -100 nos rótulos do prompt (perda só no bloco).
+- `treinar.py`: `Qwen/Qwen3-4B` em NF4 + LoRA r=16 (todas as projeções),
+  fp16, gradient checkpointing, `paged_adamw_8bit`, checkpoints no Drive com
+  retomada automática.
+- `avaliar.py`: gera o bloco para cada par de teste e mede `valido`,
+  `vocabulario_ok`, `ast_igual` (principal), `exato`, `f1_linhas` e
+  `numeros_ok`; retoma de onde parou e imprime a tabela comparativa.
+- Para o agente usar o modelo treinado: `GOBR_MODELO_GERADOR=hf:Qwen/Qwen3-4B`
+  e `GOBR_GERADOR_ADAPTADOR=<dir>` (`src/llm_config.py`).
 
 ### `src/pipelines/`
 Scripts de lote, todos `python -m src.pipelines.<nome>`:
