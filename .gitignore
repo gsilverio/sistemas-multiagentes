@@ -16,6 +16,8 @@ venv/
 outputs/colab_generated/
 outputs/generated/
 outputs/reference_explanations/
+outputs/explicacoes/
+outputs/explicacoes_rascunho/
 
 # Sistema / IDE
 .DS_Store

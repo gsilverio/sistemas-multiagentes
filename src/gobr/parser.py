@@ -7,6 +7,7 @@ suportado permanece em `desconhecidos` para impedir indexacao silenciosa.
 import re
 import unicodedata
 
+from src.gobr import grammar
 from src.gobr.ast import (
     GobrParsedRule,
     ParsedCondition,
@@ -45,6 +46,7 @@ class GobrParser:
         result = GobrParsedRule(nome=self._extract_name(lines))
         condition_started = False
         preference_started = False
+        frequency_started = False
 
         for line in lines:
             normalized = _sem_acentos(line)
@@ -54,6 +56,7 @@ class GobrParser:
 
             if self._parse_scope(line, result):
                 preference_started = False
+                frequency_started = False
                 continue
 
             if normalized.startswith("quando "):
@@ -62,6 +65,7 @@ class GobrParser:
                 )
                 condition_started = True
                 preference_started = False
+                frequency_started = False
                 continue
 
             # Preferencia de intensidade pode ter varias linhas:
@@ -76,6 +80,13 @@ class GobrParser:
                 result.modificadores[-1] += "\n" + line
                 continue
 
+            # Cascata de frequencia em varias linhas:
+            # frequencia do historico\n  ou no maximo de 30 dias
+            if frequency_started and self._continua_frequencia(normalized):
+                result.frequencia = f"{result.frequencia} {line.strip()}"
+                continue
+            frequency_started = False
+
             # Filtro temporal restringe QUANDO a regra sera executada.
             # Nao deve ser confundido com preferencias de agendamento.
             if self._is_temporal_filter(normalized):
@@ -86,6 +97,7 @@ class GobrParser:
             if normalized.startswith("frequencia "):
                 result.frequencia = self._parse_frequency(line)
                 preference_started = False
+                frequency_started = True
                 continue
 
             if normalized == "nao agendar":
@@ -95,13 +107,9 @@ class GobrParser:
 
             if self._is_modifier(line):
                 result.modificadores.append(line)
-                preference_started = (
-                    normalized == "preferencia"
-                    or bool(re.match(
-                        r"^preferencia\s+(?:maior|menor|normal)\s+(?:na|no|nos|nas)\s+",
-                        normalized,
-                    ))
-                )
+                # Qualquer preferencia pode continuar na linha seguinte
+                # (`preferencia nos dias uteis` + `e no sabado`).
+                preference_started = normalized.startswith("preferencia")
                 continue
 
             if (
@@ -212,20 +220,24 @@ class GobrParser:
             or normalized == "preferencia"
             or normalized in ("fixo", "roteirizavel")
             or normalized.startswith("sem choque ")
+            or normalized.startswith("restrito ")
         )
 
     @staticmethod
     def _is_temporal_filter(normalized: str) -> bool:
         """Somente filtros com semantica documentada (manual, capitulo 5)."""
-        if normalized in (
-            "na segunda", "na terca", "na quarta", "na quinta", "na sexta",
-            "no sabado", "no domingo", "todos os dias", "nos dias uteis",
-            "no fim de semana", "na ultima semana", "na primeira semana",
-            "na segunda semana", "na terceira semana", "na quarta semana",
-            "na primeira quinzena", "na segunda quinzena",
-        ):
-            return True
-        return bool(re.fullmatch(r"a partir do dia\s+\d{1,2}", normalized))
+        return bool(grammar.FILTRO_TEMPORAL.match(normalized))
+
+    @staticmethod
+    def _continua_frequencia(normalized: str) -> bool:
+        """`ou <frequencia>` ou `e no maximo/minimo ...` na linha seguinte."""
+        match = grammar.CONTINUACAO_FREQUENCIA.match(normalized)
+        if not match:
+            return False
+        resto = match.group("resto")
+        if normalized.startswith("e ") and not re.match(r"no\s+(?:maximo|minimo)\b", resto):
+            return False
+        return grammar.frequencia_valida(resto)
 
     @staticmethod
     def _continua_preferencia(normalized: str, *, allow_bare_day: bool = False) -> bool:

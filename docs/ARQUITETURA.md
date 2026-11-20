@@ -55,34 +55,20 @@ O grafo é um **supervisor em estrela** no LangGraph:
 
 ## Estrutura do código
 
-```
-src/
-  gobr/         núcleo determinístico da DSL: AST, parser, extrator de blocos
-  validation/   verificações determinísticas (guard das explicações; validador GOBR)
-  agents/       agentes com LLM
-  prompts/      prompts dos agentes
-  models/       modelos Pydantic de saída dos agentes
-  rag/          indexação e busca (manual e explicações)
-  pipelines/    scripts de lote: preparar referências, gerar explicações
-  llm_config.py configuração dos modelos (Ollama)
-data/
-  referencias/  246 arquivos .gobr (1.699 blocos `parametros`)
-  exemplos/     3 regras com PDF da regra comercial + GOBR (conjunto de teste)
-  manual/       manual da linguagem
-  avaliacao/    linhas de base para comparação
-```
+Descrição de cada pasta, módulo e dos códigos de erro do validador:
+[`ESTRUTURA_DO_CODIGO.md`](ESTRUTURA_DO_CODIGO.md).
 
 ## Etapas
 
-| # | Etapa | Resultado |
-|---|---|---|
-| 0 | Limpeza e reestruturação (tag `entregas-1-a-4` preserva o estado anterior) | repositório enxuto, testes passando |
-| 1 | Validador GOBR completo (arquivo inteiro, referências, vocabulário de condições) | `validar(gobr)` com erros acionáveis |
-| 2 | Explicador novo (AST → rascunho determinístico → 1 chamada LLM → guard) e geração por bloco | ~1.700 explicações revisadas |
-| 3 | RAG híbrido, re-chunking do manual por construção da linguagem | `buscar_exemplos()` / `buscar_manual()` |
-| 4 | Grafo multiagente com orquestrador supervisor e subgrafos | fluxo ponta a ponta |
-| 5 | Memória de contexto + interface Gradio | entrega final |
-| 6 | Fine-tuning QLoRA do gerador + avaliação comparativa | modelo próprio plugado |
+| # | Etapa | Resultado | Status |
+|---|---|---|---|
+| 0 | Limpeza e reestruturação (tag `entregas-1-a-4` preserva o estado anterior) | repositório enxuto, testes passando | ✅ |
+| 1 | Validador GOBR completo (arquivo inteiro, referências, vocabulário de condições) | `GobrValidator.validar(gobr)` com erros acionáveis | ✅ |
+| 2 | Explicador novo (AST → rascunho determinístico → 1 chamada LLM → guard) e geração por bloco | código ✅; 1.698 rascunhos gerados localmente; versão com LLM ⏳ no Colab | ⏳ |
+| 3 | RAG híbrido, re-chunking do manual por construção da linguagem | `buscar_exemplos()` / `buscar_manual()` | |
+| 4 | Grafo multiagente com orquestrador supervisor e subgrafos | fluxo ponta a ponta | |
+| 5 | Memória de contexto + interface Gradio | entrega final | |
+| 6 | Fine-tuning QLoRA do gerador + avaliação comparativa | modelo próprio plugado | |
 
 ## Linha de base
 
@@ -93,3 +79,7 @@ conhecidos dessa versão: `frequencia de inativos da empresa` interpretada como 
 para inativos" (é a frequência configurada para inativos), frequência inventada
 (`regra_005_003` cita "14 dias" que não existe na regra) e 10 casos que caíram no
 fallback determinístico.
+
+O guard da etapa 2 aprova só **20 das 59** (o guard antigo aprovava 49): 33 reprovações
+por frequência mal explicada, 11 por número inventado e 7 por condição perdida. Para
+reproduzir: `python -m src.pipelines.avaliar_explicacoes data/avaliacao/explicacoes_baseline_v1.jsonl`.

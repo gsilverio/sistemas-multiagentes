@@ -54,10 +54,12 @@ class GobrRuleExtractor:
         cabecalhos: list[tuple[int, re.Match[str]]] = []
 
         for posicao, linha in enumerate(linhas):
-            # Regras e definicoes sao declaracoes de nivel zero.
-            if not linha or linha[0].isspace():
+            # Regras e definicoes sao declaracoes de nivel zero, mas o acervo
+            # tem cabecalho com recuo acidental (regra_047); nenhum corpo de
+            # bloco tem a forma `<categoria> "nome":`, entao aceitamos o recuo.
+            if not linha.strip():
                 continue
-            encontrado = self.CABECALHO.match(linha)
+            encontrado = self.CABECALHO.match(linha.strip())
             if encontrado:
                 cabecalhos.append((posicao, encontrado))
 

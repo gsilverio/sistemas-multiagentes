@@ -6,13 +6,13 @@ import unittest
 from src.gobr.ast import ParsedScope
 from src.gobr.scope_text import scope_subject
 from src.gobr.parser import GobrParser
-from src.validation.explanation_guard import ExplanationGuard
+from src.explicacao.guarda import verificar
+from src.explicacao.rascunho import montar_rascunho
 
 
 class MultivalorTests(unittest.TestCase):
     def setUp(self):
         self.parser = GobrParser()
-        self.guard = ExplanationGuard()
 
     def test_parse_uma_lista_de_tres_carteiras(self):
         rule = self.parser.parse('''parametros "Regra":
@@ -46,17 +46,17 @@ class MultivalorTests(unittest.TestCase):
     do time("campo", "televendas")''')
         self.assertEqual('Os clientes dos times "campo", "televendas"', scope_subject(rule.escopos))
 
-    def test_validator_exige_presenca_de_todos_os_nomes(self):
+    def test_guard_exige_presenca_de_todos_os_nomes(self):
         rule = self.parser.parse('''parametros "Regra":
     da carteira("sul_sudeste_centrooeste", "norte_nordeste")
     frequencia de 7 dias''')
+        rascunho = montar_rascunho(rule)
         invalid = 'Clientes da carteira "sul_sudeste_centrooeste" têm atendimento a cada 7 dias.'
         valid = 'Os clientes das carteiras "sul_sudeste_centrooeste", "norte_nordeste" têm atendimento a cada 7 dias.'
-        self.assertFalse(self.guard.inspect(rule, invalid).accepted)
-        self.assertTrue(self.guard.inspect(rule, valid).accepted)
-        fallback = self.guard.conservative_fallback(rule)
-        self.assertTrue(self.guard.inspect(rule, fallback).accepted)
-        self.assertIn('"norte_nordeste"', fallback)
+        self.assertFalse(verificar(rascunho, invalid).aprovado)
+        self.assertTrue(verificar(rascunho, valid).aprovado)
+        self.assertTrue(verificar(rascunho, rascunho.texto).aprovado)
+        self.assertIn('"norte_nordeste"', rascunho.texto)
 
     def test_aceita_serializacao_de_json_antigo(self):
         old_json = '{"tipo":"time","valor":"televendas","operador":null}'

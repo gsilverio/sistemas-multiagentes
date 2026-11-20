@@ -31,18 +31,24 @@ Se a pasta já é um repositório Git, **não repita** `git init` nem `git remot
 ## 4. Execute as células, na ordem
 1. Confira a GPU via `nvidia-smi`.
 2. Monte o Drive e conceda acesso.
-3. Defina `REPO_URL` com a URL GitHub real na célula de clone. Repositórios privados exigem autenticação; **não grave credenciais no notebook**. Para testar um repositório privado sem configurar autenticação, use o modo `ORIGEM="zip"`.
+3. Defina `REPO_URL` com a URL GitHub real e `BRANCH` com o branch que contém o código (o branch de trabalho, ou `main` depois do merge) na célula de clone. Repositórios privados exigem autenticação; **não grave credenciais no notebook**. Para testar um repositório privado sem configurar autenticação, use o modo `ORIGEM="zip"`.
 4. Instale as dependências.
 5. Instale e inicie o Ollama dentro do Colab.
 6. Baixe `gemma3:12b` (~8,2 GB).
 7. Verifique `ollama ps` para checar a utilização da GPU.
 8. Siga as células seguintes para extrair as regras, gerar explicações em lote e montar os índices no Drive (`Meu Drive > gobr-agent > outputs`).
 
+### Geração das explicações (etapa 2)
+- Etapa 10 do notebook: gera 5 explicações de teste. Confira na etapa 11.
+- Etapa 12: `EXECUTAR_MAIS = True` e rode quantas vezes precisar (200 regras por vez; `LOTE = 0` faz tudo). O que já foi feito é pulado.
+- Etapa 12b: confere todas as explicações com o guard e compara com a linha de base antiga.
+- No fim, baixe `explicacoes.jsonl` da pasta do Drive indicada na etapa 8 e coloque no projeto em `data/explicacoes/explicacoes_v2.jsonl`.
+
 **Importante**: nunca faça `git push` no Colab como fluxo principal. Faça alterações no Windows, envie para o GitHub, **reinicie a sessão do Colab** e execute novamente a célula de clone. O conteúdo de `/content` é temporário, enquanto o Drive é persistente.
 
 ## 5. Limites conhecidos
 - O plano gratuito do Colab não garante GPU, disponibilidade de T4 ou duração da sessão; consulte a FAQ oficial: https://research.google.com/colaboratory/intl/pt-BR/faq.html.
 - A instalação e o download do modelo terão de ser refeitos quando a máquina virtual do Colab for substituída.
-- `pending_review` nas explicações significa que as verificações estruturais passaram, **não que a explicação foi aprovada para o RAG**. `needs_review` indica problemas detectados e uso do fallback determinístico.
+- `aprovada` nas explicações significa que o guard não encontrou omissões nem invenções (nomes, números, condições, `nao agendar`, `ou`). É uma rede de segurança, não prova de correção. O método `rascunho` indica que o modelo errou duas vezes e o texto determinístico foi usado.
 
 No Windows, `python -m unittest discover -s tests -v` executa as verificações estruturais **sem GPU e sem Ollama**.

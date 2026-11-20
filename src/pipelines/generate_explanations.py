@@ -1,11 +1,16 @@
-"""Geração incremental de explicações GOBR para revisão, sem indexação.
+"""Geração incremental de explicações para os blocos `parametros` do acervo.
 
-Uso local (sem GPU):
+Cada bloco vira `items/<id>.json`, gravado assim que termina; reexecutar
+pula o que já foi feito com a mesma versão do explicador e o mesmo modelo.
+Ao final, `explicacoes.jsonl` consolida todos os itens concluídos (entrada
+do índice RAG da etapa 3 e dos pares de fine-tuning da etapa 6).
+
+Local, sem LLM (só o rascunho determinístico, ~1 min para o acervo todo):
     python -m src.pipelines.prepare_references
-    python -m src.pipelines.generate_explanations --dry-run --limit 3
+    python -m src.pipelines.generate_explanations --sem-llm --limit 0
 
-No Colab, configure OLLAMA_BASE_URL, GOBR_LLM_MODEL e GOBR_LLM_NUM_CTX
-antes de executar, apontando --output-dir para o Drive montado.
+No Colab (Ollama + gemma3:12b), apontando --output-dir para o Drive:
+    python -m src.pipelines.generate_explanations --output-dir /content/drive/... --limit 50
 """
 
 from __future__ import annotations
@@ -22,40 +27,51 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-from src.gobr.parser import GobrParser
-
-PIPELINE_VERSION = "gobr-reference-batch-v1"
+PIPELINE_VERSION = "gobr-explicador-v2"
 SAFE_ID = re.compile(r"^[a-zA-Z0-9_][a-zA-Z0-9_.-]*$")
+RAIZ = Path(__file__).resolve().parents[2]
+# Arquivos que mudam o resultado da explicação; mudar qualquer um deles
+# invalida os itens já gerados (mudanças em outras partes do código, não).
+ARQUIVOS_DO_EXPLICADOR = (
+    "src/agents/explicador.py",
+    "src/prompts/explicador_prompt.py",
+    "src/explicacao/glossario.py",
+    "src/explicacao/rascunho.py",
+    "src/explicacao/guarda.py",
+    "src/gobr/parser.py",
+    "src/gobr/scope_text.py",
+)
 
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def versao_explicador() -> str:
+    h = hashlib.sha256(PIPELINE_VERSION.encode())
+    for relativo in ARQUIVOS_DO_EXPLICADOR:
+        h.update(relativo.encode())
+        h.update((RAIZ / relativo).read_bytes().replace(b"\r\n", b"\n"))
+    return h.hexdigest()[:16]
+
+
 def code_revision() -> str:
-    """Commit para impedir reutilização silenciosa de resultados de código antigo."""
+    """Commit atual, só para registro (não entra na assinatura)."""
     explicit = os.getenv("GOBR_SOURCE_REVISION", "").strip()
     if explicit:
         return explicit
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False
-    )
+    result = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=False)
     if result.returncode != 0:
         return "unversioned"
-    revision = result.stdout.strip()
-    dirty = subprocess.run(
-        ["git", "status", "--porcelain", "--untracked-files=no"],
-        capture_output=True, text=True, check=False,
-    )
-    return revision + ("-dirty" if dirty.stdout.strip() else "")
+    dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+                           capture_output=True, text=True, check=False)
+    return result.stdout.strip() + ("-dirty" if dirty.stdout.strip() else "")
 
 
 def load_rules(path: Path) -> list[dict[str, Any]]:
     """Valida a estrutura mínima do JSONL antes de iniciar uma inferência."""
     if not path.is_file():
-        raise FileNotFoundError(
-            f"Arquivo {path} ausente. Execute python -m src.pipelines.prepare_references."
-        )
+        raise FileNotFoundError(f"Arquivo {path} ausente. Execute python -m src.pipelines.prepare_references.")
     rules: list[dict[str, Any]] = []
     seen: set[str] = set()
     with path.open(encoding="utf-8") as source:
@@ -70,15 +86,13 @@ def load_rules(path: Path) -> list[dict[str, Any]]:
                 raise ValueError(f"ID duplicado no JSONL: {rid}")
             if not isinstance(obj.get("gobr"), str) or not obj["gobr"].strip():
                 raise ValueError(f"GOBR ausente na linha {line_number}")
-            if not isinstance(obj.get("contexto", []), list):
-                raise ValueError(f"Contexto inválido na linha {line_number}")
             seen.add(rid)
             rules.append(obj)
     return rules
 
 
 def atomic_write_json(path: Path, obj: dict[str, Any]) -> None:
-    """Escreve cada item em duas etapas, para evitar JSON parcial em interrupções."""
+    """Grava em arquivo temporário e renomeia: nunca deixa JSON parcial."""
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(path.suffix + ".tmp")
     with temp.open("w", encoding="utf-8") as dest:
@@ -96,98 +110,87 @@ def read_previous(path: Path) -> dict[str, Any] | None:
         previous = json.loads(path.read_text(encoding="utf-8"))
         return previous if isinstance(previous, dict) else None
     except (OSError, json.JSONDecodeError):
-        return None  # O item será reprocessado em vez de marcado como concluído.
+        return None  # O item será reprocessado.
 
 
-def fingerprint(rule: dict[str, Any], *, model: str, num_ctx: int,
-                revision: str, max_context_chars: int) -> str:
-    payload = {
-        "pipeline_version": PIPELINE_VERSION,
-        "id": rule["id"],
-        "gobr": rule["gobr"],
-        "contexto": rule.get("contexto", []),
-        "model": model,
-        "num_ctx": num_ctx,
-        "code_revision": revision,
-        "max_context_chars": max_context_chars,
-    }
+def fingerprint(rule: dict[str, Any], *, model: str, num_ctx: int, versao: str) -> str:
+    payload = {"pipeline_version": PIPELINE_VERSION, "id": rule["id"], "gobr": rule["gobr"],
+               "model": model, "num_ctx": num_ctx, "versao_explicador": versao}
     canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
-def context_text(context: list[dict[str, Any]]) -> str:
-    """Todas as definições locais como dados, sem alterar a GOBR original."""
-    return json.dumps(
-        [
-            {"tipo": d["tipo"], "nome": d["nome"], "texto": d["texto"]}
-            for d in context
-        ],
-        ensure_ascii=False,
-    )
+def consolidar(output_dir: Path) -> Path:
+    """Junta os itens concluídos em `explicacoes.jsonl`, em ordem de id."""
+    destino = output_dir / "explicacoes.jsonl"
+    temp = destino.with_suffix(".jsonl.tmp")
+    total = 0
+    with temp.open("w", encoding="utf-8") as saida:
+        for arquivo in sorted((output_dir / "items").glob("*.json")):
+            item = read_previous(arquivo)
+            if not item or item.get("status") != "completed":
+                continue
+            explicacao = item["explicacao"]
+            saida.write(json.dumps({
+                "id": item["id"], "nome": item.get("nome"), "arquivo_origem": item.get("arquivo_origem"),
+                "gobr": item["gobr"], "explicacao": explicacao["texto"], "metodo": explicacao["metodo"],
+                "aprovada": explicacao["aprovada"], "model": item.get("model"),
+            }, ensure_ascii=False) + "\n")
+            total += 1
+    os.replace(temp, destino)
+    print(f"{total} explicações consolidadas em {destino}", flush=True)
+    return destino
 
 
 class ReferenceBatchRunner:
-    def __init__(
-        self, *,
-        interpreter_factory: Callable[[], Any] | None = None,
-        explainer_factory: Callable[[], Any] | None = None,
-    ) -> None:
-        self.parser = GobrParser()
-        self.interpreter_factory = interpreter_factory
-        self.explainer_factory = explainer_factory
-        self.interpreter: Any = None
-        self.explainer: Any = None
+    def __init__(self, *, explicador_factory: Callable[[], Any] | None = None) -> None:
+        self.explicador_factory = explicador_factory
+        self.explicador: Any = None
 
-    def _load_agents(self) -> None:
-        if self.interpreter is not None and self.explainer is not None:
-            return
-        if self.interpreter_factory is None:
-            from src.agents.gobr_interpreter import GobrInterpreterAgent
-            self.interpreter_factory = GobrInterpreterAgent
-        if self.explainer_factory is None:
-            from src.agents.business_explainer import BusinessExplainerAgent
-            self.explainer_factory = BusinessExplainerAgent
-        if self.interpreter is None:
-            self.interpreter = self.interpreter_factory()
-        if self.explainer is None:
-            self.explainer = self.explainer_factory()
+    def _carregar(self, sem_llm: bool) -> Any:
+        if self.explicador is None:
+            if self.explicador_factory is None:
+                from src.agents.explicador import AgenteExplicador
+                self.explicador_factory = lambda: AgenteExplicador(usar_llm=not sem_llm)
+            self.explicador = self.explicador_factory()
+        return self.explicador
 
     def run(
-        self, *, input_path: Path, output_dir: Path, limit: int = 3,
-        max_attempts: int = 2, max_context_chars: int = 4000,
-        model: str = "gemma3:12b", num_ctx: int = 4096,
-        revision: str = "unversioned", dry_run: bool = False,
-        force: bool = False,
+        self, *, input_path: Path, output_dir: Path, limit: int = 3, max_attempts: int = 2,
+        model: str = "gemma3:12b", num_ctx: int = 4096, versao: str | None = None,
+        revision: str = "unversioned", dry_run: bool = False, force: bool = False, sem_llm: bool = False,
     ) -> dict[str, Any]:
-        if limit < 0 or max_attempts < 1 or max_context_chars < 1 or num_ctx < 1:
-            raise ValueError("limit >= 0, max_attempts >= 1 e tamanhos positivos.")
+        if limit < 0 or max_attempts < 1 or num_ctx < 1:
+            raise ValueError("limit >= 0, max_attempts >= 1 e num_ctx positivo.")
         rules = load_rules(input_path)
+        versao = versao or versao_explicador()
+        if sem_llm:
+            model, num_ctx = "sem-llm", 0
         items_dir = output_dir / "items"
         stats: dict[str, Any] = {
             "total_regras": len(rules), "simuladas": 0, "concluidas_nesta_execucao": 0,
             "falhas_nesta_execucao": 0, "bloqueadas_nesta_execucao": 0,
-            "ignoradas_concluidas": 0, "ignoradas_tentativas": 0,
-            "ignoradas_contexto": 0, "dry_run": dry_run,
-            "model": model, "num_ctx": num_ctx, "revision": revision,
+            "ignoradas_concluidas": 0, "ignoradas_tentativas": 0, "ignoradas_bloqueadas": 0,
+            "metodos_nesta_execucao": {}, "dry_run": dry_run, "model": model, "num_ctx": num_ctx,
+            "versao_explicador": versao, "revision": revision,
             "executed_at_utc": utc_now(), "output_dir": str(output_dir),
         }
         executed = 0
         for rule in rules:
             rule_id = rule["id"]
             output = items_dir / f"{rule_id}.json"
-            signature = fingerprint(rule, model=model, num_ctx=num_ctx,
-                                    revision=revision,
-                                    max_context_chars=max_context_chars)
+            signature = fingerprint(rule, model=model, num_ctx=num_ctx, versao=versao)
             previous = read_previous(output)
             matches = previous is not None and previous.get("fingerprint") == signature
             if not force and matches:
-                if previous.get("status") == "completed":
+                status = previous.get("status")
+                if status == "completed":
                     stats["ignoradas_concluidas"] += 1
                     continue
-                if previous.get("status") == "blocked_context":
-                    stats["ignoradas_contexto"] += 1
+                if status == "blocked":
+                    stats["ignoradas_bloqueadas"] += 1
                     continue
-                if previous.get("status") == "failed" and previous.get("attempt", 0) >= max_attempts:
+                if status == "failed" and previous.get("attempt", 0) >= max_attempts:
                     stats["ignoradas_tentativas"] += 1
                     continue
             if limit and executed >= limit:
@@ -197,64 +200,30 @@ class ReferenceBatchRunner:
                 stats["simuladas"] += 1
                 print(f"[DRY RUN] {rule_id}: {rule.get('nome', '')}")
                 continue
-            attempts = (
-                int(previous.get("attempt", 0)) + 1
-                if matches and not force and previous else 1
-            )
+            attempts = int(previous.get("attempt", 0)) + 1 if matches and not force and previous else 1
             started = time.monotonic()
             record: dict[str, Any] = {
-                "id": rule_id,
-                "nome": rule.get("nome"),
-                "arquivo_origem": rule.get("arquivo_origem"),
-                "indice": rule.get("indice"),
-                "linha_inicio": rule.get("linha_inicio"),
-                "linha_fim": rule.get("linha_fim"),
-                "gobr": rule["gobr"],
-                "contexto": rule.get("contexto", []),
+                "id": rule_id, "nome": rule.get("nome"), "arquivo_origem": rule.get("arquivo_origem"),
+                "indice": rule.get("indice"), "linha_inicio": rule.get("linha_inicio"),
+                "linha_fim": rule.get("linha_fim"), "gobr": rule["gobr"],
                 "referencias_nao_resolvidas": rule.get("referencias_nao_resolvidas", []),
-                "fingerprint": signature,
-                "pipeline_version": PIPELINE_VERSION,
-                "model": model,
-                "num_ctx": num_ctx,
-                "code_revision": revision,
-                "attempt": attempts,
-                "created_at_utc": utc_now(),
-                "indexable": False,  # Nenhum item entra automaticamente no RAG.
+                "fingerprint": signature, "pipeline_version": PIPELINE_VERSION,
+                "versao_explicador": versao, "model": model, "num_ctx": num_ctx,
+                "code_revision": revision, "attempt": attempts, "created_at_utc": utc_now(),
             }
             try:
-                ctx = record["contexto"]
-                if not all(isinstance(d, dict) and all(k in d for k in ("tipo", "nome", "texto")) for d in ctx):
-                    raise ValueError("Definições de contexto malformadas.")
-                context_json = context_text(ctx)
-                if len(context_json) > max_context_chars:
-                    record.update(
-                        status="blocked_context",
-                        reason=f"Contexto de {len(context_json)} caracteres ultrapassa o limite de {max_context_chars}; nenhuma definição foi omitida.",
-                    )
-                    stats["bloqueadas_nesta_execucao"] += 1
-                elif record["referencias_nao_resolvidas"]:
-                    record.update(
-                        status="blocked_context",
-                        reason="Referências de contexto não resolvidas: " + ", ".join(record["referencias_nao_resolvidas"]),
-                    )
+                explicacao = self._carregar(sem_llm).explicar(rule["gobr"])
+                dados = explicacao.model_dump(mode="json")
+                record["explicacao"] = dados
+                if any(not f["conhecido"] for f in dados.get("fatos", [])):
+                    record["status"] = "blocked"
+                    record["reason"] = "Há trechos sem tradução no glossário; explicação fica para revisão."
                     stats["bloqueadas_nesta_execucao"] += 1
                 else:
-                    parsed = self.parser.parse(rule["gobr"])
-                    record["parsed"] = parsed.model_dump(mode="json")
-                    if parsed.desconhecidos:
-                        record.update(status="blocked_context",
-                                      reason="Cláusulas não reconhecidas pelo parser.")
-                        stats["bloqueadas_nesta_execucao"] += 1
-                    else:
-                        self._load_agents()
-                        interpretation = self.interpreter.interpret(parsed, contexto=ctx)
-                        explanation = self.explainer.explain(
-                            interpretation, parsed_rule=parsed,
-                        )
-                        record["interpretation"] = interpretation.model_dump(mode="json")
-                        record["explanation"] = explanation.model_dump(mode="json")
-                        record["status"] = "completed"
-                        stats["concluidas_nesta_execucao"] += 1
+                    record["status"] = "completed"
+                    stats["concluidas_nesta_execucao"] += 1
+                    metodo = dados["metodo"]
+                    stats["metodos_nesta_execucao"][metodo] = stats["metodos_nesta_execucao"].get(metodo, 0) + 1
             except Exception as exc:
                 record.update(status="failed", error={
                     "type": type(exc).__name__, "message": str(exc),
@@ -263,33 +232,36 @@ class ReferenceBatchRunner:
                 stats["falhas_nesta_execucao"] += 1
             record["elapsed_seconds"] = round(time.monotonic() - started, 3)
             atomic_write_json(output, record)
-            print(f"[{record['status']}] {rule_id} | tentativa {attempts} | {record['elapsed_seconds']}s", flush=True)
+            metodo = (record.get("explicacao") or {}).get("metodo", "-")
+            print(f"[{record['status']}] {rule_id} | {metodo} | tentativa {attempts} | "
+                  f"{record['elapsed_seconds']}s", flush=True)
         if not dry_run:
             atomic_write_json(output_dir / "batch_summary.json", stats)
+            if items_dir.exists():
+                consolidar(output_dir)
         print(json.dumps(stats, ensure_ascii=False, indent=2), flush=True)
         return stats
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--input", type=Path, default=Path("outputs/generated/regras_extraidas.jsonl"))
-    parser.add_argument("--output-dir", type=Path, default=Path("outputs/reference_explanations"))
+    parser.add_argument("--output-dir", type=Path, default=None,
+                        help="Padrão: outputs/explicacoes (LLM) ou outputs/explicacoes_rascunho (--sem-llm).")
     parser.add_argument("--limit", type=int, default=3,
-                        help="Número máximo de novas tentativas nesta execução; 0 = sem limite.")
+                        help="Máximo de blocos processados nesta execução; 0 = sem limite.")
     parser.add_argument("--max-attempts", type=int, default=2)
-    parser.add_argument("--max-context-chars", type=int, default=4000)
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--force", action="store_true",
-                        help="Refaz regras mesmo que já tenham sido concluídas.")
+    parser.add_argument("--force", action="store_true", help="Refaz blocos já concluídos.")
+    parser.add_argument("--sem-llm", action="store_true",
+                        help="Só o rascunho determinístico (não precisa de Ollama).")
     args = parser.parse_args()
-    runner = ReferenceBatchRunner()
-    runner.run(
-        input_path=args.input, output_dir=args.output_dir,
-        limit=args.limit, max_attempts=args.max_attempts,
-        max_context_chars=args.max_context_chars,
-        model=os.getenv("GOBR_LLM_MODEL", "gemma3:12b"),
-        num_ctx=int(os.getenv("GOBR_LLM_NUM_CTX", "4096")),
-        revision=code_revision(), dry_run=args.dry_run, force=args.force,
+    from src.llm_config import contexto_padrao, modelo_padrao
+    output_dir = args.output_dir or Path("outputs/explicacoes_rascunho" if args.sem_llm else "outputs/explicacoes")
+    ReferenceBatchRunner().run(
+        input_path=args.input, output_dir=output_dir, limit=args.limit, max_attempts=args.max_attempts,
+        model=modelo_padrao(), num_ctx=contexto_padrao(), revision=code_revision(),
+        dry_run=args.dry_run, force=args.force, sem_llm=args.sem_llm,
     )
 
 

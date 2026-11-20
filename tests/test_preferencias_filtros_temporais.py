@@ -9,13 +9,13 @@ from pathlib import Path
 from src.gobr.ast import GobrParsedRule
 from src.gobr.parser import GobrParser
 from src.gobr.extractor import GobrRuleExtractor
-from src.validation.explanation_guard import ExplanationGuard
+from src.explicacao.guarda import verificar
+from src.explicacao.rascunho import montar_rascunho
 
 
 class PreferenciasEFiltrosTemporaisTests(unittest.TestCase):
     def setUp(self):
         self.parser = GobrParser()
-        self.guard = ExplanationGuard()
 
     def test_preferencia_inline_multilinha_regra_168_003(self):
         caminho = Path("data/referencias/regra_168.gobr")
@@ -73,21 +73,23 @@ class PreferenciasEFiltrosTemporaisTests(unittest.TestCase):
     da carteira("empresa toda")
     na segunda
     preferencia maior na segunda''')
-        so_preferencia = ('Os clientes da carteira "empresa toda" tem ' 
-                         'preferencia maior na segunda.')
-        self.assertFalse(self.guard.inspect(regra, so_preferencia).accepted)
-        texto = self.guard.conservative_fallback(regra)
-        self.assertTrue(self.guard.inspect(regra, texto).accepted)
-        self.assertIn("A regra deve ser aplicada somente na segunda.", texto)
-        self.assertIn('Modificador informado: "preferencia maior na segunda".', texto)
+        rascunho = montar_rascunho(regra)
+        so_preferencia = ('Os clientes da carteira "empresa toda" tem '
+                          'preferencia maior na segunda.')
+        self.assertFalse(verificar(rascunho, so_preferencia).aprovado)
+        self.assertTrue(verificar(rascunho, rascunho.texto).aprovado)
+        self.assertIn("só é aplicada quando a regra executa às segundas-feiras", rascunho.texto)
+        self.assertIn("Preferência de visita maior na segunda-feira", rascunho.texto)
 
-    def test_filtro_temporal_negado_nao_aprovado(self):
+    def test_filtro_temporal_sem_restricao_nao_aprovado(self):
         regra = self.parser.parse('''parametros "Teste":
     da carteira("empresa toda")
-    na segunda''')
-        self.assertFalse(self.guard.inspect(
-            regra, 'A regra da carteira "empresa toda" nao se aplica na segunda.'
-        ).accepted)
+    na segunda
+    frequencia de 7 dias''')
+        rascunho = montar_rascunho(regra)
+        self.assertFalse(verificar(
+            rascunho, 'Os clientes da carteira "empresa toda" devem ser atendidos a cada 7 dias, de segunda.'
+        ).aprovado)
 
     def test_json_antigo_continua_valido(self):
         regra = GobrParsedRule.model_validate({"nome": "Teste", "modificadores": []})
@@ -98,7 +100,7 @@ class PreferenciasEFiltrosTemporaisTests(unittest.TestCase):
         if not pasta.exists():
             self.skipTest("Acervo nao incluido")
         blocos = GobrRuleExtractor().extract_directory(pasta)
-        self.assertEqual(1699, len(blocos))
+        self.assertEqual(1700, len(blocos))
         for bloco in blocos:
             regra = self.parser.parse(bloco.gobr)
             if regra.desconhecidos:

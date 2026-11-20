@@ -1,7 +1,9 @@
 """Apresentação textual conservadora dos escopos da AST GOBR.
 
-Uma lista de nomes dentro de uma cláusula não recebe um operador lógico
-sintético. `e`/`ou` só são reproduzidos entre cláusulas diferentes.
+Os nomes são sempre citados literalmente, entre aspas (mesmo "empresa toda":
+é o nome de um time definido no arquivo). Uma lista de nomes dentro de uma
+cláusula não recebe um operador lógico sintético; `e`/`ou` só são
+reproduzidos entre cláusulas diferentes.
 """
 
 from src.gobr.ast import ParsedScope
@@ -20,10 +22,6 @@ def scope_fragment(scope: ParsedScope) -> str:
     valores = scope.valores or [scope.valor]
     if scope.tipo == "time":
         if len(valores) == 1:
-            if valores[0].casefold() == "todos":
-                return "todos os clientes"
-            if valores[0].casefold() in {"toda empresa", "empresa toda"}:
-                return "todos os clientes da empresa"
             return f'do time {_nomes(valores)}'
         return f'dos times {_nomes(valores)}'
     if scope.tipo == "carteira":
@@ -40,10 +38,7 @@ def scope_subject(scopes: list[ParsedScope]) -> str:
     for index, scope in enumerate(scopes):
         fragment = scope_fragment(scope)
         if index == 0:
-            if fragment.startswith("todos os clientes"):
-                pieces.append(fragment.capitalize())
-            else:
-                pieces.append(f"Os clientes {fragment}")
+            pieces.append(f"Os clientes {fragment}")
         else:
             if scope.operador in ("e", "ou"):
                 pieces.append(f"{scope.operador} {fragment}")

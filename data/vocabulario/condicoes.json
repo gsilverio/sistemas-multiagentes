@@ -1,0 +1,768 @@
+{
+  "descricao": "Condicoes `quando` do acervo data/referencias, normalizadas.",
+  "total": 127,
+  "condicoes": [
+    {
+      "modelo": "ramo de atividade igual(\"X\")",
+      "ocorrencias": 152,
+      "exemplo": "ramo de atividade igual(\"MATCON\",\"FERRAGISTA\",\"AGROPECUARIA\",\"HOME CENTER\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ativos para o vendedor",
+      "ocorrencias": 137,
+      "exemplo": "ativos para o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "sem venda",
+      "ocorrencias": 114,
+      "exemplo": "sem venda",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao em N dias",
+      "ocorrencias": 104,
+      "exemplo": "recencia de positivacao em 150 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao global em N dias",
+      "ocorrencias": 103,
+      "exemplo": "recencia de positivacao global em 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inativos para o vendedor",
+      "ocorrencias": 87,
+      "exemplo": "inativos para o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inadimplentes",
+      "ocorrencias": 59,
+      "exemplo": "inadimplentes",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inativos para o vendedor e inadimplentes",
+      "ocorrencias": 56,
+      "exemplo": "inativos para o vendedor e inadimplentes",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao entre N dias e N dias",
+      "ocorrencias": 56,
+      "exemplo": "recencia de positivacao entre 21 dias e 41 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "no ciclo de vida prospect com a empresa",
+      "ocorrencias": 51,
+      "exemplo": "no ciclo de vida prospect com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "media faturada no ano com a empresa maior que r$ N",
+      "ocorrencias": 48,
+      "exemplo": "media faturada no ano com a empresa maior que R$ 25000",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao em N dias",
+      "ocorrencias": 46,
+      "exemplo": "fora da recencia de positivacao em 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao global entre N dias e N dias",
+      "ocorrencias": 46,
+      "exemplo": "recencia de positivacao global entre 7 dias e 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inativos para o vendedor e adimplentes",
+      "ocorrencias": 41,
+      "exemplo": "inativos para o vendedor e adimplentes",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nome da cidade igual(\"X\")",
+      "ocorrencias": 40,
+      "exemplo": "nome da cidade igual(\"AGUAS DE SAO PEDRO\",\"AMERICANA\",\"ARARAS\",\"CHARQUEADA\",\"CORDEIROPOLIS\",\"Cordeirópolis\",\"IPEUNA\",\"IRACEMAPOLIS\",\"Iracemápolis\",\"PIRACICABA\",\"RIO CLARO\",\"RIO DAS PEDRAS\",\"SANTA BARBARA D OESTE\",\"SANTA BÁRBARA D'OESTE\",\"SANTA GERTRUDES\",\"SAO PEDRO\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ativos para o vendedor e inadimplentes",
+      "ocorrencias": 36,
+      "exemplo": "ativos para o vendedor e inadimplentes",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "status na receita federal definido como baixada",
+      "ocorrencias": 35,
+      "exemplo": "status na receita federal definido como baixada",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ativos para o vendedor e adimplentes",
+      "ocorrencias": 32,
+      "exemplo": "ativos para o vendedor e adimplentes",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "contido na segmentacao(\"X\")",
+      "ocorrencias": 29,
+      "exemplo": "contido na segmentacao(\"ext_niteroi_rio2_para_tmk1\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao do vendedor entre N dias e N dias",
+      "ocorrencias": 28,
+      "exemplo": "recencia de positivacao do vendedor entre 11 dias e 59 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "unica compra com o vendedor",
+      "ocorrencias": 28,
+      "exemplo": "unica compra com o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "frequencia historica menor que N dias",
+      "ocorrencias": 26,
+      "exemplo": "frequencia historica menor que 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "sem vendas",
+      "ocorrencias": 26,
+      "exemplo": "sem vendas",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "no ciclo de vida prospect com o vendedor",
+      "ocorrencias": 24,
+      "exemplo": "no ciclo de vida prospect com o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "adimplentes",
+      "ocorrencias": 23,
+      "exemplo": "adimplentes",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "pessoa juridica",
+      "ocorrencias": 23,
+      "exemplo": "pessoa juridica",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao do vendedor em N dias",
+      "ocorrencias": 21,
+      "exemplo": "recencia de positivacao do vendedor em 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao global em N dias",
+      "ocorrencias": 20,
+      "exemplo": "fora da recencia de positivacao global em 90 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "frequencia historica entre N dias e N dias",
+      "ocorrencias": 17,
+      "exemplo": "frequencia historica entre 31 dias e 90 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "sem venda do vendedor",
+      "ocorrencias": 17,
+      "exemplo": "sem venda do vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "o rotulo contem(\"X\")",
+      "ocorrencias": 15,
+      "exemplo": "o rotulo contem(\"condominio\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "cadastrado faz N dias",
+      "ocorrencias": 13,
+      "exemplo": "cadastrado faz 60 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "cliente filial",
+      "ocorrencias": 13,
+      "exemplo": "cliente filial",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva a com a empresa",
+      "ocorrencias": 13,
+      "exemplo": "curva a com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva b com a empresa",
+      "ocorrencias": 13,
+      "exemplo": "curva b com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "unica compra com a empresa",
+      "ocorrencias": 13,
+      "exemplo": "unica compra com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "e o cliente filial",
+      "ocorrencias": 12,
+      "exemplo": "e o cliente filial",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ramo de atividade diferente(\"X\")",
+      "ocorrencias": 12,
+      "exemplo": "ramo de atividade diferente(\"2\",\"3\",\"4\",\"5\",\"6\",\"7\",\"8\",\"10\",\"11\",\"12\",\"14\",\"15\",\"17\",\"18\",\"19\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "uf do estado igual(\"X\")",
+      "ocorrencias": 12,
+      "exemplo": "uf do estado igual( \"PR\",\"SC\",\"RS\",\"SP\",\"RJ\",\"MG\",\"ES\",\"GO\",\"MT\",\"MS\",\"DF\" )",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "codigo da rota igual(\"X\")",
+      "ocorrencias": 11,
+      "exemplo": "codigo da rota igual(\"8\",\"9\",\"10\",\"11\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao entre N dias e N dias",
+      "ocorrencias": 11,
+      "exemplo": "fora da recencia de positivacao entre 8 dias e 15 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao global entre N dias e N dias",
+      "ocorrencias": 11,
+      "exemplo": "fora da recencia de positivacao global entre 15 dias e 90 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "pessoa fisica",
+      "ocorrencias": 11,
+      "exemplo": "pessoa fisica",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "bloqueados",
+      "ocorrencias": 10,
+      "exemplo": "bloqueados",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva c com a empresa",
+      "ocorrencias": 9,
+      "exemplo": "curva c com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "no ciclo de vida ativo com a empresa",
+      "ocorrencias": 9,
+      "exemplo": "no ciclo de vida ativo com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao do vendedor em N dias",
+      "ocorrencias": 8,
+      "exemplo": "fora da recencia de positivacao do vendedor em 90 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "com N% de credito",
+      "ocorrencias": 7,
+      "exemplo": "com 5% de credito",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "frequencia historica de N dias",
+      "ocorrencias": 7,
+      "exemplo": "frequencia historica de 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de visita na semana",
+      "ocorrencias": 7,
+      "exemplo": "recencia de visita na semana",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "cadastrado a partir do dia 'X'",
+      "ocorrencias": 6,
+      "exemplo": "cadastrado a partir do dia '2023-07-18'",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota ha N dias atras",
+      "ocorrencias": 6,
+      "exemplo": "data da rota ha 7 dias atras",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota nos proximos N dias",
+      "ocorrencias": 6,
+      "exemplo": "data da rota nos proximos 1 dia",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao do vendedor entre N dias e N dias",
+      "ocorrencias": 6,
+      "exemplo": "fora da recencia de positivacao do vendedor entre 31 dias e 60 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de visita entre N dias e N dias",
+      "ocorrencias": 6,
+      "exemplo": "recencia de visita entre 4 dias e 3000 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ativos para o vendedor e ramo de atividade igual(\"X\")",
+      "ocorrencias": 5,
+      "exemplo": "ativos para o vendedor e ramo de atividade igual(\"3\",\"4\",\"6\",\"8\",\"15\",\"18\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "cnae e igual(\"X\")",
+      "ocorrencias": 5,
+      "exemplo": "cnae é igual(\"8411600\",\"8424800\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "com menos de r$ N de credito disponivel e tipo de cobranca igual(\"X\")",
+      "ocorrencias": 5,
+      "exemplo": "com menos de R$ 80 de credito disponivel e tipo de cobranca igual(\"BK\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nao tem credito e tipo de cobranca igual(\"X\")",
+      "ocorrencias": 5,
+      "exemplo": "nao tem credito e tipo de cobranca igual(\"DH\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "atividade do vendedor de N dias",
+      "ocorrencias": 4,
+      "exemplo": "atividade do vendedor de 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ativos para o vendedor e cnae e igual(\"X\")",
+      "ocorrencias": 4,
+      "exemplo": "ativos para o vendedor e cnae é igual(\"8630501\",\"8610101\",\"8630502\",\"7500100\",\"8610102\",\"8630503\",\"8640201\",\"8690901\",\"8630501\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota na semana",
+      "ocorrencias": 4,
+      "exemplo": "data da rota na semana",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nao tem venda da empresa no ano",
+      "ocorrencias": 4,
+      "exemplo": "nao tem venda da empresa no ano",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "no ciclo de vida inativo com a empresa",
+      "ocorrencias": 4,
+      "exemplo": "no ciclo de vida inativo com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem visita da empresa na semana anterior",
+      "ocorrencias": 4,
+      "exemplo": "tem visita da empresa na semana anterior",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota futura nos proximos N dias",
+      "ocorrencias": 3,
+      "exemplo": "data da rota futura nos proximos 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "frequencia historica maior que N dias",
+      "ocorrencias": 3,
+      "exemplo": "frequencia historica maior que 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inatividade global maior que N dias",
+      "ocorrencias": 3,
+      "exemplo": "inatividade global maior que 31 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nome do bairro igual(\"X\")",
+      "ocorrencias": 3,
+      "exemplo": "nome do bairro igual(\"CENTRO\",\"Centro\",\"centro\",\"PAVUNA\",\"Pavuna\",\"BOLCO A - PAVUNA\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda da empresa entre N dias e N dias",
+      "ocorrencias": 3,
+      "exemplo": "tem venda da empresa entre 181 dias e 360 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda no mes",
+      "ocorrencias": 3,
+      "exemplo": "tem venda no mês",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao do vendedor entre N dias e N dias e ramo de atividade igual(\"X\")",
+      "ocorrencias": 2,
+      "exemplo": "fora da recencia de positivacao do vendedor entre 60 dias e 89 dias e ramo de atividade igual(\"37\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de positivacao na semana",
+      "ocorrencias": 2,
+      "exemplo": "fora da recencia de positivacao na semana",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inativos para a empresa",
+      "ocorrencias": 2,
+      "exemplo": "inativos para a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nao contido na segmentacao(\"X\")",
+      "ocorrencias": 2,
+      "exemplo": "nao contido na segmentacao( \"ext_niteroi_rio2_para_tmk1\",\"ext_lagos_norte_para_tmk2\",\"ext_baixada1_baixada3_para_tmk3\", \"ext_rio1_rio3_para_tmk5\",\"ext_sulflu1_sulflu2_para_tmk6\",\"ext_serrana_baixada2_para_tmk7\" )",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nao tem credito",
+      "ocorrencias": 2,
+      "exemplo": "nao tem crédito",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nao tem venda em N dias",
+      "ocorrencias": 2,
+      "exemplo": "nao tem venda em 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao no mes",
+      "ocorrencias": 2,
+      "exemplo": "recencia de positivacao no mes",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "sem venda da empresa",
+      "ocorrencias": 2,
+      "exemplo": "sem venda da empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "total faturado no ano com a empresa maior que r$ N",
+      "ocorrencias": 2,
+      "exemplo": "total faturado no ano com a empresa maior que R$ 30000",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "total faturado no ano com a empresa menor que r$ N ou indefinido",
+      "ocorrencias": 2,
+      "exemplo": "total faturado no ano com a empresa menor que R$ 10000 ou indefinido",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "atividade de N dias",
+      "ocorrencias": 1,
+      "exemplo": "atividade de 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ativos para a empresa",
+      "ocorrencias": 1,
+      "exemplo": "ativos para a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "com ticket medio maior que r$ N",
+      "ocorrencias": 1,
+      "exemplo": "com ticket medio maior que R$ 4999",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "com ticket medio menor que r$ N",
+      "ocorrencias": 1,
+      "exemplo": "com ticket medio menor que R$ 4999",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva a com a empresa e ativos para o vendedor",
+      "ocorrencias": 1,
+      "exemplo": "curva A com a empresa e ativos para o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva a com o vendedor",
+      "ocorrencias": 1,
+      "exemplo": "curva A com o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva b com a empresa e ativos para o vendedor",
+      "ocorrencias": 1,
+      "exemplo": "curva B com a empresa e ativos para o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva b com o vendedor",
+      "ocorrencias": 1,
+      "exemplo": "curva B com o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva c com a empresa e ativos para o vendedor",
+      "ocorrencias": 1,
+      "exemplo": "curva C com a empresa e ativos para o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "curva c com o vendedor",
+      "ocorrencias": 1,
+      "exemplo": "curva C com o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota em N dias",
+      "ocorrencias": 1,
+      "exemplo": "data da rota em 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota futura do vendedor nos proximos N dias",
+      "ocorrencias": 1,
+      "exemplo": "data da rota futura do vendedor nos proximos 21 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota futura em N dias",
+      "ocorrencias": 1,
+      "exemplo": "data da rota futura em 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da rota hoje",
+      "ocorrencias": 1,
+      "exemplo": "data da rota hoje",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "data da ultima visita do representante na semana anterior",
+      "ocorrencias": 1,
+      "exemplo": "data da ultima visita do representante na semana anterior",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de venda do vendedor em N dias",
+      "ocorrencias": 1,
+      "exemplo": "fora da recencia de venda do vendedor em 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "fora da recencia de visita em N dias",
+      "ocorrencias": 1,
+      "exemplo": "fora da recencia de visita em 60 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "id do cliente principal e diferente(\"X\")",
+      "ocorrencias": 1,
+      "exemplo": "id do cliente principal é diferente(\"36979\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inatividade de N dias",
+      "ocorrencias": 1,
+      "exemplo": "inatividade de 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "inativos para o vendedor e cnae do erp inicia com(\"X\")",
+      "ocorrencias": 1,
+      "exemplo": "inativos para o vendedor e cnae do erp inicia com(\"03\",\"47\",\"27\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nao tem venda da empresa em N dias",
+      "ocorrencias": 1,
+      "exemplo": "nao tem venda da empresa em 120 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "nao tem venda da empresa entre N dias e N dias",
+      "ocorrencias": 1,
+      "exemplo": "nao tem venda da empresa entre 15 dias e 180 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "no ciclo de vida inativo com o vendedor",
+      "ocorrencias": 1,
+      "exemplo": "no ciclo de vida inativo com o vendedor",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "no ciclo de vida prospect com a empresa e ramo de atividade igual(\"X\")",
+      "ocorrencias": 1,
+      "exemplo": "no ciclo de vida prospect com a empresa e ramo de atividade igual(\"2\",\"7\",\"11\",\"12\",\"14\",\"19\")",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "no ciclo de vida reativado com a empresa",
+      "ocorrencias": 1,
+      "exemplo": "no ciclo de vida reativado com a empresa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "prospect",
+      "ocorrencias": 1,
+      "exemplo": "prospect",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "queda de faturamento maior que N%",
+      "ocorrencias": 1,
+      "exemplo": "queda de faturamento maior que 5%",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "ramo de atividade igual(\"X\"",
+      "ocorrencias": 1,
+      "exemplo": "ramo de atividade igual(\"CONS. FINAL\"",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao do vendedor em N dias\u0001",
+      "ocorrencias": 1,
+      "exemplo": "recencia de positivacao do vendedor em 21 dias\u0001",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao entre 'X' e 'X'",
+      "ocorrencias": 1,
+      "exemplo": "recencia de positivacao entre '2023-12-31' e '2023-01-01'",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao global no ano passado",
+      "ocorrencias": 1,
+      "exemplo": "recencia de positivacao global no ano passado",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de positivacao na semana",
+      "ocorrencias": 1,
+      "exemplo": "recencia de positivacao na semana",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "recencia de visita em N dias",
+      "ocorrencias": 1,
+      "exemplo": "recencia de visita em 3 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "sem vendas e pessoa fisica",
+      "ocorrencias": 1,
+      "exemplo": "sem vendas e pessoa fisica",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "sem vendas e pessoa juridica",
+      "ocorrencias": 1,
+      "exemplo": "sem vendas e pessoa juridica",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "status na receita federal definido como inapta",
+      "ocorrencias": 1,
+      "exemplo": "status na receita federal definido como inapta",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "status na receita federal definido como suspensa",
+      "ocorrencias": 1,
+      "exemplo": "status na receita federal definido como suspensa",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda da empresa em N dias",
+      "ocorrencias": 1,
+      "exemplo": "tem venda da empresa em 14 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda da empresa no ano anterior",
+      "ocorrencias": 1,
+      "exemplo": "tem venda da empresa no ano anterior",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda da empresa no ano passado",
+      "ocorrencias": 1,
+      "exemplo": "tem venda da empresa no ano passado",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda do vendedor em N dias",
+      "ocorrencias": 1,
+      "exemplo": "tem venda do vendedor em 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda em N dias",
+      "ocorrencias": 1,
+      "exemplo": "tem venda em 7 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "tem venda no ano passado",
+      "ocorrencias": 1,
+      "exemplo": "tem venda no ano passado",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "unica compra com a empresa e cadastrado ha N dias",
+      "ocorrencias": 1,
+      "exemplo": "unica compra com a empresa e cadastrado há 30 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "unica compra com a empresa e recencia de positivacao em N dias",
+      "ocorrencias": 1,
+      "exemplo": "unica compra com a empresa e recencia de positivacao em 40 dias",
+      "fonte": "acervo"
+    },
+    {
+      "modelo": "unica compra com o vendedor e ramo de atividade igual(\"X\")",
+      "ocorrencias": 1,
+      "exemplo": "unica compra com o vendedor e ramo de atividade igual(\"37\")",
+      "fonte": "acervo"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ regras na DSL GOBR, apontando falhas na modelagem. Usa apenas modelos open sourc
 (Ollama) e LangGraph.
 
 - Arquitetura, agentes e etapas: [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
+- Estrutura do código, módulo a módulo: [`docs/ESTRUTURA_DO_CODIGO.md`](docs/ESTRUTURA_DO_CODIGO.md)
 - Enunciado: [`docs/enunciado.pdf`](docs/enunciado.pdf)
 - Execução no Colab: [`notebooks/gobr_colab.ipynb`](notebooks/gobr_colab.ipynb) e
   [`docs/COLAB_PASSO_A_PASSO.md`](docs/COLAB_PASSO_A_PASSO.md)
@@ -28,16 +29,41 @@ Testes (sem GPU e sem Ollama):
 python -m unittest discover -s tests -v
 ```
 
-Extrair os 1.699 blocos `parametros` das referências e diagnosticar o parser:
+Validar um arquivo GOBR (erros de sintaxe, referências e vocabulário):
+
+```powershell
+python -m src.validation.gobr_validator data/exemplos/RegraMaxlub.gobr
+```
+
+Regenerar o vocabulário de condições a partir do acervo:
+
+```powershell
+python -m src.pipelines.build_vocabulary
+```
+
+Extrair os 1.700 blocos `parametros` das referências e diagnosticar o parser:
 
 ```powershell
 python -m src.pipelines.prepare_references
 ```
 
-Gerar explicações em lote (pensado para o Colab, com retomada incremental):
+Gerar explicações em lote, com retomada incremental. Sem LLM (só o rascunho
+determinístico, roda local em segundos):
 
 ```powershell
-python -m src.pipelines.generate_explanations --input outputs/generated/regras_extraidas.jsonl --limit 3
+python -m src.pipelines.generate_explanations --sem-llm --limit 0
+```
+
+Com LLM (no Colab, ver o notebook):
+
+```powershell
+python -m src.pipelines.generate_explanations --limit 5
+```
+
+Conferir explicações com o guard (aqui, a linha de base antiga):
+
+```powershell
+python -m src.pipelines.avaliar_explicacoes data/avaliacao/explicacoes_baseline_v1.jsonl
 ```
 
 Indexar o manual e as explicações:

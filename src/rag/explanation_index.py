@@ -23,12 +23,19 @@ def load_documents(items_dir: Path, *, include_pending: bool = False) -> list[di
         record = json.loads(path.read_text(encoding="utf-8"))
         if record.get("status") != "completed":
             continue
-        explanation = record.get("explanation") or {}
-        text = (explanation.get("explicacao") or "").strip()
+        if "explicacao" in record:  # formato da etapa 2 (src/agents/explicador.py)
+            nova = record["explicacao"]
+            text = (nova.get("texto") or "").strip()
+            review = {"status": "approved" if nova.get("aprovada") else "needs_review",
+                      "metodo": nova.get("metodo")}
+            approved = bool(nova.get("aprovada"))
+        else:  # formato antigo (entregas 1 a 4)
+            explanation = record.get("explanation") or {}
+            text = (explanation.get("explicacao") or "").strip()
+            review = explanation.get("revisao") or {}
+            approved = bool(record.get("indexable"))
         if not text:
             continue
-        review = explanation.get("revisao") or {}
-        approved = bool(record.get("indexable"))
         if not approved and not include_pending:
             continue
         documents.append(
