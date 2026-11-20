@@ -37,8 +37,15 @@ log = logging.getLogger(__name__)
 LIMITE_PASSOS = 80
 
 
-def entrada(texto: str = "", imagens: list[str] | None = None, origem: str = "usuario") -> dict[str, Any]:
-    return {"mensagens": [{"texto": texto, "imagens": list(imagens or []), "origem": origem}]}
+def entrada(texto: str = "", imagens: list[str] | None = None, origem: str = "usuario", *,
+            exibir: str | None = None, anexos: list[str] | None = None) -> dict[str, Any]:
+    """Mensagem do usuário. `exibir`/`anexos`: o que aparece no histórico (sem o texto extraído do PDF)."""
+    mensagem = {"texto": texto, "imagens": list(imagens or []), "origem": origem}
+    if exibir is not None:
+        mensagem["exibir"] = exibir
+    if anexos:
+        mensagem["anexos"] = list(anexos)
+    return {"mensagens": [mensagem]}
 
 
 def config_thread(thread_id: str) -> dict[str, Any]:
@@ -56,10 +63,13 @@ def _falha(no: str, exc: Exception) -> dict[str, Any]:
 
 def construir_grafo(agentes: Agentes, *, checkpointer: Any = None):
     def inicio(e: Estado) -> dict[str, Any]:
-        total = len(e.get("mensagens") or [])
+        mensagens = e.get("mensagens") or []
+        total = len(mensagens)
         if total > e.get("processadas", 0):
+            novas = [{"papel": "usuario", "texto": m.get("exibir") or m["texto"],
+                      "anexos": m.get("anexos") or []} for m in mensagens[e.get("processadas", 0):]]
             return {**CAMPOS_DERIVADOS, "processadas": total, "rodadas_perguntas": 0, "perguntas_feitas": [],
-                    **_passo("inicio", nova_mensagem=True)}
+                    "conversa": novas, **_passo("inicio", nova_mensagem=True)}
         return _passo("inicio", nova_mensagem=False)
 
     def no_orquestrador(e: Estado) -> Command:
@@ -91,6 +101,9 @@ def construir_grafo(agentes: Agentes, *, checkpointer: Any = None):
         resposta = interrupt({"perguntas": perguntas, "mensagem": texto})
         resposta = str(resposta or "").strip()
         update: dict[str, Any] = {"rodadas_perguntas": e.get("rodadas_perguntas", 0) + 1,
+                                  "conversa": [{"papel": "agente", "texto": texto},
+                                               {"papel": "usuario",
+                                                "texto": resposta or "(seguir com as suposições)"}],
                                   "perguntas_feitas": [*(e.get("perguntas_feitas") or []), *(p["id"] for p in perguntas)],
                                   **_passo("perguntar_usuario", perguntas=len(perguntas), respondeu=bool(resposta))}
         if resposta:
@@ -155,7 +168,8 @@ def construir_grafo(agentes: Agentes, *, checkpointer: Any = None):
 
     def no_finalizar(e: Estado) -> dict[str, Any]:
         resposta = montar_resposta(e, max_tentativas=agentes.max_tentativas)
-        return {"resposta": resposta, **_passo("finalizar", caracteres=len(resposta))}
+        return {"resposta": resposta, "conversa": [{"papel": "agente", "texto": resposta}],
+                **_passo("finalizar", caracteres=len(resposta))}
 
     g = StateGraph(Estado)
     g.add_node("inicio", inicio)

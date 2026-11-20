@@ -46,8 +46,8 @@ estrela** no LangGraph:
   quem produziu.
 - **Laço de correção**: o validador agrupa os erros por bloco; o gerador refaz só os blocos
   com erro, recebendo os erros (até 3 gerações).
-- **Memória**: checkpointer por `thread_id` (InMemorySaver nos testes; SqliteSaver na
-  etapa 5). Uma mensagem nova na mesma conversa (ex.: "mude a frequência dos ativos")
+- **Memória**: checkpointer por `thread_id` (`SqliteSaver` na interface, `InMemorySaver`
+  nos testes). Uma mensagem nova na mesma conversa (ex.: "mude a frequência dos ativos")
   passa por `inicio`, que zera os campos derivados, e a Percepção relê o histórico todo.
   `interrupt()` pausa o grafo para perguntas; retoma-se com `Command(resume=...)`.
 
@@ -77,7 +77,7 @@ Descrição de cada pasta, módulo e dos códigos de erro do validador:
 | 2 | Explicador novo (AST → rascunho determinístico → 1 chamada LLM → guard) e geração por bloco | código ✅; 1.698 rascunhos gerados localmente; versão com LLM ⏳ no Colab | ⏳ |
 | 3 | RAG híbrido, re-chunking do manual por construção da linguagem | `buscar_exemplos()` / `buscar_manual()`; índices com rascunhos, refazer com as explicações do LLM | ✅ |
 | 4 | Grafo multiagente com orquestrador supervisor | fluxo ponta a ponta (testado com LLM falso; falta rodar no Colab) | ⏳ |
-| 5 | Memória de contexto + interface Gradio | entrega final | |
+| 5 | Memória de contexto + interface Gradio | `SqliteSaver` por conversa, chat com anexos, progresso e retomada (testado com LLM falso; falta rodar no Colab) | ⏳ |
 | 6 | Fine-tuning QLoRA do gerador + avaliação comparativa | modelo próprio plugado | |
 
 ## Linha de base

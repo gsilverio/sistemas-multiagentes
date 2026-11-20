@@ -36,6 +36,9 @@ src/
 │   ├── grafo.py           construir_grafo(): nós, arestas, interrupt
 │   ├── relatorio.py       resposta final em markdown
 │   └── executar.py        linha de comando
+├── interface/             ENTREGA FINAL (etapa 5)
+│   ├── servico.py         ServicoConversa: grafo + memória SQLite + eventos de progresso
+│   └── app.py             interface Gradio (chat, anexos, .gobr, decisões, conversas salvas)
 ├── prompts/               prompts dos agentes com LLM
 │   ├── percepcao_prompt.py
 │   ├── gerador_prompt.py
@@ -74,7 +77,7 @@ notebooks/gobr_colab.ipynb  execução das partes pesadas no Colab
 | `prepare_references`, `build_vocabulary`, `avaliar_explicacoes` | ✅ | ✅ |
 | `src/explicacao/*`, `generate_explanations --sem-llm` | ✅ (~10 s para o acervo) | ✅ |
 | Índices e busca (`src/rag/*`, `construir_indices`) | ✅ (~2 min em CPU com embeddings; BM25 instantâneo) | ✅ |
-| Grafo com LLM falso (testes) | ✅ | ✅ |
+| Grafo e interface com LLM falso (testes) | ✅ | ✅ |
 | Agentes com LLM, grafo de verdade, `generate_explanations` | ❌ (pouca VRAM) | ✅ |
 
 ## Conceitos do domínio
@@ -303,6 +306,31 @@ Fluxo de uma conversa (detalhes e diagrama em `ARQUITETURA.md`):
 e cobrem o fluxo completo, o laço de correção, o limite de tentativas, a
 pausa para perguntas, a escolha do orquestrador LLM, o guardrail e uma
 segunda mensagem na mesma conversa.
+
+### `src/interface/` — memória e interface (etapa 5)
+`ServicoConversa` junta o grafo e a memória, sem depender do Gradio (é o
+que os testes usam):
+- `abrir_checkpointer(banco)`: `SqliteSaver` num arquivo; cada conversa é
+  um `thread_id`. Reiniciar o processo não perde nada, nem uma conversa
+  pausada numa pergunta.
+- `enviar(thread_id, texto, arquivos)`: se a conversa está pausada, a
+  mensagem é a resposta (`Command(resume=...)`); senão, uma mensagem nova
+  (descrição ou pedido de ajuste). É um gerador de `Evento`s: uma linha de
+  progresso a cada agente que termina, e no fim a pergunta, a resposta ou o
+  erro. PDF e imagem anexados passam por `ler_anexo()`; o histórico mostra
+  só o nome do arquivo.
+- `historico()`, `gobr()`, `decisoes()` (orquestrador, último ciclo) e
+  `conversas()` (ids salvos) alimentam a tela.
+
+O estado do grafo ganhou `conversa`, o histórico exibido (mensagens do
+usuário, perguntas com a resposta e respostas finais), gravado pelos
+próprios nós.
+
+`app.py` monta a tela: chat com anexos e um bloco recolhível com o andamento
+dos agentes, botão *Seguir com as suposições*, arquivo `.gobr` para baixar,
+tabela de decisões do orquestrador (regra, LLM ou guardrail) e *Conversas
+salvas → Retomar*. `responder()` é a função do chat, testada sem subir o
+servidor.
 
 ### `src/pipelines/`
 Scripts de lote, todos `python -m src.pipelines.<nome>`:

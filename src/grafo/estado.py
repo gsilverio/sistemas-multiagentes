@@ -37,6 +37,7 @@ class Estado(TypedDict, total=False):
     resposta: Optional[str]
     erro: Optional[str]
     trace: Annotated[list[dict], operator.add]
+    conversa: Annotated[list[dict], operator.add]     # histórico exibido: {"papel": usuario|agente, "texto"}
 
 
 @dataclass

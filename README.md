@@ -90,3 +90,10 @@ python -m src.grafo.executar --arquivo data/exemplos/RegraMaxlub.pdf --trace
 
 `--interativo` pausa para perguntas; `--orquestrador-sem-llm` usa só as regras;
 `--explicar-com-llm` usa o LLM nas explicações.
+
+Interface Gradio (entrega final; precisa do Ollama, no Colab é a etapa 16 do notebook). As
+conversas ficam em `outputs/conversas.sqlite` e podem ser retomadas:
+
+```powershell
+python -m src.interface.app
+```

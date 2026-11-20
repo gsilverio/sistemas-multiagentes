@@ -28,3 +28,6 @@ Thumbs.db
 # Copias locais baixadas do Drive e pacote original do enunciado
 outputs/outputs-*/
 docs/trabalho.zip
+
+# Memória das conversas da interface (etapa 5)
+outputs/conversas.sqlite*

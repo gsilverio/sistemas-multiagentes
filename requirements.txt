@@ -7,3 +7,6 @@ langgraph>=1,<2
 sentence-transformers>=3,<6
 # Extração do PDF do manual antes da indexação.
 pypdf>=5,<7
+# Etapa 5: memória persistente das conversas (SQLite) e interface.
+langgraph-checkpoint-sqlite>=2,<4
+gradio>=5,<6
