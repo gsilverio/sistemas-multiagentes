@@ -43,6 +43,7 @@ class Exemplo(BaseModel):
     contexto: list[str]
     explicacao: str
     metodo: str
+    descricao_cliente: str | None = None
     assinatura: str
     construcoes: list[str]
     score: float
@@ -96,7 +97,8 @@ def buscar_exemplos(consulta: str, *, k: int = 3, modo: str = "hibrido", diversi
             continue
         formas.add(m["assinatura"])
         escolhidos.append(Exemplo(id=r["id"], nome=m["nome"], gobr=m["gobr"], contexto=m["contexto"],
-                                  explicacao=m["explicacao"], metodo=m["metodo"], assinatura=m["assinatura"],
+                                  explicacao=m["explicacao"], metodo=m["metodo"],
+                                  descricao_cliente=m.get("descricao_cliente"), assinatura=m["assinatura"],
                                   construcoes=m["construcoes"], score=r["score"], modo=r["modo"]))
         if len(escolhidos) == k:
             break

@@ -1,0 +1,25 @@
+{
+  "descricao": "Descrição de cada bloco GOBR de data/exemplos no estilo das tabelas dos clientes (linhas dos PDFs). Usada como entrada do conjunto 'real' da avaliação do fine-tuning. Os blocos sem linha correspondente no PDF (bloqueios e fallback) e os da V1Vidros (PDF só com imagem) foram descritos no mesmo estilo.",
+  "descricoes": {
+    "RegraInfinittoDesign_001": "Não agendar clientes baixados na Receita Federal.",
+    "RegraInfinittoDesign_002": "Clientes com ciclo de vida prospect (nunca tiraram pedido). Atender a cada 7 dias.",
+    "RegraInfinittoDesign_003": "Clientes com pedidos nos últimos 60 dias. Atender a cada 14 dias.",
+    "RegraInfinittoDesign_004": "Clientes com pedidos entre 60 e 90 dias. Atender a cada 7 dias.",
+    "RegraInfinittoDesign_005": "Clientes sem pedidos há mais de 90 dias. Atender a cada 28 dias.",
+    "RegraMaxlub_001": "Não agendar clientes baixados na Receita Federal.",
+    "RegraMaxlub_002": "Não agendar inadimplentes.",
+    "RegraMaxlub_003": "Não agendar clientes em rota na semana.",
+    "RegraMaxlub_004": "Clientes com ciclo de vida em prospects na empresa. Atender a cada 14 dias.",
+    "RegraMaxlub_005": "Clientes com compra entre 0 e 60 dias. Atender a cada 14 dias.",
+    "RegraMaxlub_006": "Clientes que compraram nos últimos 90 dias mas estão há 60 dias sem comprar. Atender a cada 7 dias.",
+    "RegraMaxlub_007": "Clientes que compraram nos últimos 120 dias mas estão há 90 dias sem comprar. Atender a cada 14 dias.",
+    "RegraMaxlub_008": "Clientes que compraram nos últimos 150 dias mas estão há 120 dias sem comprar. Atender a cada 21 dias.",
+    "RegraMaxlub_009": "Clientes que compraram nos últimos 180 dias mas estão há 150 dias sem comprar. Atender a cada 28 dias.",
+    "RegraMaxlub_010": "Clientes que não se enquadraram nas regras anteriores: não agendar.",
+    "V1Vidros-RegraComercial_001": "Não agendar clientes baixados na Receita Federal.",
+    "V1Vidros-RegraComercial_002": "Clientes com compra nos últimos 30 dias. Atender a cada 14 dias.",
+    "V1Vidros-RegraComercial_003": "Clientes que compraram nos últimos 45 dias mas estão há 30 dias sem comprar. Atender a cada 7 dias.",
+    "V1Vidros-RegraComercial_004": "Clientes sem compra há mais de 45 dias. Atender a cada 14 dias.",
+    "V1Vidros-RegraComercial_005": "Clientes com ciclo de vida prospect. Atender a cada 7 dias."
+  }
+}

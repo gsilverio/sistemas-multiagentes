@@ -36,3 +36,6 @@ outputs/conversas.sqlite*
 outputs/finetuning/
 .venv-studio/
 .langgraph_api/
+
+# Avaliação ponta a ponta do agente
+outputs/avaliacao_agente/

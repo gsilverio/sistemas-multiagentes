@@ -22,15 +22,16 @@ from pathlib import Path
 
 from src.gobr.extractor import GobrRuleExtractor
 from src.rag.busca_hibrida import MODELO_EMBEDDINGS, IndiceHibrido, embeddings_disponiveis
-from src.rag.exemplos import carregar_jsonl, documentos_de_exemplos, explicacoes_aprovadas
+from src.rag.exemplos import carregar_jsonl, descricoes_cliente, documentos_de_exemplos, explicacoes_aprovadas
 from src.rag.manual import documentos_do_manual, ler_pdf
 
 RAIZ = Path(__file__).resolve().parents[2]
 EXPLICACOES_PADRAO = RAIZ / "data" / "explicacoes" / "explicacoes_v2.jsonl"
+DESCRICOES_PADRAO = RAIZ / "data" / "explicacoes" / "descricoes_cliente.jsonl"
 
 
 def construir(*, pdf: Path, referencias: Path, explicacoes: Path | None, saida: Path, modelo: str,
-              com_vetores: bool) -> dict:
+              com_vetores: bool, descricoes: Path | None = None) -> dict:
     if com_vetores and not embeddings_disponiveis():
         print("sentence-transformers não instalado: gerando só o índice BM25.")
         com_vetores = False
@@ -45,13 +46,15 @@ def construir(*, pdf: Path, referencias: Path, explicacoes: Path | None, saida: 
         for b in GobrRuleExtractor().extract_directory(referencias)
     ]
     aprovadas = explicacoes_aprovadas(carregar_jsonl(explicacoes)) if explicacoes and explicacoes.exists() else {}
-    exemplo_docs = documentos_de_exemplos(regras, aprovadas)
+    curtas = descricoes_cliente(carregar_jsonl(descricoes)) if descricoes and descricoes.exists() else {}
+    exemplo_docs = documentos_de_exemplos(regras, aprovadas, curtas)
     exemplos = IndiceHibrido.construir(exemplo_docs, tipo="gobr_exemplos", modelo=modelo, com_vetores=com_vetores)
     metodos: dict[str, int] = {}
     for d in exemplo_docs:
         metodos[d["metadata"]["metodo"]] = metodos.get(d["metadata"]["metodo"], 0) + 1
     m2 = exemplos.salvar(saida / "exemplos", blocos=len(regras), metodos=metodos,
-                         explicacoes=explicacoes.name if aprovadas else None)
+                         explicacoes=explicacoes.name if aprovadas else None,
+                         descricoes_cliente=sum(bool(d["metadata"]["descricao_cliente"]) for d in exemplo_docs))
     return {"manual": m1, "exemplos": m2}
 
 
@@ -67,7 +70,8 @@ def main() -> None:
     a = args.parse_args()
     explicacoes = a.explicacoes or (EXPLICACOES_PADRAO if EXPLICACOES_PADRAO.exists() else None)
     resultado = construir(pdf=a.pdf, referencias=a.referencias, explicacoes=explicacoes, saida=a.saida,
-                          modelo=a.modelo, com_vetores=not a.sem_vetores)
+                          modelo=a.modelo, com_vetores=not a.sem_vetores,
+                          descricoes=DESCRICOES_PADRAO if DESCRICOES_PADRAO.exists() else None)
     print(json.dumps(resultado, ensure_ascii=False, indent=2))
 
 

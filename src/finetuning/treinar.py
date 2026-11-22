@@ -44,7 +44,7 @@ def main() -> None:
     args.add_argument("--dataset", type=Path, default=SAIDA_PADRAO)
     args.add_argument("--saida", type=Path, required=True)
     args.add_argument("--modelo", default=MODELO_BASE)
-    args.add_argument("--epocas", type=float, default=2)
+    args.add_argument("--epocas", type=float, default=1)
     args.add_argument("--lr", type=float, default=2e-4)
     args.add_argument("--rank", type=int, default=16)
     args.add_argument("--lote", type=int, default=4)

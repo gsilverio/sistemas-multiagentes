@@ -35,7 +35,9 @@ class AgenteRecuperador:
         manual = self._manual(consulta, k=self.k_manual, modo=self.modo,
                               construcao=["filtro_cliente", "parametros"], **self._dir("manual"))
         return ContextoSegmento(
-            exemplos=[TrechoContexto(titulo=e.nome, texto=f"{e.explicacao}\n---\n{e.gobr}") for e in exemplos],
+            # A descrição curta (estilo das tabelas) é o mesmo formato dos pares do fine-tuning.
+            exemplos=[TrechoContexto(titulo=e.nome, texto=f"{e.descricao_cliente or e.explicacao}\n---\n{e.gobr}")
+                      for e in exemplos],
             manual=[TrechoContexto(titulo=f"{t.secao} {t.titulo}", texto=t.texto[:LIMITE_TRECHO_MANUAL])
                     for t in manual],
         )

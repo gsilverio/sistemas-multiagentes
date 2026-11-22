@@ -125,6 +125,11 @@ Limitação observada: as explicações são fiéis (100% no guard), mas pouco v
 delas o LLM praticamente copiou o rascunho, e todas têm o tom formal de documentação, não o
 das tabelas dos clientes (`data/exemplos`).
 
+Para seguir a dica do enunciado ("traduza as regras em descrições parecidas com as das
+imagens"), um segundo lote gera uma **descrição curta no estilo das tabelas** para cada
+regra, conferida em código (números, valores, ação, frequência). Ela entra no índice de
+exemplos e no fine-tuning, aproximando o texto de treino do que o Gerador recebe no uso.
+
 ## Teste local com modelo pequeno (qwen3:4b-instruct, RTX 2060)
 
 O grafo rodou ponta a ponta numa GPU de 6 GB (~80 s para a Maxlub) e expôs falhas que os
@@ -173,13 +178,23 @@ unidade: **descrição comercial → bloco GOBR**, com o mesmo prompt do agente.
 - **Dados**: um par por corpo distinto do acervo (1.122 no treino). A descrição é a
   explicação do bloco: o rascunho determinístico e, quando aprovada pelo guard, a
   explicação do LLM (dois pares com a mesma resposta). Blocos com GOBR inválido ficam fora.
+- **Descrições no estilo dos clientes**: cada regra ganha também um par com a descrição curta
+  (etapa 12d); no teste, é essa a descrição usada, e no conjunto `real` são as linhas das
+  tabelas dos PDFs.
 - **Teste sem vazamento**: a separação é por forma de regra (`assinatura_estrutural`):
   as 44 formas do teste (79 pares) não aparecem no treino, nem com outros números. Os 17
   blocos de `data/exemplos` (clientes reais, fora do acervo) são um segundo teste.
-- **Modelo**: `Qwen/Qwen3-4B` em 4 bits + LoRA r=16 numa T4. O 4B (e não o 8B) cabe na GPU
+- **Modelo**: `Qwen/Qwen3-4B` em 4 bits + LoRA r=16, 1 época, numa T4. O 4B (e não o 8B) cabe na GPU
   junto com o `gemma3:12b` do Ollama, que os outros agentes continuam usando.
 - **Comparação justa**: base e treinado rodam com o mesmo código, a mesma quantização e o
   mesmo prompt, com e sem exemplos do RAG. A métrica principal é `ast_igual` (mesma
   estrutura da referência); também `valido`, `vocabulario_ok`, `numeros_ok` e F1 por linha.
 
 Resultados: `python -m src.finetuning.avaliar --comparar <dir>` (etapa 20 do notebook).
+
+## Teste final (agente inteiro)
+
+`python -m src.pipelines.avaliar_agente --rotulo <nome>` roda o grafo completo nos 6 casos de
+`data/avaliacao/casos_agente.json` e compara com o GOBR esperado (cobertura estrutural e de
+ação por bloco, validade, falhas de modelagem apontadas). A etapa 20b do notebook roda duas
+vezes, mudando só o Gerador (Ollama × `Qwen3-4B` treinado), e mostra a tabela comparativa.

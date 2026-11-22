@@ -66,6 +66,12 @@ Conferir explicações com o guard (aqui, a linha de base antiga):
 python -m src.pipelines.avaliar_explicacoes data/avaliacao/explicacoes_baseline_v1.jsonl
 ```
 
+Descrições no estilo das tabelas dos clientes (no Colab, etapa 12d):
+
+```powershell
+python -m src.pipelines.gerar_descricoes_cliente --limit 5
+```
+
 Gerar os índices de recuperação (manual por seção + exemplos do acervo) em
 `outputs/rag/`. Usa `data/explicacoes/explicacoes_v2.jsonl` se existir; com
 `--sem-vetores`, só BM25:
@@ -126,4 +132,10 @@ python -m src.finetuning.dataset
 
 ```powershell
 python -m src.finetuning.avaliar --comparar outputs/finetuning/avaliacao
+```
+
+Teste final do agente inteiro (precisa do Ollama; no Colab, etapa 20b):
+
+```powershell
+python -m src.pipelines.avaliar_agente --rotulo ollama
 ```

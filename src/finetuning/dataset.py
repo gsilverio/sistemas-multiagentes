@@ -38,7 +38,7 @@ from src.gobr.assinatura import assinatura_estrutural, chave_corpo
 from src.gobr.extractor import GobrRuleExtractor
 from src.gobr.parser import GobrParser
 from src.rag.busca_hibrida import IndiceHibrido
-from src.rag.exemplos import carregar_jsonl, explicacoes_aprovadas
+from src.rag.exemplos import carregar_jsonl, descricoes_cliente, explicacoes_aprovadas
 from src.validation.gobr_validator import GobrValidator
 
 RAIZ = Path(__file__).resolve().parents[2]
@@ -78,9 +78,16 @@ def bloco_valido(bloco: str, contexto: list[str], validador: GobrValidator) -> b
 
 
 def pares_do_acervo(blocos: Iterable, explicacoes: dict[str, dict] | None = None, *,
-                    split_fixo: str | None = None, percentual_teste: int = PERCENTUAL_TESTE) -> list[dict[str, Any]]:
-    """Um par por corpo distinto; ficam de fora blocos com cláusula sem tradução ou GOBR inválido."""
+                    split_fixo: str | None = None, percentual_teste: int = PERCENTUAL_TESTE,
+                    descricoes: dict[str, str] | None = None) -> list[dict[str, Any]]:
+    """Um par por corpo distinto; ficam de fora blocos com cláusula sem tradução ou GOBR inválido.
+
+    `descricoes`: descrição curta no estilo das tabelas dos clientes. No treino
+    vira mais um par; no teste e no conjunto real é a descrição usada (é o
+    formato que o Gerador recebe no uso).
+    """
     explicacoes = explicacoes or {}
+    descricoes = descricoes or {}
     parser, validador = GobrParser(), GobrValidator()
     vistos: set[str] = set()
     pares: list[dict[str, Any]] = []
@@ -100,10 +107,15 @@ def pares_do_acervo(blocos: Iterable, explicacoes: dict[str, dict] | None = None
         comum = dict(nome=bloco.nome, split=split, assinatura=assinatura, corpo=corpo,
                      contexto=[d.texto for d in bloco.contexto])
         llm = explicacoes.get(bloco.id)
+        curta = descricoes.get(bloco.id)
         if split == "treino":
             pares.append(_par(bloco, descricao=rascunho.texto, fonte="rascunho", **comum))
             if llm and llm["texto"] != rascunho.texto:
                 pares.append(_par(bloco, descricao=llm["texto"], fonte=llm["metodo"], **comum))
+            if curta:
+                pares.append(_par(bloco, descricao=curta, fonte="cliente", **comum))
+        elif curta:
+            pares.append(_par(bloco, descricao=curta, fonte="cliente", **comum))
         else:
             descricao, fonte = (llm["texto"], llm["metodo"]) if llm else (rascunho.texto, "rascunho")
             pares.append(_par(bloco, descricao=descricao, fonte=fonte, **comum))
@@ -126,12 +138,26 @@ def exemplos_para(par: dict[str, Any], indice: IndiceHibrido, k: int = K_EXEMPLO
             for r in resultados]
 
 
+def descricoes_reais(exemplos_reais: Path) -> dict[str, str]:
+    """Descrições dos blocos de `data/exemplos`, tiradas das tabelas (PDFs) dos clientes."""
+    arquivo = exemplos_reais / "descricoes_reais.json"
+    if not arquivo.exists():
+        return {}
+    return json.loads(arquivo.read_text(encoding="utf-8"))["descricoes"]
+
+
 def montar(referencias: Path, exemplos_reais: Path, explicacoes: Path | None, *, seed: int = 13,
-           percentual_teste: int = PERCENTUAL_TESTE) -> dict[str, list[dict[str, Any]]]:
+           percentual_teste: int = PERCENTUAL_TESTE, descricoes: Path | None = None) -> dict[str, list[dict[str, Any]]]:
     aprovadas = explicacoes_aprovadas(carregar_jsonl(explicacoes)) if explicacoes and explicacoes.exists() else {}
+    curtas = descricoes_cliente(carregar_jsonl(descricoes)) if descricoes and descricoes.exists() else {}
     extrator = GobrRuleExtractor()
-    pares = pares_do_acervo(extrator.extract_directory(referencias), aprovadas, percentual_teste=percentual_teste)
-    reais = pares_do_acervo(extrator.extract_directory(exemplos_reais), split_fixo="real")
+    pares = pares_do_acervo(extrator.extract_directory(referencias), aprovadas, percentual_teste=percentual_teste,
+                            descricoes=curtas)
+    reais = pares_do_acervo(extrator.extract_directory(exemplos_reais), split_fixo="real",
+                            descricoes=descricoes_reais(exemplos_reais))
+    for par in reais:
+        if par["fonte_descricao"] == "cliente":
+            par["fonte_descricao"] = "pdf"
     treino = [p for p in pares if p["split"] == "treino"]
     teste = [p for p in pares if p["split"] == "teste"]
 
@@ -173,11 +199,15 @@ def main() -> None:
     args.add_argument("--exemplos-reais", type=Path, default=RAIZ / "data" / "exemplos")
     args.add_argument("--explicacoes", type=Path, default=None,
                       help="explicacoes.jsonl da etapa 2 (padrão: data/explicacoes/explicacoes_v2.jsonl, se existir)")
+    args.add_argument("--descricoes", type=Path, default=None,
+                      help="descricoes_cliente.jsonl (padrão: data/explicacoes/descricoes_cliente.jsonl, se existir)")
     args.add_argument("--saida", type=Path, default=SAIDA_PADRAO)
     a = args.parse_args()
     explicacoes = a.explicacoes or RAIZ / "data" / "explicacoes" / "explicacoes_v2.jsonl"
-    conjuntos = montar(a.referencias, a.exemplos_reais, explicacoes)
-    resumo = salvar(conjuntos, a.saida, explicacoes=str(explicacoes) if explicacoes.exists() else None)
+    descricoes = a.descricoes or RAIZ / "data" / "explicacoes" / "descricoes_cliente.jsonl"
+    conjuntos = montar(a.referencias, a.exemplos_reais, explicacoes, descricoes=descricoes)
+    resumo = salvar(conjuntos, a.saida, explicacoes=str(explicacoes) if explicacoes.exists() else None,
+                    descricoes=str(descricoes) if descricoes.exists() else None)
     print(json.dumps(resumo, ensure_ascii=False, indent=2))
 
 

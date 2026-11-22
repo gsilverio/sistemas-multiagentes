@@ -20,7 +20,8 @@ src/
 ├── explicacao/            EXPLICAÇÃO DETERMINÍSTICA — sem LLM
 │   ├── glossario.py       cada construção GOBR → português (manual cap. 5 a 7)
 │   ├── rascunho.py        AST → fatos + texto completo
-│   └── guarda.py          um texto preserva todos os fatos, e só eles?
+│   ├── guarda.py          um texto preserva todos os fatos, e só eles?
+│   └── descricao_cliente.py  descrição curta no estilo das tabelas dos clientes (LLM + conferência)
 ├── agents/                AGENTES (um por nó do grafo)
 │   ├── contratos.py       RuleSpec, Segmento, Analise, Conferencia... (Pydantic)
 │   ├── percepcao.py       texto / imagem / PDF → RuleSpec (LLM com visão)
@@ -61,7 +62,9 @@ src/
 │   ├── generate_explanations.py  regras → explicações (LLM no Colab; --sem-llm local)
 │   ├── avaliar_explicacoes.py    JSONL de explicações → relatório do guard
 │   ├── construir_indices.py      manual + acervo → outputs/rag/{manual,exemplos}
-│   └── avaliar_recuperacao.py    consultas de referência → acerto@k e MRR
+│   ├── avaliar_recuperacao.py    consultas de referência → acerto@k e MRR
+│   ├── gerar_descricoes_cliente.py  acervo → descrições no estilo das tabelas (Colab)
+│   └── avaliar_agente.py         teste final: agente inteiro × GOBR esperado
 └── llm_config.py          cria o ChatOllama (modelo, URL, contexto)
 
 data/
@@ -345,6 +348,28 @@ dos agentes, botão *Seguir com as suposições*, arquivo `.gobr` para baixar,
 tabela de decisões do orquestrador (regra, LLM ou guardrail) e *Conversas
 salvas → Retomar*. `responder()` é a função do chat, testada sem subir o
 servidor.
+
+### Descrições no estilo das tabelas dos clientes (dica do enunciado)
+O enunciado sugere descrever as regras `.gobr` como as tabelas das imagens.
+`src/explicacao/descricao_cliente.py` pede ao LLM uma linha curta ("Clientes
+com compra nos últimos 60 dias. Atender a cada 14 dias."), com 6 exemplos
+tirados das tabelas reais, e confere: números, valores entre aspas,
+"não agendar", frequência e modificadores (pelas palavras-chave do glossário)
+e nenhum nome de time/carteira. `gerar_descricoes_cliente` roda o lote no
+Colab (1.202 corpos, retomada por item, para se o Ollama cair) e grava
+`descricoes_cliente.jsonl`. Elas entram no texto do índice de exemplos, nos
+exemplos que o Recuperador passa ao Gerador e no dataset do fine-tuning (par
+extra no treino; descrição do teste). O conjunto `real` usa as linhas dos PDFs
+dos clientes (`data/exemplos/descricoes_reais.json`).
+
+### `src/pipelines/avaliar_agente.py` — teste final do agente
+Roda o grafo inteiro (sem pausas) nos casos de `data/avaliacao/casos_agente.json`
+(3 exemplos reais, 2 casos com GOBR esperado escrito à mão e 1 caso com falhas
+de modelagem) e mede: GOBR válido, `cobertura_ast` (blocos esperados com um
+gerado de mesma estrutura, ignorando nomes), `cobertura_acao` (mesma ação e
+mesmo limite de dias, aceitando formas equivalentes) e `achados_ok` (falhas
+que o Analista devia apontar). `--comparar` imprime a tabela das execuções
+(ex.: Gerador do Ollama × Gerador treinado, etapa 20b do notebook).
 
 ### `src/finetuning/` — fine-tuning QLoRA do Gerador (etapa 6)
 - `dataset.py`: um par por corpo distinto de bloco do acervo. Entrada:
