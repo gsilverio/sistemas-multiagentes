@@ -4,6 +4,11 @@ Roda o grafo completo (Percepção → Analista → Recuperador → Gerador ⇄
 Validador → Explicador) sem pausar para perguntas, em cada caso de
 `data/avaliacao/casos_agente.json`, e mede:
 
+- `acerto` (métrica principal): % dos clientes simulados que o GOBR gerado trata
+  exatamente como o esperado (mesma decisão de agendar, frequência e
+  preferências), ver `src.gobr.simulacao`. Os erros vêm em
+  `erros_comportamento` (ex.: "última compra há 52 dias: esperado a cada 14
+  dias, gerado a cada 7 dias");
 - `valido`: o GOBR final passa no validador e na conferência com o RuleSpec;
 - `blocos`: quantos blocos `parametros` foram gerados × esperados;
 - `cobertura_ast`: fração dos blocos esperados com um bloco gerado de mesma
@@ -35,11 +40,12 @@ from typing import Any
 from src.agents.validador import dias_da_frequencia
 from src.gobr.ast import GobrParsedRule
 from src.gobr.grammar import normalizar
+from src.gobr.simulacao import acerto_comportamento
 from src.validation.gobr_validator import GobrValidator
 
 RAIZ = Path(__file__).resolve().parents[2]
 CASOS = RAIZ / "data" / "avaliacao" / "casos_agente.json"
-METRICAS = ("valido", "cobertura_ast", "cobertura_acao", "achados_ok")
+METRICAS = ("acerto", "valido", "cobertura_ast", "cobertura_acao", "achados_ok")
 
 
 def _estrutura(regra: GobrParsedRule) -> tuple:
@@ -75,7 +81,8 @@ def comparar(gobr_gerado: str | None, gobr_esperado: str | None) -> dict[str, An
     if not gobr_esperado:
         return {"blocos_gerados": len(geradas)}
     esperadas = list(validador.validar(gobr_esperado).parametros.values())
-    return {"blocos_gerados": len(geradas), "blocos_esperados": len(esperadas),
+    return {**acerto_comportamento(gobr_gerado, gobr_esperado),
+            "blocos_gerados": len(geradas), "blocos_esperados": len(esperadas),
             "cobertura_ast": _cobertura(esperadas, geradas, _estrutura),
             "cobertura_acao": _cobertura(esperadas, geradas, _acao)}
 
@@ -155,8 +162,10 @@ def avaliar(grafo: Any, casos: list[dict[str, Any]], saida: Path, *, rotulo: str
     for caso in casos:
         r = avaliar_caso(grafo, caso)
         resultados.append(r)
-        metricas = "  ".join(f"{m}={r[m]}" for m in ("valido", "cobertura_ast", "cobertura_acao", "achados_ok") if m in r)
+        metricas = "  ".join(f"{m}={r[m]}" for m in METRICAS if m in r)
         print(f"[{rotulo}] {caso['id']}: {metricas}  ({r['segundos']}s)", flush=True)
+        for erro in r.get("erros_comportamento") or []:
+            print(f"    {erro['cliente']}: esperado {erro['esperado']}, gerado {erro['gerado']}", flush=True)
     resumo = resumir(resultados)
     (saida / f"{rotulo}.json").write_text(json.dumps({"resumo": resumo, "casos": resultados}, ensure_ascii=False,
                                                      indent=2) + "\n", encoding="utf-8")
@@ -173,11 +182,12 @@ def tabela(diretorio: Path) -> str:
                                                                         for m in METRICAS)
                       + f" | {r['segundos_medio']} |")
         for c in dados["casos"]:
-            detalhes.append(f"| {arquivo.stem} | {c['id']} | {c.get('valido')} | {c.get('blocos_gerados', '-')}"
-                            f"/{c.get('blocos_esperados', '-')} | {c.get('cobertura_ast', '-')} | "
-                            f"{c.get('cobertura_acao', '-')} | {', '.join(c.get('achados_faltando') or []) or '-'} |")
-    cab = ["", "| execução | caso | válido | blocos (gerados/esperados) | cobertura AST | cobertura ação | "
-               "achados faltando |", "|---|---|---|---|---|---|---|"]
+            detalhes.append(f"| {arquivo.stem} | {c['id']} | {c.get('acerto', '-')} | {c.get('valido')} | "
+                            f"{c.get('blocos_gerados', '-')}/{c.get('blocos_esperados', '-')} | "
+                            f"{c.get('cobertura_ast', '-')} | {c.get('cobertura_acao', '-')} | "
+                            f"{', '.join(c.get('achados_faltando') or []) or '-'} |")
+    cab = ["", "| execução | caso | acerto | válido | blocos (gerados/esperados) | cobertura AST | cobertura ação | "
+               "achados faltando |", "|---|---|---|---|---|---|---|---|"]
     return "\n".join(linhas + cab + detalhes)
 
 

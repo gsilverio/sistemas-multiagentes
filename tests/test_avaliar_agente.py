@@ -11,7 +11,7 @@ from tests.test_grafo import CORPOS, SPEC, LLMRoteiro, agentes, gerador_correto
 
 ESPERADO = "version 1.0\n\ntime \"televendas\":\n    vendedores todostelevendas ativados\n\n" + "\n\n".join(
     f'parametros "{nome}":\n    do time("televendas")\n' + "\n".join("    " + l for l in CORPOS[nome])
-    for nome in ("Clientes ativos", "Risco de inatividade", "Não agendar inadimplentes")) + "\n"
+    for nome in ("Não agendar inadimplentes", "Clientes ativos", "Risco de inatividade")) + "\n"
 
 
 class AvaliarAgenteTests(unittest.TestCase):
@@ -22,6 +22,8 @@ class AvaliarAgenteTests(unittest.TestCase):
                 "achados_esperados": ["sem_fallback", "fora_do_gobr"], "achados_ausentes": ["buraco_faixa"]}
         r = av.avaliar_caso(grafo, caso)
         self.assertTrue(r["valido"])
+        self.assertEqual(1.0, r["acerto"])
+        self.assertEqual([], r["erros_comportamento"])
         self.assertEqual((3, 3, 1.0, 1.0, 1.0), (r["blocos_gerados"], r["blocos_esperados"], r["cobertura_ast"],
                                                  r["cobertura_acao"], r["achados_ok"]))
         self.assertEqual(7, r["passos"])
@@ -49,15 +51,18 @@ class AvaliarAgenteTests(unittest.TestCase):
             resumo = av.avaliar(grafo, [{"id": "x", "texto": "t", "gobr_esperado_texto": ESPERADO}], Path(tmp),
                                 rotulo="base")
             self.assertEqual(1.0, resumo["cobertura_ast"])
-            self.assertIn("| base | x | True | 3/3 |", av.tabela(Path(tmp)))
+            self.assertIn("| base | x | 1.0 | True | 3/3 |", av.tabela(Path(tmp)))
 
     def test_casos_do_repositorio_sao_coerentes(self):
         casos = json.loads(av.CASOS.read_text(encoding="utf-8"))["casos"]
-        self.assertGreaterEqual(len(casos), 6)
+        self.assertGreaterEqual(len(casos), 11)
         for caso in casos:
             esperado = av.gobr_esperado(caso)
             if esperado:
-                self.assertEqual(1.0, av.comparar(esperado, esperado)["cobertura_ast"], caso["id"])
+                if caso.get("gobr_esperado_texto"):  # os reais (V1Vidros) vieram sem a linha version
+                    self.assertTrue(av.GobrValidator().validar(esperado).ok, caso["id"])
+                r = av.comparar(esperado, esperado)
+                self.assertEqual((1.0, 1.0), (r["cobertura_ast"], r["acerto"]), caso["id"])
             texto, _ = av.entrada_do_caso(caso)
             self.assertTrue(texto.strip(), caso["id"])
 

@@ -9,5 +9,6 @@
     "llm_corrigido": 173,
     "rascunho": 49
   },
-  "explicacoes": "explicacoes_v2.jsonl"
+  "explicacoes": "explicacoes_v2.jsonl",
+  "descricoes_cliente": 1112
 }

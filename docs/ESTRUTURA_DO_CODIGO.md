@@ -14,6 +14,7 @@ src/
 │   ├── extractor.py       arquivo .gobr → lista de blocos + definições usadas
 │   ├── vocabulary.py      vocabulário de condições `quando` (acervo + manual)
 │   ├── assinatura.py      chaves de agrupamento: mesmo corpo / mesma forma de regra
+│   ├── simulacao.py       acerto por comportamento: clientes simulados × dois GOBR
 │   └── scope_text.py      escopos da AST → texto em português
 ├── validation/            VERIFICAÇÕES — determinísticas, sem LLM
 │   └── gobr_validator.py  arquivo GOBR inteiro → relatório de erros/avisos
@@ -364,12 +365,27 @@ dos clientes (`data/exemplos/descricoes_reais.json`).
 
 ### `src/pipelines/avaliar_agente.py` — teste final do agente
 Roda o grafo inteiro (sem pausas) nos casos de `data/avaliacao/casos_agente.json`
-(3 exemplos reais, 2 casos com GOBR esperado escrito à mão e 1 caso com falhas
-de modelagem) e mede: GOBR válido, `cobertura_ast` (blocos esperados com um
+(3 exemplos reais, 7 casos com GOBR esperado escrito à mão e 1 caso com falhas
+de modelagem) e mede: **`acerto`** (métrica principal, ver `src/gobr/simulacao.py`
+abaixo), GOBR válido, `cobertura_ast` (blocos esperados com um
 gerado de mesma estrutura, ignorando nomes), `cobertura_acao` (mesma ação e
 mesmo limite de dias, aceitando formas equivalentes) e `achados_ok` (falhas
 que o Analista devia apontar). `--comparar` imprime a tabela das execuções
 (ex.: Gerador do Ollama × Gerador treinado, etapa 20b do notebook).
+
+### `src/gobr/simulacao.py` — acerto por comportamento
+Mede se o GOBR gerado **faz o que o usuário pediu**, sem depender de como foi
+escrito. Gera clientes simulados (um dia no meio de cada faixa de recência
+formada pelos limites dos dois arquivos, "nunca comprou" e cada outra condição,
+como inadimplente ou baixado na Receita, como atributo sim/não), aplica os dois
+arquivos com a regra do manual (o cliente fica com a primeira regra que o
+atende; sem nenhuma, não é agendado) e compara o tratamento: não agendar, ou a
+frequência em dias e as preferências. `acerto` é a fração (ponderada: cada
+faixa vale 1, cada atributo vale 1 no total) de clientes tratados igual. Os
+desencontros saem em `erros_comportamento`, ex.: "última compra há 52 dias:
+esperado a cada 14 dias, gerado a cada 7 dias". Simplificações: recência global,
+do vendedor e do time são a mesma variável; condições como "ativos para o
+vendedor" são atributos opacos; escopos não contam.
 
 ### `src/finetuning/` — fine-tuning QLoRA do Gerador (etapa 6)
 - `dataset.py`: um par por corpo distinto de bloco do acervo. Entrada:

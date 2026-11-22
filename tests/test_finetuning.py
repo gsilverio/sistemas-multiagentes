@@ -46,6 +46,24 @@ class ModeloFalso:
         return self.resposta(mensagens) if callable(self.resposta) else self.resposta
 
 
+class ArgumentosTreinoTests(unittest.TestCase):
+    def test_transformers_5_sem_warmup_ratio(self):
+        from src.finetuning.treinar import argumentos_compativeis
+
+        class V5:
+            def __init__(self, output_dir, warmup_steps=0, fp16=False):
+                self.kwargs = {"output_dir": output_dir, "warmup_steps": warmup_steps, "fp16": fp16}
+
+        class V4(V5):
+            def __init__(self, output_dir, warmup_ratio=0.0, group_by_length=False, fp16=False):
+                self.kwargs = {"warmup_ratio": warmup_ratio, "group_by_length": group_by_length}
+
+        v5 = argumentos_compativeis(V5, output_dir="x", warmup_ratio=0.03, group_by_length=True, fp16=True)
+        self.assertEqual({"output_dir": "x", "warmup_steps": 0.03, "fp16": True}, v5.kwargs)
+        v4 = argumentos_compativeis(V4, output_dir="x", warmup_ratio=0.03, group_by_length=True)
+        self.assertEqual({"warmup_ratio": 0.03, "group_by_length": True}, v4.kwargs)
+
+
 class DatasetTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

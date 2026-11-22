@@ -130,6 +130,14 @@ imagens"), um segundo lote gera uma **descrição curta no estilo das tabelas** 
 regra, conferida em código (números, valores, ação, frequência). Ela entra no índice de
 exemplos e no fine-tuning, aproximando o texto de treino do que o Gerador recebe no uso.
 
+O lote (gemma3:12b) descreveu 1.112 dos 1.202 corpos distintos: 1.071 regras aprovadas
+na primeira tentativa e 535 na correção; as que falharam duas vezes (listas longas de
+valores, sobretudo) ficaram sem descrição de propósito, para não entrar texto errado no
+treino. Com elas no índice, a recuperação de exemplos fica praticamente igual nas 18
+consultas: híbrido 0,833 / 0,889 / 0,861 (igual), BM25 MRR 0,796 → 0,806, denso
+0,833 / 0,889 / 0,861 (com as explicações: 0,833 / 0,944 / 0,880). O ganho esperado está
+no fine-tuning, não na busca.
+
 ## Teste local com modelo pequeno (qwen3:4b-instruct, RTX 2060)
 
 O grafo rodou ponta a ponta numa GPU de 6 GB (~80 s para a Maxlub) e expôs falhas que os
@@ -194,7 +202,21 @@ Resultados: `python -m src.finetuning.avaliar --comparar <dir>` (etapa 20 do not
 
 ## Teste final (agente inteiro)
 
-`python -m src.pipelines.avaliar_agente --rotulo <nome>` roda o grafo completo nos 6 casos de
-`data/avaliacao/casos_agente.json` e compara com o GOBR esperado (cobertura estrutural e de
-ação por bloco, validade, falhas de modelagem apontadas). A etapa 20b do notebook roda duas
-vezes, mudando só o Gerador (Ollama × `Qwen3-4B` treinado), e mostra a tabela comparativa.
+`python -m src.pipelines.avaliar_agente --rotulo <nome>` roda o grafo completo nos 11 casos de
+`data/avaliacao/casos_agente.json` (3 reais, 7 escritos com gabarito, 1 com falhas de modelagem
+de propósito) e compara com o GOBR esperado. A etapa 20b do notebook roda duas vezes, mudando
+só o Gerador (Ollama × `Qwen3-4B` treinado), e mostra a tabela comparativa.
+
+**Métrica principal: `acerto`**, o quanto a resposta faz o que o usuário pediu. Comparar o
+texto dos blocos é injusto (há várias formas corretas de escrever a mesma faixa) e não pega
+erros de ordem (no GOBR o cliente fica com a primeira regra que o atende). Por isso o
+`acerto` aplica o GOBR gerado e o esperado a clientes simulados, um em cada faixa de
+recência, prospects, inadimplentes, baixados na Receita etc., e conta quantos recebem o
+mesmo tratamento (não agendar, ou a mesma frequência e preferências). "Acerto 0,92" quer
+dizer que 92% dos clientes seriam atendidos exatamente como o usuário pediu; os casos
+errados aparecem por extenso ("última compra há 52 dias: esperado a cada 14 dias, gerado a
+cada 7"). A meta é 0,90 com modelos abertos.
+
+As métricas de apoio: `valido` (passa no validador e na conferência), `cobertura_ast` e
+`cobertura_acao` (blocos iguais na estrutura ou na ação) e `achados_ok` (o Analista apontou as
+falhas de modelagem que devia, e não apontou as que não existem).

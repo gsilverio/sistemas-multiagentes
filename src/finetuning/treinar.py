@@ -39,6 +39,24 @@ def preparar(dataset: Path, tokenizer, *, max_tokens: int, validacao: float, see
     return exemplos[n_val:], exemplos[:n_val], descartados
 
 
+def argumentos_compativeis(classe, **kwargs):
+    """Adapta os argumentos à versão instalada do `transformers`.
+
+    A 5.x removeu `warmup_ratio` (a fração vai em `warmup_steps`, que aceita
+    float < 1). Argumentos opcionais que a versão não conhece são descartados
+    com aviso, em vez de derrubar o treino.
+    """
+    import inspect
+
+    aceitos = inspect.signature(classe.__init__).parameters
+    if "warmup_ratio" in kwargs and "warmup_ratio" not in aceitos:
+        kwargs["warmup_steps"] = kwargs.pop("warmup_ratio")
+    descartados = sorted(k for k in kwargs if k not in aceitos)
+    if descartados:
+        print(f"Aviso: esta versão do transformers não tem {', '.join(descartados)}; seguindo sem.")
+    return classe(**{k: v for k, v in kwargs.items() if k in aceitos})
+
+
 def main() -> None:
     args = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     args.add_argument("--dataset", type=Path, default=SAIDA_PADRAO)
@@ -71,8 +89,8 @@ def main() -> None:
     model.print_trainable_parameters()
 
     a.saida.mkdir(parents=True, exist_ok=True)
-    config = TrainingArguments(
-        output_dir=str(a.saida / "checkpoints"), num_train_epochs=a.epocas, learning_rate=a.lr,
+    config = argumentos_compativeis(
+        TrainingArguments, output_dir=str(a.saida / "checkpoints"), num_train_epochs=a.epocas, learning_rate=a.lr,
         per_device_train_batch_size=a.lote, per_device_eval_batch_size=a.lote,
         gradient_accumulation_steps=a.acumular, lr_scheduler_type="cosine", warmup_ratio=0.03,
         fp16=True, gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
