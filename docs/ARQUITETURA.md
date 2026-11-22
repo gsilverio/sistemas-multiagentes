@@ -74,7 +74,7 @@ Descrição de cada pasta, módulo e dos códigos de erro do validador:
 |---|---|---|---|
 | 0 | Limpeza e reestruturação (tag `entregas-1-a-4` preserva o estado anterior) | repositório enxuto, testes passando | ✅ |
 | 1 | Validador GOBR completo (arquivo inteiro, referências, vocabulário de condições) | `GobrValidator.validar(gobr)` com erros acionáveis | ✅ |
-| 2 | Explicador novo (AST → rascunho determinístico → 1 chamada LLM → guard) e geração por bloco | código ✅; 1.698 rascunhos gerados localmente; versão com LLM ⏳ no Colab | ⏳ |
+| 2 | Explicador novo (AST → rascunho determinístico → 1 chamada LLM → guard) e geração por bloco | 1.698 explicações com `gemma3:12b` (1.466 de primeira, 182 após correção, 50 no rascunho), 100% aprovadas pelo guard: `data/explicacoes/explicacoes_v2.jsonl` | ✅ |
 | 3 | RAG híbrido, re-chunking do manual por construção da linguagem | `buscar_exemplos()` / `buscar_manual()`; índices com rascunhos, refazer com as explicações do LLM | ✅ |
 | 4 | Grafo multiagente com orquestrador supervisor | fluxo ponta a ponta (testado com LLM falso; falta rodar no Colab) | ⏳ |
 | 5 | Memória de contexto + interface Gradio | `SqliteSaver` por conversa, chat com anexos, progresso e retomada (testado com LLM falso; falta rodar no Colab) | ⏳ |
@@ -117,8 +117,27 @@ O BM25 sozinho é melhor que os embeddings neste domínio (termos exatos da DSL,
 `roteirizavel` e `nao agendar`); o híbrido junta os dois e é o melhor em todas as métricas.
 O texto dos exemplos começa pelo nome da regra: testado sem ele, o MRR do denso cai de
 0,778 para 0,685 (os nomes do acervo descrevem o segmento, ex.: "Inativos (90 dias)").
-Os índices atuais usam os rascunhos determinísticos; serão refeitos com as explicações do
-LLM quando o lote da etapa 2 terminar.
+A tabela acima foi medida com os rascunhos. Refeito com as explicações do LLM (etapa 2), o
+índice de exemplos melhora na busca por significado: denso acerto@1 0,833, acerto@3 0,944,
+MRR 0,880 (antes 0,722 / 0,833 / 0,778); o híbrido fica igual (0,833 / 0,889 / 0,861).
+
+Limitação observada: as explicações são fiéis (100% no guard), mas pouco variadas: em 46%
+delas o LLM praticamente copiou o rascunho, e todas têm o tom formal de documentação, não o
+das tabelas dos clientes (`data/exemplos`).
+
+## Teste local com modelo pequeno (qwen3:4b-instruct, RTX 2060)
+
+O grafo rodou ponta a ponta numa GPU de 6 GB (~80 s para a Maxlub) e expôs falhas que os
+testes com LLM falso não pegavam, todas corrigidas e cobertas por testes:
+
+- a Percepção pedia JSON só no prompt; um modelo que "pensa em voz alta" estourava o
+  contexto, e com o esquema sem campos obrigatórios fechava o JSON vazio. Agora a saída é
+  restrita a um esquema com todos os campos obrigatórios (`esquema_estrito`);
+- "Não agendar X" ia para restrições gerais e bloqueios eram marcados como `fallback`: a
+  Percepção e o Analista corrigem isso em código;
+- o Gerador inventava modificadores (`preferencia nos dias uteis`): a conferência agora
+  reprova modificador que o segmento não pede;
+- o tipo de vendedor saía incoerente com o nome do time: o Analista ajusta.
 
 ## Grafo (etapa 4)
 
@@ -142,7 +161,9 @@ o arquivo (`version 1.0`, `time`, blocos na ordem do Analista) é montado em có
 `nao agendar` só onde foi pedido, a frequência pedida e os limites da faixa nas condições.
 
 Execução: `python -m src.grafo.executar --arquivo data/exemplos/RegraMaxlub.pdf --trace`
-(precisa do Ollama) ou as etapas 14 e 15 do notebook.
+(precisa do Ollama), as etapas 14 e 15 do notebook, a interface Gradio (etapa 16) ou o
+**LangGraph Studio** (etapa 16b), que mostra o grafo e executa nó a nó, com o estado de cada
+passo e as interrupções para perguntas.
 
 ## Fine-tuning (etapa 6)
 

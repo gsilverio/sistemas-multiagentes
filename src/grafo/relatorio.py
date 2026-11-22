@@ -30,8 +30,13 @@ def montar_resposta(e: Estado, *, max_tentativas: int) -> str:
     suposicoes = [p for p in [*(analise.get("perguntas") or []), *(analise.get("perguntas_sem_resposta") or [])]
                   if not p.get("bloqueante") and p.get("suposicao")]
     if suposicoes and e.get("gobr"):
-        partes.append("## Suposições (perguntas sem resposta)\n\n"
-                      + "\n".join(f"- {p['texto']} **Assumido:** {p['suposicao']}." for p in suposicoes))
+        feitas = set(e.get("perguntas_feitas") or [])
+        respondidas = any(m.get("origem") == "respostas" for m in e.get("mensagens") or [])
+        linhas = []
+        for p in suposicoes:
+            nota = " (perguntei, mas a resposta não resolveu)" if p["id"] in feitas and respondidas else ""
+            linhas.append(f"- {p['texto']}{nota} **Assumido:** {p['suposicao']}.")
+        partes.append("## Suposições (pontos em aberto)\n\n" + "\n".join(linhas))
 
     if e.get("gobr"):
         conferencia = e.get("conferencia") or {}

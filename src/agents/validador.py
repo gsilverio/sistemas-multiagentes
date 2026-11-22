@@ -57,6 +57,9 @@ def conferir_bloco(segmento: Segmento, regra: GobrParsedRule) -> list[str]:
         elif dias is not None and dias != segmento.frequencia_dias:
             erros.append(f"A frequência do bloco é de {dias} dias; o segmento pede "
                          f"{segmento.frequencia_dias} dias (`frequencia de {segmento.frequencia_dias} dias`).")
+    if regra.modificadores and not segmento.restricoes:
+        erros.append("O bloco tem modificadores que o segmento não pede ("
+                     + "; ".join(f"`{m}`" for m in regra.modificadores) + "); remova-os.")
     f = segmento.faixa
     if f and not segmento.nao_agendar:
         numeros = _numeros(regra)

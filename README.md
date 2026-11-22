@@ -98,6 +98,25 @@ conversas ficam em `outputs/conversas.sqlite` e podem ser retomadas:
 python -m src.interface.app
 ```
 
+LangGraph Studio (página web que mostra o grafo e executa nó a nó). No Colab, etapa 16b
+do notebook (cria um túnel e imprime o link). No Windows, num ambiente separado (o
+`langgraph-api` conflita com o Gradio), com o Ollama rodando:
+
+```powershell
+python -m venv --system-site-packages .venv-studio
+```
+
+```powershell
+.venv-studio\Scripts\pip install "langgraph-cli[inmem]"
+```
+
+```powershell
+.venv-studio\Scripts\langgraph dev --allow-blocking
+```
+
+Abra no Chrome o link `https://smith.langchain.com/studio/?baseUrl=http://127.0.0.1:2024` e escolha
+o grafo `agente_gobr`. A entrada tem `pedido` (texto) e `anexo` (ex.: `data/exemplos/RegraMaxlub.pdf`).
+
 Fine-tuning do Gerador (etapa 6). O dataset roda local; treino e avaliação, no Colab
 (etapas 17 a 21 do notebook):
 

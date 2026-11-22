@@ -41,7 +41,12 @@ Regras:
 5. Frequência: "semanal" = 7, "quinzenal" = 15, "mensal" = 30, "a cada 14 dias" = 14.
 6. "fallback": true só para o grupo "demais clientes" / "clientes que não se enquadram".
 7. Não invente grupos, números nem restrições. Se algo estiver ilegível ou ambíguo, registre em
-   "observacoes" e use null."""
+   "observacoes" e use null.
+8. "vendedores": "todostelevendas" quando a regra fala de televendas; "todosdecampo" para
+   vendedores externos/de campo; "todos" se não estiver claro.
+9. Se houver "Respostas do usuário às perguntas", APLIQUE-AS: elas completam ou corrigem a
+   descrição. Ex.: "os demais clientes: não agendar" → um segmento com "fallback": true e
+   "nao_agendar": true; "ativos a cada 7 dias" → muda a frequência desse grupo."""
 
 CORRECAO = """A resposta anterior não é um JSON válido para o formato pedido. Erro:
 {erro}

@@ -135,6 +135,29 @@ class AnalistaTests(unittest.TestCase):
         self.assertFalse(a.perguntas)
         self.assertNotIn("sem_fallback", {x.codigo for x in a.achados})
 
+    def test_fallback_com_criterio_proprio_e_restricao_duplicada(self):
+        a = AgenteAnalista().analisar(RuleSpec(
+            segmentos=[Segmento(nome="Ativos", criterio="x", faixa=Faixa(max_dias=60), frequencia_dias=7,
+                                restricoes=["Fora da rota."]),
+                       Segmento(nome="Não agendar inadimplentes", criterio="inadimplentes", nao_agendar=True,
+                                fallback=True),
+                       Segmento(nome="Demais clientes", criterio="os demais clientes", nao_agendar=True,
+                                fallback=True)],
+            restricoes_gerais=["fora da rota"]))
+        self.assertEqual(["Não agendar inadimplentes", "Ativos", "Demais clientes"], [s.nome for s in a.spec.segmentos])
+        self.assertEqual([], a.spec.restricoes_gerais)
+        self.assertFalse([p for p in a.perguntas if p.id.startswith("restricao_geral")])
+
+    def test_restricao_geral_vira_pergunta_e_time_coerente(self):
+        a = AgenteAnalista().analisar(RuleSpec(
+            time="televendas", vendedores="todosdecampo",
+            segmentos=[Segmento(nome="A", criterio="x", frequencia_dias=7, fallback=True)],
+            restricoes_gerais=["Somente clientes que não estão na rota da semana"]))
+        self.assertEqual(["restricao_geral:1"], [p.id for p in a.perguntas])
+        self.assertFalse(a.perguntas[0].bloqueante)
+        self.assertEqual("todostelevendas", a.spec.vendedores)
+        self.assertTrue(any("todostelevendas" in x for x in a.ajustes))
+
     def test_nomes_repetidos_e_restricao_fora_do_gobr(self):
         a = AgenteAnalista().analisar(RuleSpec(
             segmentos=[Segmento(nome="A", nao_agendar=True, criterio="x"), Segmento(nome="A", nao_agendar=True, criterio="y")],
@@ -149,6 +172,17 @@ class AgentesTests(unittest.TestCase):
         spec = AgentePercepcao(llm).extrair(["texto"])
         self.assertEqual(3, len(spec.segmentos))
         self.assertIn("não é um JSON válido", llm.chamadas[1][-1][1])
+
+    def test_bloqueio_nas_restricoes_gerais_vira_grupo(self):
+        spec = json.loads(json.dumps(SPEC))
+        spec["segmentos"] = spec["segmentos"][:2]
+        spec["restricoes_gerais"] = ["Não agendar clientes em rota.", "Capacidade de 35 clientes (Dia)"]
+        resultado = AgentePercepcao(LLMRoteiro(json.dumps(spec))).extrair(["texto"])
+        novo = resultado.segmentos[-1]
+        self.assertEqual(("Não agendar clientes em rota", "clientes em rota", True),
+                         (novo.nome, novo.criterio, novo.nao_agendar))
+        self.assertEqual(["Capacidade de 35 clientes (Dia)"], resultado.restricoes_gerais)
+        self.assertTrue(resultado.observacoes)
 
     def test_percepcao_desiste_depois_da_correcao(self):
         with self.assertRaises(PercepcaoFalhou):
@@ -179,6 +213,24 @@ class AgentesTests(unittest.TestCase):
         self.assertIn('Escopo: da carteira("c")', llm.chamadas[0][1][1])
         self.assertIn("7.4.1 Frequência", llm.chamadas[0][0][1])
 
+    def test_modificador_nao_pedido_e_erro_de_conferencia(self):
+        from src.agents.validador import conferir_bloco
+        from src.gobr.parser import GobrParser
+
+        regra = GobrParser().parse('parametros "A":\n    do time("t")\n    frequencia de 7 dias\n'
+                                   "    preferencia nos dias uteis")
+        erros = conferir_bloco(Segmento(nome="A", frequencia_dias=7), regra)
+        self.assertTrue(any("modificadores que o segmento não pede" in e for e in erros))
+        self.assertFalse(conferir_bloco(Segmento(nome="A", frequencia_dias=7, restricoes=["dias úteis"]), regra))
+
+    def test_relatorio_marca_pergunta_respondida_sem_efeito(self):
+        from src.grafo.relatorio import montar_resposta
+
+        pergunta = {"id": "p1", "texto": "E os demais?", "bloqueante": False, "suposicao": "ficam sem regra"}
+        e = {"analise": {"perguntas": [pergunta]}, "gobr": "version 1.0\n", "conferencia": {"ok": True},
+             "perguntas_feitas": ["p1"], "mensagens": [{"texto": "x"}, {"texto": "não agendar", "origem": "respostas"}]}
+        self.assertIn("perguntei, mas a resposta não resolveu", montar_resposta(e, max_tentativas=3))
+
     def test_frequencias_nomeadas(self):
         self.assertEqual(7, dias_da_frequencia("semanal()"))
         self.assertEqual(14, dias_da_frequencia("de 14 dias"))
@@ -188,7 +240,9 @@ class AgentesTests(unittest.TestCase):
         contexto = AgenteRecuperador(modo="bm25").contexto(
             Segmento(nome="Inadimplentes", criterio="clientes inadimplentes", nao_agendar=True))
         self.assertTrue(contexto.exemplos)
-        self.assertTrue(all("nao agendar" in e.texto for e in contexto.exemplos))
+        from src.gobr.grammar import normalizar
+
+        self.assertTrue(all("nao agendar" in normalizar(e.texto) for e in contexto.exemplos))
         self.assertTrue(contexto.manual)
 
 
@@ -293,6 +347,31 @@ class GrafoTests(unittest.TestCase):
         self.assertIn("frequencia de 10 dias", segunda["gobr"])
         self.assertEqual(1, segunda["tentativas"])
         self.assertEqual(2, len(percepcao.chamadas[1][1][1].split("\n\n")))  # as duas mensagens
+
+
+class StudioTests(unittest.TestCase):
+    def test_entrada_simples_com_pdf(self):
+        percepcao = LLMRoteiro(json.dumps(SPEC))
+        ag = agentes(percepcao, LLMRoteiro(*[gerador_correto] * 3))
+        grafo = construir_grafo(ag, checkpointer=InMemorySaver(), entrada_simples=True)
+        self.assertEqual({"pedido", "anexo"}, set(grafo.get_input_jsonschema()["properties"]))
+        saida = grafo.invoke({"pedido": "Regras da Maxlub", "anexo": "data/exemplos/RegraMaxlub.pdf"},
+                             config_thread("s1"))
+        self.assertTrue(saida["conferencia"]["ok"])
+        self.assertIn("Risco de Inatividade", percepcao.chamadas[0][1][1])   # texto do PDF
+        self.assertEqual(["RegraMaxlub.pdf"], saida["conversa"][0]["anexos"])
+        self.assertIsNone(saida.get("pedido"))
+
+    def test_anexo_inexistente_vira_resposta(self):
+        grafo = construir_grafo(agentes(LLMRoteiro(), LLMRoteiro()), checkpointer=InMemorySaver(),
+                                entrada_simples=True)
+        saida = grafo.invoke({"pedido": "x", "anexo": "nao_existe.pdf"}, config_thread("s2"))
+        self.assertTrue(saida["resposta"].startswith("Não consegui concluir: inicio"))
+
+    def test_modulo_do_studio_carrega(self):
+        from src.grafo import studio
+
+        self.assertIn("orquestrador", studio.grafo.get_graph().nodes)
 
 
 class GuardrailsTests(unittest.TestCase):

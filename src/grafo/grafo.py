@@ -30,7 +30,7 @@ from langgraph.types import Command, interrupt
 from src.agents.contratos import Analise, Conferencia, ContextoSegmento, RuleSpec
 from src.agents.gerador import montar_arquivo
 from src.grafo import orquestrador
-from src.grafo.estado import CAMPOS_DERIVADOS, Agentes, Estado
+from src.grafo.estado import CAMPOS_DERIVADOS, Agentes, EntradaSimples, Estado
 from src.grafo.relatorio import montar_resposta
 
 log = logging.getLogger(__name__)
@@ -61,16 +61,43 @@ def _falha(no: str, exc: Exception) -> dict[str, Any]:
     return {"erro": f"{no}: {type(exc).__name__}: {exc}", **_passo(no, erro=str(exc)[:300])}
 
 
-def construir_grafo(agentes: Agentes, *, checkpointer: Any = None):
+def mensagem_do_pedido(pedido: str, anexo: str | None) -> dict[str, Any]:
+    """Entrada simples (LangGraph Studio): texto + caminho de um PDF/imagem → mensagem do grafo."""
+    from pathlib import Path
+
+    from src.agents.percepcao import ler_anexo
+
+    texto, imagens, anexos = pedido.strip(), [], []
+    if anexo:
+        caminho = Path(anexo)
+        if not caminho.is_absolute():
+            caminho = Path(__file__).resolve().parents[2] / caminho
+        conteudo, imagens = ler_anexo(caminho)
+        texto = "\n\n".join(t for t in [texto, conteudo] if t)
+        anexos = [caminho.name]
+    return entrada(texto, imagens, exibir=pedido.strip() or "(regras no anexo)", anexos=anexos)["mensagens"][0]
+
+
+def construir_grafo(agentes: Agentes, *, checkpointer: Any = None, entrada_simples: bool = False):
+    """`entrada_simples=True` (Studio): o formulário de entrada pede só `pedido` e `anexo`."""
+
     def inicio(e: Estado) -> dict[str, Any]:
-        mensagens = e.get("mensagens") or []
+        mensagens = list(e.get("mensagens") or [])
+        extra: dict[str, Any] = {}
+        if e.get("pedido") or e.get("anexo"):
+            try:
+                nova = mensagem_do_pedido(e.get("pedido") or "", e.get("anexo"))
+            except Exception as exc:  # noqa: BLE001 - anexo ilegível vira resposta de erro
+                return {**CAMPOS_DERIVADOS, "pedido": None, "anexo": None, **_falha("inicio", exc)}
+            mensagens.append(nova)
+            extra = {"mensagens": [nova], "pedido": None, "anexo": None}
         total = len(mensagens)
         if total > e.get("processadas", 0):
             novas = [{"papel": "usuario", "texto": m.get("exibir") or m["texto"],
                       "anexos": m.get("anexos") or []} for m in mensagens[e.get("processadas", 0):]]
             return {**CAMPOS_DERIVADOS, "processadas": total, "rodadas_perguntas": 0, "perguntas_feitas": [],
-                    "conversa": novas, **_passo("inicio", nova_mensagem=True)}
-        return _passo("inicio", nova_mensagem=False)
+                    "conversa": novas, **extra, **_passo("inicio", nova_mensagem=True)}
+        return {**extra, **_passo("inicio", nova_mensagem=False)}
 
     def no_orquestrador(e: Estado) -> Command:
         decisao = orquestrador.decidir(e, agentes)
@@ -171,7 +198,7 @@ def construir_grafo(agentes: Agentes, *, checkpointer: Any = None):
         return {"resposta": resposta, "conversa": [{"papel": "agente", "texto": resposta}],
                 **_passo("finalizar", caracteres=len(resposta))}
 
-    g = StateGraph(Estado)
+    g = StateGraph(Estado, input_schema=EntradaSimples) if entrada_simples else StateGraph(Estado)
     g.add_node("inicio", inicio)
     g.add_node("orquestrador", no_orquestrador, destinations=orquestrador.AGENTES)
     trabalhadores = {

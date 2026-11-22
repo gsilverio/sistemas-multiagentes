@@ -50,13 +50,17 @@ def create_llm_para(papel: str, **kwargs):
     return create_llm(modelo, **kwargs)
 
 
-def create_llm(model: str | None = None, *, num_ctx: int | None = None, temperature: float = 0):
+def create_llm(model: str | None = None, *, num_ctx: int | None = None, temperature: float = 0,
+               formato: str | dict | None = None):
+    """`formato`: "json" ou um JSON Schema; o Ollama restringe a saída a ele (sem texto fora do JSON)."""
     from langchain_ollama import ChatOllama
 
     nome = model or modelo_padrao()
     extras = {}
-    if nome.startswith("qwen3"):
+    if nome.startswith("qwen3") and "instruct" not in nome:
         extras["reasoning"] = False  # Sem bloco <think>: resposta direta.
+    if formato is not None:
+        extras["format"] = formato
     return ChatOllama(
         model=nome,
         base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),

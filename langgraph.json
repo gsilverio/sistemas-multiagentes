@@ -1,0 +1,6 @@
+{
+  "dependencies": ["."],
+  "graphs": {
+    "agente_gobr": "./src/grafo/studio.py:grafo"
+  }
+}

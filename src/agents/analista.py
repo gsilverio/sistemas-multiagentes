@@ -29,6 +29,7 @@ from src.agents.contratos import Achado, Analise, Pergunta, RuleSpec, Segmento
 INFINITO = 10**9
 FREQUENCIA_MAXIMA = 365
 
+_DEMAIS = re.compile(r"demais|restante|outros clientes|nao se enquadr|todos os outros|fallback")
 _FORA_DO_GOBR = re.compile(r"capacidade|clientes\s+(?:por|/)\s*dia|meta|comiss|or[cç]amento|ligar\s+\d+")
 _BLOQUEIOS_COMUNS = {
     "inadimpl": "Não há regra para clientes inadimplentes. É comum não agendá-los (`quando inadimplentes` + `nao agendar`).",
@@ -85,6 +86,17 @@ class AgenteAnalista:
             else:
                 vistos[chave] = 1
 
+        # "fallback" só vale para o grupo dos demais clientes (sem critério próprio).
+        for s in spec.segmentos:
+            if s.fallback and s.criterio.strip() and not _DEMAIS.search(_sem_acento(s.nome + " " + s.criterio)):
+                s.fallback = False
+                ajustes.append(f'"{s.nome}" tem critério próprio ("{s.criterio}"); não é a regra dos demais '
+                               "clientes, então não vai para o fim.")
+
+        # Restrição geral que já está dentro dos grupos não precisa ficar também como geral.
+        nos_grupos = {_sem_acento(r).strip(" .") for s in spec.segmentos for r in s.restricoes}
+        spec.restricoes_gerais = [r for r in spec.restricoes_gerais if _sem_acento(r).strip(" .") not in nos_grupos]
+
         for s in spec.segmentos:
             if not s.nao_agendar and not s.frequencia_dias and not s.frequencia_texto:
                 perguntas.append(Pergunta(
@@ -118,11 +130,26 @@ class AgenteAnalista:
 
         self._faixas(spec, achados, perguntas)
 
-        for restricao in spec.restricoes_gerais:
+        for indice, restricao in enumerate(spec.restricoes_gerais, start=1):
             if _FORA_DO_GOBR.search(_sem_acento(restricao)):
                 achados.append(Achado(codigo="fora_do_gobr", severidade="aviso",
                                       mensagem=f'"{restricao}" não é configurado nas regras de parâmetros do GOBR; '
                                                "precisa ser ajustado em outra configuração do goVendas."))
+            else:
+                # Restrição que muda quem é atendido, mas não está em nenhum grupo: não entraria no GOBR.
+                perguntas.append(Pergunta(
+                    id=f"restricao_geral:{indice}",
+                    texto=f'A restrição "{restricao}" vale para quais grupos? Do jeito que está, '
+                          "ela não entra em nenhuma regra.",
+                    suposicao="ela não foi aplicada a nenhum grupo (revise antes de usar)"))
+
+        nome_time = _sem_acento(spec.time)
+        esperado = ("todostelevendas" if "televenda" in nome_time
+                    else "todosdecampo" if re.search(r"campo|extern", nome_time) else None)
+        if esperado and spec.vendedores != esperado:
+            ajustes.append(f'O time "{spec.time}" estava com `vendedores {spec.vendedores}`; '
+                           f"troquei para `{esperado}`, coerente com o nome do time.")
+            spec.vendedores = esperado
 
         textos = _sem_acento(" ".join([s.nome + " " + s.criterio for s in spec.segmentos] + spec.restricoes_gerais))
         for chave, mensagem in _BLOQUEIOS_COMUNS.items():

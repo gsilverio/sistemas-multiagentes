@@ -31,7 +31,7 @@ Se a pasta já é um repositório Git, **não repita** `git init` nem `git remot
 ## 4. Execute as células, na ordem
 1. Confira a GPU via `nvidia-smi`.
 2. Monte o Drive e conceda acesso.
-3. Defina `REPO_URL` com a URL GitHub real e `BRANCH` com o branch que contém o código (o branch de trabalho, ou `main` depois do merge) na célula de clone. Repositórios privados exigem autenticação; **não grave credenciais no notebook**. Para testar um repositório privado sem configurar autenticação, use o modo `ORIGEM="zip"`.
+3. Defina `REPO_URL` com a URL GitHub real e `BRANCH` (padrão `main`) na célula de clone. Repositórios privados exigem autenticação; **não grave credenciais no notebook**. Para testar um repositório privado sem configurar autenticação, use o modo `ORIGEM="zip"`.
 4. Instale as dependências.
 5. Instale e inicie o Ollama dentro do Colab.
 6. Baixe `gemma3:12b` (~8,2 GB).

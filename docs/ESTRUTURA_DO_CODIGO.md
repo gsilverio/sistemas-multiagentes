@@ -35,7 +35,8 @@ src/
 │   ├── orquestrador.py    guardrails (destinos permitidos) + decisão do LLM
 │   ├── grafo.py           construir_grafo(): nós, arestas, interrupt
 │   ├── relatorio.py       resposta final em markdown
-│   └── executar.py        linha de comando
+│   ├── executar.py        linha de comando
+│   └── studio.py          grafo exposto ao LangGraph Studio (langgraph.json)
 ├── interface/             ENTREGA FINAL (etapa 5)
 │   ├── servico.py         ServicoConversa: grafo + memória SQLite + eventos de progresso
 │   └── app.py             interface Gradio (chat, anexos, .gobr, decisões, conversas salvas)
@@ -306,6 +307,13 @@ Fluxo de uma conversa (detalhes e diagrama em `ARQUITETURA.md`):
 7. **Explicador**: o `AgenteExplicador` da etapa 2 em cada bloco válido.
 8. **Finalizar** (`relatorio.montar_resposta`): falhas de modelagem, ajustes,
    suposições, GOBR com o status da validação e o que cada regra faz.
+
+**LangGraph Studio**: `langgraph.json` (raiz) aponta para `src/grafo/studio.py:grafo`,
+compilado com `entrada_simples=True` (formulário com `pedido` e `anexo`; o nó
+`inicio` transforma em mensagem) e sem checkpointer (o servidor do Studio
+guarda as threads). O servidor (`langgraph dev`) roda num ambiente virtual
+próprio porque o `langgraph-api` exige `starlette`/`pydantic` mais novos que
+os do Gradio.
 
 `Agentes.padrao()` cria os agentes reais (Ollama, modelos por papel em
 `src/llm_config.py`). Os testes (`tests/test_grafo.py`) injetam LLMs falsos

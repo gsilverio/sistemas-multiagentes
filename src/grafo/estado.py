@@ -21,7 +21,16 @@ CAMPOS_DERIVADOS = {
 }
 
 
+class EntradaSimples(TypedDict, total=False):
+    """Formulário de entrada no LangGraph Studio."""
+
+    pedido: str        # descrição das regras ou pedido de ajuste
+    anexo: str         # opcional: caminho de um PDF/imagem, ex.: data/exemplos/RegraMaxlub.pdf
+
+
 class Estado(TypedDict, total=False):
+    pedido: Optional[str]                             # entrada simples (Studio); `inicio` vira mensagem
+    anexo: Optional[str]
     mensagens: Annotated[list[dict], operator.add]   # {"texto": str, "imagens": [base64], "origem": str}
     processadas: int                                  # quantas mensagens já iniciaram um ciclo
     rodadas_perguntas: int
@@ -71,7 +80,7 @@ class Agentes:
         if orquestrador_com_llm:
             from src.llm_config import create_llm_para
 
-            orquestrador = create_llm_para("orquestrador")
+            orquestrador = create_llm_para("orquestrador", formato="json")
         explicador_llm = None
         if explicar_com_llm:
             from src.llm_config import create_llm_para

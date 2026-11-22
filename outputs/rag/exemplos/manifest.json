@@ -5,7 +5,9 @@
   "dimension": 384,
   "blocos": 1700,
   "metodos": {
-    "rascunho": 1202
+    "llm": 980,
+    "llm_corrigido": 173,
+    "rascunho": 49
   },
-  "explicacoes": null
+  "explicacoes": "explicacoes_v2.jsonl"
 }

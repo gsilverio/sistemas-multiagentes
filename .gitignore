@@ -34,3 +34,5 @@ outputs/conversas.sqlite*
 
 # Fine-tuning (etapa 6): dataset e avaliações gerados
 outputs/finetuning/
+.venv-studio/
+.langgraph_api/
