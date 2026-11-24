@@ -111,9 +111,13 @@ def avaliar(modelo: Any, pares: list[dict[str, Any]], saida: Path, *, rotulo: st
     feitos = {}
     if arquivo.exists():
         for linha in arquivo.read_text(encoding="utf-8").splitlines():
-            if linha.strip():
+            try:
                 r = json.loads(linha)
-                feitos[(r["split"], r["id"])] = r
+            except ValueError:  # linha cortada (a sessão caiu durante a gravação): o item é refeito
+                continue
+            feitos[(r["split"], r["id"])] = r
+        arquivo.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in feitos.values()),
+                           encoding="utf-8")
     validador, parser = GobrValidator(), GobrParser()
     with arquivo.open("a", encoding="utf-8") as destino:
         for i, par in enumerate(pares, start=1):

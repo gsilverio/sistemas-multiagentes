@@ -57,6 +57,26 @@ def argumentos_compativeis(classe, **kwargs):
     return classe(**{k: v for k, v in kwargs.items() if k in aceitos})
 
 
+def ultimo_checkpoint(diretorio: Path) -> str | None:
+    """Checkpoint mais recente que está inteiro.
+
+    Se a sessão do Colab cai durante a gravação, o último fica pela metade no
+    Drive; nesse caso vale o anterior.
+    """
+    candidatos = [p for p in diretorio.glob("checkpoint-*") if p.name.removeprefix("checkpoint-").isdigit()]
+    for pasta in sorted(candidatos, key=lambda p: int(p.name.removeprefix("checkpoint-")), reverse=True):
+        try:
+            json.loads((pasta / "trainer_state.json").read_text(encoding="utf-8"))
+            inteiro = all((pasta / n).stat().st_size > 0
+                          for n in ("adapter_model.safetensors", "optimizer.pt", "scheduler.pt"))
+        except (OSError, ValueError):
+            inteiro = False
+        if inteiro:
+            return str(pasta)
+        print(f"Aviso: {pasta.name} está incompleto; ignorando.")
+    return None
+
+
 def main() -> None:
     args = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     args.add_argument("--dataset", type=Path, default=SAIDA_PADRAO)
@@ -65,18 +85,22 @@ def main() -> None:
     args.add_argument("--epocas", type=float, default=1)
     args.add_argument("--lr", type=float, default=2e-4)
     args.add_argument("--rank", type=int, default=16)
-    args.add_argument("--lote", type=int, default=4)
-    args.add_argument("--acumular", type=int, default=4)
+    # Lote 1 × 16 acumulados (lote efetivo 16): com lote 4, a saída do modelo (vocabulário de
+    # 152 mil tokens × sequência) estourava os 15 GB da T4 no backward.
+    args.add_argument("--lote", type=int, default=1)
+    args.add_argument("--acumular", type=int, default=16)
     args.add_argument("--max-tokens", type=int, default=1536)
     args.add_argument("--validacao", type=float, default=0.05)
-    args.add_argument("--salvar-a-cada", type=int, default=50)
+    args.add_argument("--salvar-a-cada", type=int, default=25)
     args.add_argument("--seed", type=int, default=13)
     a = args.parse_args()
 
+    import os
+
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")  # menos fragmentação
     from datasets import Dataset
     from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
     from transformers import DataCollatorForSeq2Seq, Trainer, TrainingArguments
-    from transformers.trainer_utils import get_last_checkpoint
 
     model, tokenizer = carregar_base(a.modelo)
     treino, validacao, descartados = preparar(a.dataset, tokenizer, max_tokens=a.max_tokens,
@@ -95,14 +119,15 @@ def main() -> None:
         gradient_accumulation_steps=a.acumular, lr_scheduler_type="cosine", warmup_ratio=0.03,
         fp16=True, gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
         optim="paged_adamw_8bit", logging_steps=10,
-        eval_strategy="steps", eval_steps=a.salvar_a_cada, save_strategy="steps", save_steps=a.salvar_a_cada,
+        eval_strategy="steps", eval_steps=2 * a.salvar_a_cada, save_strategy="steps", save_steps=a.salvar_a_cada,
         save_total_limit=2, report_to="none", seed=a.seed, group_by_length=True,
+        disable_tqdm=True,
     )
     trainer = Trainer(
         model=model, args=config, train_dataset=Dataset.from_list(treino), eval_dataset=Dataset.from_list(validacao),
         data_collator=DataCollatorForSeq2Seq(tokenizer, padding=True, label_pad_token_id=-100),
     )
-    ultimo = get_last_checkpoint(config.output_dir) if (a.saida / "checkpoints").exists() else None
+    ultimo = ultimo_checkpoint(a.saida / "checkpoints")
     if ultimo:
         print(f"Retomando de {ultimo}")
     trainer.train(resume_from_checkpoint=ultimo)

@@ -64,6 +64,25 @@ class ArgumentosTreinoTests(unittest.TestCase):
         self.assertEqual({"warmup_ratio": 0.03, "group_by_length": True}, v4.kwargs)
 
 
+class CheckpointTests(unittest.TestCase):
+    def test_ignora_checkpoint_pela_metade(self):
+        from src.finetuning.treinar import ultimo_checkpoint
+
+        with tempfile.TemporaryDirectory() as tmp:
+            raiz = Path(tmp)
+            self.assertIsNone(ultimo_checkpoint(raiz / "nao_existe"))
+            for passo in (25, 50, 100):
+                pasta = raiz / f"checkpoint-{passo}"
+                pasta.mkdir()
+                for nome in ("adapter_model.safetensors", "optimizer.pt", "scheduler.pt"):
+                    (pasta / nome).write_bytes(b"x")
+                (pasta / "trainer_state.json").write_text("{}", encoding="utf-8")
+            self.assertEqual("checkpoint-100", Path(ultimo_checkpoint(raiz)).name)
+            (raiz / "checkpoint-100" / "trainer_state.json").write_text('{"gl', encoding="utf-8")
+            (raiz / "checkpoint-50" / "optimizer.pt").write_bytes(b"")
+            self.assertEqual("checkpoint-25", Path(ultimo_checkpoint(raiz)).name)
+
+
 class DatasetTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -165,6 +184,11 @@ class AvaliacaoTests(unittest.TestCase):
             self.assertEqual(2, modelo.chamadas)
             av.avaliar(modelo, pares, saida, rotulo="base")      # retomada: nada a refazer
             self.assertEqual(2, modelo.chamadas)
+            arquivo = saida / "base.jsonl"                        # última linha cortada: só ela é refeita
+            arquivo.write_text(arquivo.read_text(encoding="utf-8")[:-20], encoding="utf-8")
+            self.assertEqual(1.0, av.avaliar(modelo, pares, saida, rotulo="base")["real"]["ast_igual"])
+            self.assertEqual(3, modelo.chamadas)
+            self.assertEqual(2, len([json.loads(l) for l in arquivo.read_text(encoding="utf-8").splitlines()]))
             av.avaliar(ModeloFalso(PAR["bloco"].replace("14", "7")), pares, saida, rotulo="ruim")
             tabela = av.tabela_comparativa(saida)
             self.assertIn("| base | teste | 1 |", tabela)

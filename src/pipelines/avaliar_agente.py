@@ -209,11 +209,14 @@ def main() -> None:
 
     from src.grafo.estado import Agentes
     from src.grafo.grafo import construir_grafo
+    from src.llm_config import create_llm_para, modelo_para
 
     casos = json.loads(a.casos.read_text(encoding="utf-8"))["casos"]
     if a.somente:
         ids = set(a.somente.split(","))
         casos = [c for c in casos if c["id"] in ids]
+    if modelo_para("gerador").startswith("hf:"):
+        create_llm_para("gerador")  # na GPU antes do Ollama, que se ajusta ao espaço que sobrar
     agentes = Agentes.padrao(orquestrador_com_llm=not a.orquestrador_sem_llm, interativo=False)
     grafo = construir_grafo(agentes, checkpointer=InMemorySaver())
     print(json.dumps(avaliar(grafo, casos, a.saida, rotulo=a.rotulo), ensure_ascii=False, indent=2))
