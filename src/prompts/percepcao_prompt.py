@@ -39,6 +39,7 @@ Regras:
    "sem pedidos há mais de 90 dias" → min 90, max null.
    Grupos que não dependem desse tempo (prospects, inadimplentes) têm "faixa": null.
 5. Frequência: "semanal" = 7, "quinzenal" = 15, "mensal" = 30, "a cada 14 dias" = 14.
+   Preferência de dia ("de preferência às sextas") vai em "restricoes" do grupo: "preferência na sexta".
 6. "fallback": true só para o grupo "demais clientes" / "clientes que não se enquadram".
 7. Não invente grupos, números nem restrições. Se algo estiver ilegível ou ambíguo, registre em
    "observacoes" e use null.
@@ -52,6 +53,12 @@ CORRECAO = """A resposta anterior não é um JSON válido para o formato pedido.
 {erro}
 
 Responda de novo SOMENTE com o objeto JSON corrigido."""
+
+
+COMPLETAR = """O JSON deixou de fora informações que estão na descrição:
+{faltando}
+
+Responda de novo SOMENTE com o objeto JSON completo, com essas informações nos grupos certos. Não mude o resto."""
 
 
 def conteudo_usuario(textos: list[str], imagens: list[str]) -> list[dict] | str:

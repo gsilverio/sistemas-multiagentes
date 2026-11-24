@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Iterable
 
 from src.agents.validador import dias_da_frequencia
 from src.gobr.ast import GobrParsedRule
@@ -147,12 +147,18 @@ def clientes(*conjuntos: list[GobrParsedRule]) -> list[tuple[Cliente, float]]:
     return pesos
 
 
-def acerto_comportamento(gobr_gerado: str | None, gobr_esperado: str, *, max_exemplos: int = 8) -> dict[str, Any]:
-    """`acerto` = fração ponderada dos clientes simulados tratados como no esperado."""
+def acerto_comportamento(gobr_gerado: str | None, gobr_esperado: str, *, max_exemplos: int = 8,
+                         ignorar: Iterable[str] = ()) -> dict[str, Any]:
+    """`acerto` = fração ponderada dos clientes simulados tratados como no esperado.
+
+    `ignorar`: condições que o GOBR de referência tem, mas que o usuário não pediu
+    (não estão no PDF); clientes com elas não entram na conta.
+    """
     if not (gobr_gerado or "").strip():
         return {"acerto": 0.0, "clientes_simulados": 0, "erros_comportamento": []}
     esperadas, geradas = _regras(gobr_esperado), _regras(gobr_gerado)
-    populacao = clientes(esperadas, geradas)
+    fora = {normalizar(t) for t in ignorar}
+    populacao = [(c, p) for c, p in clientes(esperadas, geradas) if not c.atributos & fora]
     total = certo = 0.0
     erros = []
     for cliente, peso in populacao:

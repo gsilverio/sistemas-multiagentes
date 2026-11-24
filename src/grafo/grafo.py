@@ -165,13 +165,15 @@ def construir_grafo(agentes: Agentes, *, checkpointer: Any = None, entrada_simpl
         if conferencia and conferencia.get("erros_gerais") and not erros:
             erros = {s.nome: conferencia["erros_gerais"] for s in spec.segmentos}  # erro sem bloco: refaz tudo
         try:
-            blocos = agentes.gerador.gerar(spec, contextos, anteriores=anteriores, erros_por_bloco=erros)
+            blocos = agentes.gerador.gerar(spec, contextos, anteriores=anteriores, erros_por_bloco=erros,
+                                           reparar=e.get("tentativas", 0) + 1 >= agentes.max_tentativas)
         except Exception as exc:  # noqa: BLE001
             return _falha("gerador", exc)
         return {"blocos": blocos, "gobr": montar_arquivo(spec, blocos), "conferencia": None,
                 "tentativas": e.get("tentativas", 0) + 1,
                 **_passo("gerador", tentativa=e.get("tentativas", 0) + 1,
-                         refeitos=len(erros) if anteriores else len(blocos))}
+                         refeitos=len(erros) if anteriores else len(blocos),
+                         reparados=list(agentes.gerador.reparados))}
 
     def no_validador(e: Estado) -> dict[str, Any]:
         spec = Analise.model_validate(e["analise"]).spec

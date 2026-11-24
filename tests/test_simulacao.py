@@ -77,5 +77,14 @@ class SimulacaoTests(unittest.TestCase):
         self.assertEqual(1.0, acerto_comportamento(gerado, esperado)["acerto"])
 
 
+class ForaDoPedidoTests(unittest.TestCase):
+    def test_condicao_que_o_usuario_nao_pediu_nao_conta(self):
+        ativos = 'parametros "A":\n    do time("t")\n    quando recencia de positivacao em 60 dias\n    frequencia de 7 dias\n'
+        baixada = "status na receita federal definido como baixada"
+        esperado = f'version 1.0\n\nparametros "B":\n    do time("t")\n    quando {baixada}\n    nao agendar\n\n{ativos}'
+        self.assertLess(acerto_comportamento(f"version 1.0\n\n{ativos}", esperado)["acerto"], 1)
+        self.assertEqual(1.0, acerto_comportamento(f"version 1.0\n\n{ativos}", esperado, ignorar=[baixada])["acerto"])
+
+
 if __name__ == "__main__":
     unittest.main()

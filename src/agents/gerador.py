@@ -3,7 +3,9 @@
 Gera um bloco por segmento (é a unidade que o fine-tuning da etapa 6 aprende)
 e monta o arquivo de forma determinística: `version 1.0`, o bloco `time` e os
 blocos na ordem do `RuleSpec` (já ajustada pelo Analista). Na correção, só
-os blocos com erro voltam ao modelo, junto com os erros do Validador.
+os blocos com erro voltam ao modelo, junto com os erros do Validador. Na
+última tentativa, o que é só conferência com o `RuleSpec` é reparado sem LLM
+(`reparar_bloco`); `reparados` diz quais blocos passaram por isso.
 """
 
 from __future__ import annotations
@@ -52,6 +54,7 @@ def limpar_bloco(resposta: str, nome: str) -> str:
 class AgenteGerador:
     def __init__(self, llm: Any = None):
         self._llm = llm
+        self.reparados: list[str] = []   # blocos da última chamada de `gerar` corrigidos sem LLM
 
     @property
     def llm(self) -> Any:
@@ -79,8 +82,9 @@ class AgenteGerador:
 
     def gerar(self, spec: RuleSpec, contextos: dict[str, ContextoSegmento], *,
               anteriores: dict[str, str] | None = None,
-              erros_por_bloco: dict[str, list[str]] | None = None) -> dict[str, str]:
+              erros_por_bloco: dict[str, list[str]] | None = None, reparar: bool = False) -> dict[str, str]:
         """Blocos por nome de segmento. Com `anteriores`, só refaz os que têm erro."""
+        self.reparados = []
         anteriores = anteriores or {}
         erros_por_bloco = erros_por_bloco or {}
         escopo = escopo_do_time(spec)
@@ -90,9 +94,24 @@ class AgenteGerador:
             if nome in anteriores and nome not in erros_por_bloco:
                 blocos[nome] = anteriores[nome]
                 continue
+            if reparar and nome in anteriores and (reparado := self._reparar(segmento, anteriores[nome], spec, escopo)):
+                blocos[nome] = reparado
+                self.reparados.append(nome)
+                continue
             blocos[nome] = self.gerar_bloco(segmento, escopo, contextos.get(nome),
                                             anterior=anteriores.get(nome), erros=erros_por_bloco.get(nome))
         return blocos
+
+    @staticmethod
+    def _reparar(segmento: Segmento, anterior: str, spec: RuleSpec, escopo: str) -> str | None:
+        from src.agents.validador import reparar_bloco
+        from src.gobr.parser import GobrParser
+
+        try:
+            regra = GobrParser().parse(anterior)
+        except ValueError:
+            return None
+        return reparar_bloco(segmento, regra, spec, escopo)
 
 
 def montar_arquivo(spec: RuleSpec, blocos: dict[str, str]) -> str:

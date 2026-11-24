@@ -5,6 +5,9 @@
       "id": "maxlub",
       "arquivo": "data/exemplos/RegraMaxlub.pdf",
       "gobr_esperado": "data/exemplos/RegraMaxlub.gobr",
+      "fora_do_pedido": [
+        "status na receita federal definido como baixada"
+      ],
       "achados_esperados": [
         "sem_fallback",
         "fora_do_gobr"
@@ -13,7 +16,10 @@
     {
       "id": "infinitto",
       "arquivo": "data/exemplos/RegraInfinittoDesign.pdf",
-      "gobr_esperado": "data/exemplos/RegraInfinittoDesign.gobr"
+      "gobr_esperado": "data/exemplos/RegraInfinittoDesign.gobr",
+      "fora_do_pedido": [
+        "status na receita federal definido como baixada"
+      ]
     },
     {
       "id": "v1vidros",

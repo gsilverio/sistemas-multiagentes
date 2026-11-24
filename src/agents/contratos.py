@@ -7,6 +7,7 @@ critica e ajusta, o Gerador o transforma em blocos `parametros`.
 
 from __future__ import annotations
 
+import re
 from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
@@ -33,6 +34,31 @@ class Faixa(BaseModel):
             return f"mais de {self.min_dias} dias sem {alvo}"
         return f"qualquer tempo sem {alvo}"
 
+    def como_descricao(self) -> str:
+        """A faixa com as palavras das descrições do acervo, que o Gerador conhece.
+
+        Não é `como_texto`: no acervo, "sem compra entre 20 e 40 dias" é
+        `fora da recencia entre 20 e 40`, o contrário do grupo pedido.
+        """
+        alvo = "compra" if self.medida == "dias_sem_compra" else "visita"
+        if self.min_dias and self.max_dias:
+            return f"última {alvo} entre {self.min_dias} e {self.max_dias} dias atrás"
+        if self.max_dias:
+            return f"{alvo} nos últimos {self.max_dias} dias"
+        return f"última {alvo} há mais de {self.min_dias} dias" if alvo == "visita" \
+            else f"sem compra há mais de {self.min_dias} dias"
+
+
+# Palavras de um critério que só fala da faixa de dias ("compraram nos últimos 90 dias mas estão há 60 sem comprar").
+_SO_FAIXA = re.compile(
+    r"(?:\d+|clientes?|com|cuja|que|fizeram|compr\w*|[uú]ltim[ao]s?|pedidos?|entre|n[oa]s?|dias?|d|h[aá]|a|[aà]|mais|menos|"
+    r"de|do|da|sem|mas|est[aã]o?|atr[aá]s|acima|at[eé]|em|e|o|os|tiveram|foi|faz|tem|t[eê]m|num|per[ií]odo)")
+
+
+def so_fala_da_faixa(criterio: str) -> bool:
+    palavras = re.findall(r"\w+", criterio.lower())
+    return bool(re.search(r"\d", criterio)) and all(_SO_FAIXA.fullmatch(p) for p in palavras)
+
 
 class Segmento(BaseModel):
     nome: str
@@ -46,10 +72,14 @@ class Segmento(BaseModel):
 
     def descricao(self) -> str:
         """Texto que o Gerador recebe (mesmo formato dos pares de fine-tuning)."""
-        partes = [self.criterio.strip() or ("Clientes que não se enquadraram nas regras anteriores"
-                                            if self.fallback else "Todos os clientes")]
-        if self.faixa and (self.faixa.min_dias or self.faixa.max_dias):
-            partes.append(f"({self.faixa.como_texto()})")
+        if self.faixa and (self.faixa.min_dias or self.faixa.max_dias) and so_fala_da_faixa(self.criterio):
+            partes = [("Clientes " if self.faixa.como_descricao().startswith("sem ") else "Clientes com ")
+                      + self.faixa.como_descricao()]
+        else:
+            partes = [self.criterio.strip() or ("Clientes que não se enquadraram nas regras anteriores"
+                                                if self.fallback else "Todos os clientes")]
+            if self.faixa and (self.faixa.min_dias or self.faixa.max_dias):
+                partes.append(f"({self.faixa.como_descricao()})")
         texto = " ".join(partes).rstrip(".") + "."
         if self.nao_agendar:
             texto += " Não devem ser agendados."

@@ -8,7 +8,8 @@ Validador → Explicador) sem pausar para perguntas, em cada caso de
   exatamente como o esperado (mesma decisão de agendar, frequência e
   preferências), ver `src.gobr.simulacao`. Os erros vêm em
   `erros_comportamento` (ex.: "última compra há 52 dias: esperado a cada 14
-  dias, gerado a cada 7 dias");
+  dias, gerado a cada 7 dias"). `fora_do_pedido`, no caso, lista condições que
+  a referência tem e a entrada do usuário não pede; elas não contam;
 - `valido`: o GOBR final passa no validador e na conferência com o RuleSpec;
 - `blocos`: quantos blocos `parametros` foram gerados × esperados;
 - `cobertura_ast`: fração dos blocos esperados com um bloco gerado de mesma
@@ -75,13 +76,13 @@ def _cobertura(esperadas: list[GobrParsedRule], geradas: list[GobrParsedRule], c
     return round(acertos / len(esperadas), 3)
 
 
-def comparar(gobr_gerado: str | None, gobr_esperado: str | None) -> dict[str, Any]:
+def comparar(gobr_gerado: str | None, gobr_esperado: str | None, ignorar: list[str] = ()) -> dict[str, Any]:
     validador = GobrValidator()
     geradas = list(validador.validar(gobr_gerado).parametros.values()) if gobr_gerado else []
     if not gobr_esperado:
         return {"blocos_gerados": len(geradas)}
     esperadas = list(validador.validar(gobr_esperado).parametros.values())
-    return {**acerto_comportamento(gobr_gerado, gobr_esperado),
+    return {**acerto_comportamento(gobr_gerado, gobr_esperado, ignorar=ignorar),
             "blocos_gerados": len(geradas), "blocos_esperados": len(esperadas),
             "cobertura_ast": _cobertura(esperadas, geradas, _estrutura),
             "cobertura_acao": _cobertura(esperadas, geradas, _acao)}
@@ -132,6 +133,7 @@ def avaliar_caso(grafo: Any, caso: dict[str, Any]) -> dict[str, Any]:
         "segundos": round(time.time() - inicio, 1),
         "valido": bool((estado.get("conferencia") or {}).get("ok")),
         "tentativas": estado.get("tentativas", 0),
+        "reparados_sem_llm": [n for p in estado.get("trace") or [] for n in p.get("reparados") or []],
         "passos": len([p for p in estado.get("trace") or [] if p["no"] not in ("inicio", "orquestrador")]),
         "decisoes_llm": sum(1 for p in estado.get("trace") or [] if p.get("origem") == "llm"),
         "guardrails": sum(1 for p in estado.get("trace") or [] if p.get("origem") == "guardrail"),
@@ -139,8 +141,10 @@ def avaliar_caso(grafo: Any, caso: dict[str, Any]) -> dict[str, Any]:
         "achados": codigos,
         "perguntas": [p["id"] for p in analise.get("perguntas") or []],
         "erro": estado.get("erro"),
+        "spec": analise.get("spec"),
+        "erros_validador": (estado.get("conferencia") or {}).get("erros_por_bloco"),
         "gobr": estado.get("gobr"),
-        **comparar(estado.get("gobr"), gobr_esperado(caso)),
+        **comparar(estado.get("gobr"), gobr_esperado(caso), caso.get("fora_do_pedido") or []),
         **conferir_achados(codigos, caso),
     }
     return resultado
@@ -152,6 +156,8 @@ def resumir(resultados: list[dict[str, Any]]) -> dict[str, Any]:
         valores = [float(r[m]) for r in resultados if m in r]
         if valores:
             resumo[m] = round(sum(valores) / len(valores), 3)
+    resumo["blocos_reparados_sem_llm"] = sum(len(r.get("reparados_sem_llm") or []) for r in resultados)
+    resumo["blocos_gerados"] = sum(r.get("blocos_gerados") or 0 for r in resultados)
     resumo["segundos_medio"] = round(sum(r["segundos"] for r in resultados) / max(1, len(resultados)), 1)
     return resumo
 
@@ -164,6 +170,8 @@ def avaliar(grafo: Any, casos: list[dict[str, Any]], saida: Path, *, rotulo: str
         resultados.append(r)
         metricas = "  ".join(f"{m}={r[m]}" for m in METRICAS if m in r)
         print(f"[{rotulo}] {caso['id']}: {metricas}  ({r['segundos']}s)", flush=True)
+        if r.get("reparados_sem_llm"):
+            print(f"    reparados sem LLM: {', '.join(r['reparados_sem_llm'])}", flush=True)
         for erro in r.get("erros_comportamento") or []:
             print(f"    {erro['cliente']}: esperado {erro['esperado']}, gerado {erro['gerado']}", flush=True)
     resumo = resumir(resultados)

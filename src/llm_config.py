@@ -47,7 +47,16 @@ def create_llm_para(papel: str, **kwargs):
 
             _MODELOS_HF[chave] = GeradorHF(modelo.removeprefix("hf:"), adaptador)
         return _MODELOS_HF[chave]
-    return create_llm(modelo, **kwargs)
+    return com_retentativas(create_llm(modelo, **kwargs))
+
+
+def com_retentativas(llm, tentativas: int = 3):
+    """Repete a chamada quando o Ollama cai no meio ("unexpected EOF") e sobe o modelo de novo."""
+    import httpx
+    from ollama import ResponseError
+
+    return llm.with_retry(retry_if_exception_type=(ResponseError, httpx.TransportError, ConnectionError),
+                          stop_after_attempt=tentativas)
 
 
 def create_llm(model: str | None = None, *, num_ctx: int | None = None, temperature: float = 0,

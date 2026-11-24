@@ -124,6 +124,27 @@ class AnalistaTests(unittest.TestCase):
         self.assertTrue(any("130 dias" in p.texto for p in a.perguntas))
         self.assertTrue(a.ajustes)
 
+    def test_faixas_vizinhas_e_nao_agendar_cobrem(self):
+        a = AgenteAnalista().analisar(RuleSpec(segmentos=[
+            Segmento(nome="A", faixa=Faixa(max_dias=30), frequencia_dias=30, criterio="x"),
+            Segmento(nome="B", faixa=Faixa(min_dias=31, max_dias=60), frequencia_dias=15, criterio="x"),
+            Segmento(nome="C", faixa=Faixa(min_dias=60), nao_agendar=True, criterio="x")]))
+        self.assertFalse({"buraco_faixa", "sem_fallback"} & {x.codigo for x in a.achados})
+
+    def test_restricao_que_um_bloqueio_ja_cobre(self):
+        rota = "Somente clientes que não estão na rota da semana"
+        a = AgenteAnalista().analisar(RuleSpec(segmentos=[
+            Segmento(nome="Ativos", faixa=Faixa(max_dias=60), frequencia_dias=14, criterio="x",
+                     restricoes=[rota, "preferência na sexta"]),
+            Segmento(nome="Não agendar inadimplentes", criterio="inadimplentes", nao_agendar=True),
+            Segmento(nome="Não agendar clientes em rota", criterio="clientes em rota", nao_agendar=True)]))
+        nomes = {s.nome: s for s in a.spec.segmentos}
+        self.assertEqual(["preferência na sexta"], nomes["Ativos"].restricoes)
+        self.assertEqual("clientes em rota na semana", nomes["Não agendar clientes em rota"].criterio)
+        sem_bloqueio = AgenteAnalista().analisar(RuleSpec(segmentos=[
+            Segmento(nome="Ativos", frequencia_dias=14, criterio="x", restricoes=[rota])]))
+        self.assertEqual([rota], sem_bloqueio.spec.segmentos[0].restricoes)
+
     def test_segmento_sem_acao_e_pergunta_bloqueante(self):
         a = AgenteAnalista().analisar(RuleSpec(segmentos=[Segmento(nome="Prospects", criterio="prospects")]))
         self.assertEqual(["acao:Prospects"], [p.id for p in a.bloqueantes])
@@ -246,6 +267,164 @@ class AgentesTests(unittest.TestCase):
         self.assertTrue(contexto.manual)
 
 
+class ConferenciaPorComportamentoTests(unittest.TestCase):
+    ATIVOS = Segmento(nome="Ativos", criterio="x", faixa=Faixa(min_dias=0, max_dias=45), frequencia_dias=15)
+    RISCO = Segmento(nome="Risco", criterio="x", faixa=Faixa(min_dias=45, max_dias=90), frequencia_dias=7)
+    PERDIDOS = Segmento(nome="Perdidos", criterio="x", faixa=Faixa(min_dias=90), frequencia_dias=30)
+    PROSPECTS = Segmento(nome="Prospects", criterio="nunca compraram", frequencia_dias=20)
+
+    def erros(self, segmento, *linhas, spec=None):
+        from src.agents.validador import conferir_bloco
+        from src.gobr.parser import GobrParser
+
+        acao = "nao agendar" if segmento.nao_agendar else f"frequencia de {segmento.frequencia_dias} dias"
+        bloco = "\n".join([f'parametros "{segmento.nome}":', '    do time("t")', *("    " + l for l in linhas),
+                           "    " + acao])
+        spec = spec or RuleSpec(segmentos=[self.ATIVOS, self.RISCO, self.PERDIDOS, self.PROSPECTS])
+        return conferir_bloco(segmento, GobrParser().parse(bloco), spec)
+
+    def test_formas_certas_passam(self):
+        for linhas in (["quando recencia de positivacao em 90 dias"],
+                       ["quando recencia de positivacao entre 45 dias e 90 dias"],
+                       ["quando recencia de positivacao em 90 dias", "e fora da recencia de positivacao em 45 dias"]):
+            self.assertEqual([], self.erros(self.RISCO, *linhas))
+        self.assertEqual([], self.erros(self.ATIVOS, "quando recencia de positivacao em 45 dias"))
+        self.assertEqual([], self.erros(self.PERDIDOS, "quando fora da recencia de positivacao em 90 dias"))
+
+    def test_faixa_invertida(self):
+        erros = self.erros(self.RISCO, "quando fora da recencia de positivacao em 90 dias")
+        self.assertIn("recencia de positivacao entre 45 dias e 90 dias", erros[0])
+        self.assertTrue(self.erros(self.PERDIDOS, "quando recencia de positivacao em 90 dias"))
+
+    def test_so_a_regra_anterior_permite_omitir_o_minimo(self):
+        self.assertTrue(self.erros(self.RISCO, "quando recencia de positivacao em 90 dias",
+                                   spec=RuleSpec(segmentos=[self.RISCO, self.PERDIDOS])))
+
+    def test_sem_condicao_engole_as_regras_seguintes(self):
+        self.assertTrue(self.erros(self.PERDIDOS))
+        self.assertEqual([], self.erros(self.PERDIDOS, spec=RuleSpec(
+            segmentos=[self.ATIVOS, self.RISCO, self.PERDIDOS])))
+        self.assertIn("pegaria todos", self.erros(self.PROSPECTS)[0])
+
+    def test_nao_agendar_com_faixa(self):
+        s = Segmento(nome="Antigos", criterio="x", faixa=Faixa(min_dias=180), nao_agendar=True)
+        spec = RuleSpec(segmentos=[s, self.ATIVOS])
+        self.assertEqual([], self.erros(s, "quando fora da recencia de positivacao em 180 dias", spec=spec))
+        self.assertTrue(self.erros(s, "quando recencia de positivacao em 180 dias", spec=spec))
+
+    def test_descricao_do_segmento_nao_inverte_a_faixa(self):
+        s = Segmento(nome="B", criterio="Clientes entre 20 e 40 dias sem comprar",
+                     faixa=Faixa(min_dias=20, max_dias=40), frequencia_dias=7)
+        self.assertEqual("Clientes com última compra entre 20 e 40 dias atrás. Devem ser atendidos a cada 7 dias.",
+                         s.descricao())
+        s = s.model_copy(update={"criterio": "Clientes ouro", "faixa": Faixa(max_dias=40)})
+        self.assertTrue(s.descricao().startswith("Clientes ouro (compra nos últimos 40 dias)."))
+        s = s.model_copy(update={"criterio": "há mais de 40 dias sem comprar", "faixa": Faixa(min_dias=40)})
+        self.assertTrue(s.descricao().startswith("Clientes sem compra há mais de 40 dias."))
+
+    def test_prospects(self):
+        self.assertIn("ciclo de vida prospect", self.erros(
+            self.PROSPECTS, "quando no ciclo de vida prospect com a empresa", "e data da rota na semana")[0])
+        self.assertEqual([], self.erros(self.PROSPECTS, "quando no ciclo de vida prospect com a empresa"))
+
+    def test_bloqueio_com_condicao_de_outro_assunto(self):
+        rota = Segmento(nome="Não agendar clientes em rota", criterio="clientes em rota", nao_agendar=True)
+        self.assertIn("data da rota na semana", self.erros(rota, "quando sem venda")[0])
+        self.assertEqual([], self.erros(rota, "quando data da rota na semana"))
+
+    def test_blocos_errados_vistos_na_avaliacao(self):
+        """Blocos que os modelos escreveram na 20b de 24/11: recusados, e o reparo acerta."""
+        from src.agents.validador import conferir_bloco, reparar_bloco
+        from src.gobr.parser import GobrParser
+
+        ativos = Segmento(nome="Ativos", criterio="Última compra em até 45 dias", faixa=Faixa(max_dias=45),
+                          frequencia_dias=21)
+        risco = Segmento(nome="Risco", criterio="entre 45 e 90 dias sem comprar",
+                         faixa=Faixa(min_dias=45, max_dias=90), frequencia_dias=7)
+        rota = Segmento(nome="Não agendar clientes em rota", criterio="clientes em rota", nao_agendar=True)
+        spec = RuleSpec(segmentos=[rota, ativos, risco, self.PROSPECTS])
+        for segmento, linhas, certo in (
+            (ativos, ["quando no ciclo de vida ativo com a empresa", "e recencia de positivacao em 45 dias",
+                      "frequencia de 21 dias"], "quando recencia de positivacao em 45 dias"),
+            (ativos, ["quando recencia de positivacao em 45 dias", "ou fora da recencia de positivacao em 45 dias",
+                      "frequencia de 21 dias"], "quando recencia de positivacao em 45 dias"),
+            (risco, ["quando fora da recencia de positivacao entre 45 dias e 90 dias", "frequencia de 7 dias"],
+             "quando recencia de positivacao entre 45 dias e 90 dias"),
+            (rota, ["quando sem venda", "nao agendar"], "quando data da rota na semana"),
+            (self.PROSPECTS, ["quando no ciclo de vida prospect com a empresa",
+                              "e fora da recencia de positivacao na semana", "frequencia de 20 dias"],
+             "quando no ciclo de vida prospect com a empresa"),
+        ):
+            regra = GobrParser().parse("\n".join([f'parametros "{segmento.nome}":', '    do time("t")',
+                                                  *("    " + l for l in linhas)]))
+            self.assertTrue(conferir_bloco(segmento, regra, spec), linhas)
+            reparado = reparar_bloco(segmento, regra, spec, 'do time("t")')
+            self.assertIsNotNone(reparado, linhas)
+            self.assertIn(certo, reparado)
+
+    def test_condicao_a_mais_na_faixa(self):
+        s = self.RISCO.model_copy(update={"criterio": "última compra entre 45 e 90 dias"})
+        self.assertIn("inadimplentes", self.erros(s, "quando recencia de positivacao em 90 dias", "e inadimplentes")[0])
+
+    def test_preferencia_pedida_e_modificador_sobrando(self):
+        s = self.ATIVOS.model_copy(update={"restricoes": ["preferência às segundas e terças"]})
+        base = "quando recencia de positivacao em 45 dias"
+        self.assertIn("preferencia na segunda e na terca", self.erros(s, base)[0])
+        self.assertEqual([], self.erros(s, base, "preferencia na segunda e na terca"))
+        r = self.ATIVOS.model_copy(update={"restricoes": ["somente fora da rota"]})
+        self.assertIn("`fixo`", self.erros(r, base, "fixo")[0])
+
+
+class PercepcaoConferenciaTests(unittest.TestCase):
+    def test_faixa_do_texto(self):
+        from src.agents.percepcao import faixa_do_texto
+
+        for texto, faixa in {
+            "Última compra em até 45 dias": (0, 45), "Clientes com compra entre 0 e 60 dias": (0, 60),
+            "Compraram nos últimos 90 mas estão a 60 dias sem comprar": (60, 90),
+            "Última compra entre 31 e 60 dias": (31, 60), "Clientes sem pedidos a mais 90 dias": (90, None),
+            "Acima de 180 dias sem comprar": (180, None), "compra nos últimos 30 dias, visitar a cada 14 dias": (0, 30),
+            "Clientes inadimplentes": None, "Inativos há 60 dias": None,
+        }.items():
+            self.assertEqual(faixa, faixa_do_texto(texto), texto)
+
+    def spec(self, **segmento):
+        return json.dumps({"segmentos": [{"nome": "Ativos", "criterio": "Última compra em até 45 dias",
+                                          "faixa": {"min_dias": 45, "max_dias": 45}, "frequencia_dias": 21, **segmento}]})
+
+    def test_faixa_corrigida_so_na_primeira_mensagem(self):
+        s = AgentePercepcao(LLMRoteiro(self.spec())).extrair(["até 45 dias, a cada 21 dias"]).segmentos[0]
+        self.assertEqual((0, 45), (s.faixa.min_dias, s.faixa.max_dias))
+        s = AgentePercepcao(LLMRoteiro(self.spec())).extrair(["até 45 dias", "mude"]).segmentos[0]
+        self.assertEqual((45, 45), (s.faixa.min_dias, s.faixa.max_dias))
+
+    def test_completa_o_que_sumiu(self):
+        texto = "Última compra em até 45 dias: a cada 21 dias, de preferência às sextas."
+        llm = LLMRoteiro(self.spec(), self.spec(restricoes=["preferência na sexta"]))
+        s = AgentePercepcao(llm).extrair([texto]).segmentos[0]
+        self.assertEqual(["preferência na sexta"], s.restricoes)
+        self.assertIn("preferência de dia", llm.chamadas[1][-1][1])
+        llm = LLMRoteiro(self.spec(), "lixo")                      # não completou: vale a primeira leitura
+        self.assertEqual(21, AgentePercepcao(llm).extrair([texto]).segmentos[0].frequencia_dias)
+
+
+class RetentativaTests(unittest.TestCase):
+    def test_ollama_que_cai_uma_vez(self):
+        from langchain_core.runnables import RunnableLambda
+        from ollama import ResponseError
+        from src.llm_config import com_retentativas
+
+        chamadas = []
+
+        def invocar(_):
+            chamadas.append(1)
+            if len(chamadas) == 1:
+                raise ResponseError("unexpected EOF", 500)
+            return "ok"
+        self.assertEqual("ok", com_retentativas(RunnableLambda(invocar)).invoke([("human", "x")]))
+        self.assertEqual(2, len(chamadas))
+
+
 class GrafoTests(unittest.TestCase):
     def test_ponta_a_ponta(self):
         ag = agentes(LLMRoteiro(json.dumps(SPEC)), LLMRoteiro(*[gerador_correto] * 3))
@@ -275,8 +454,18 @@ class GrafoTests(unittest.TestCase):
         self.assertIn("frequencia de 14 dias", correcao)
         self.assertIn("CONFERÊNCIA", correcao)
 
+    def test_ultima_tentativa_repara_sem_llm(self):
+        teimoso = lambda m: gerador_correto(m).replace("quando recencia de positivacao em 90",  # noqa: E731
+                                                       "quando fora da recencia de positivacao entre 60 dias e 90")
+        gerador = LLMRoteiro(*[teimoso] * 4)                  # 3 blocos + 1 correção que não corrige
+        _, _, saida = rodar(agentes(LLMRoteiro(json.dumps(SPEC)), gerador))
+        self.assertTrue(saida["conferencia"]["ok"])
+        self.assertIn("quando recencia de positivacao entre 60 dias e 90 dias", saida["gobr"])
+        self.assertEqual(["Risco de inatividade"], [n for p in saida["trace"] for n in p.get("reparados") or []])
+
     def test_desiste_depois_do_maximo_de_tentativas(self):
-        sempre_errado = lambda m: gerador_correto(m).replace("frequencia de 14 dias", "frequencia de 3 dias")
+        sempre_errado = lambda m: gerador_correto(m).replace("quando recencia de positivacao em 60 dias",
+                                                             "quando clientes muito felizes")
         ag = agentes(LLMRoteiro(json.dumps(SPEC)), LLMRoteiro(*[sempre_errado] * 10))
         _, _, saida = rodar(ag)
         self.assertEqual(3, saida["tentativas"])

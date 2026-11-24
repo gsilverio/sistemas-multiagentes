@@ -31,6 +31,10 @@ FREQUENCIA_MAXIMA = 365
 
 _DEMAIS = re.compile(r"demais|restante|outros clientes|nao se enquadr|todos os outros|fallback")
 _FORA_DO_GOBR = re.compile(r"capacidade|clientes\s+(?:por|/)\s*dia|meta|comiss|or[cç]amento|ligar\s+\d+")
+_PALAVRA = re.compile(r"[a-z]{4,}")
+_NEGACAO = re.compile(r"\b(?:nao|fora|exceto|sem)\b")
+_VAZIAS = {"cliente", "clientes", "agendar", "todos", "todas", "somente", "apenas", "esta", "estao", "estejam",
+           "semana", "mesma", "quem", "para", "deve", "devem"}
 _BLOQUEIOS_COMUNS = {
     "inadimpl": "Não há regra para clientes inadimplentes. É comum não agendá-los (`quando inadimplentes` + `nao agendar`).",
     "receita": "Não há regra para clientes baixados na Receita Federal. É comum não agendá-los "
@@ -97,6 +101,8 @@ class AgenteAnalista:
         nos_grupos = {_sem_acento(r).strip(" .") for s in spec.segmentos for r in s.restricoes}
         spec.restricoes_gerais = [r for r in spec.restricoes_gerais if _sem_acento(r).strip(" .") not in nos_grupos]
 
+        self._restricoes_ja_bloqueadas(spec, ajustes)
+
         for s in spec.segmentos:
             if not s.nao_agendar and not s.frequencia_dias and not s.frequencia_texto:
                 perguntas.append(Pergunta(
@@ -159,10 +165,36 @@ class AgenteAnalista:
         return Analise(achados=achados, perguntas=perguntas, ajustes=ajustes, spec=spec)
 
     @staticmethod
+    def _restricoes_ja_bloqueadas(spec: RuleSpec, ajustes: list[str]) -> None:
+        """"Somente clientes fora da rota" é redundante quando há um grupo "não agendar clientes em rota".
+
+        O bloqueio vem antes e já tira esses clientes; repetir a condição em
+        cada grupo só dá ao Gerador a chance de escrevê-la invertida.
+        """
+        for bloqueio in [s for s in spec.segmentos if s.nao_agendar and not s.fallback and not s.faixa]:
+            palavras = set(_PALAVRA.findall(_sem_acento(bloqueio.criterio or bloqueio.nome))) - _VAZIAS
+            if not palavras:
+                continue
+            tirados = []
+            for s in spec.segmentos:
+                if s.nao_agendar:
+                    continue
+                for r in list(s.restricoes):
+                    texto = _sem_acento(r)
+                    if _NEGACAO.search(texto) and palavras <= set(_PALAVRA.findall(texto)):
+                        s.restricoes.remove(r)
+                        tirados.append(s.nome)
+                        if "semana" in texto and "semana" not in _sem_acento(bloqueio.criterio):
+                            bloqueio.criterio = f"{(bloqueio.criterio or bloqueio.nome).rstrip(' .')} na semana"
+            if tirados:
+                ajustes.append(f'A restrição de "{bloqueio.nome}" também estava em ' + ", ".join(f'"{n}"' for n in tirados)
+                               + '; como o "não agendar" vem antes e já tira esses clientes, ela ficou só lá.')
+
+    @staticmethod
     def _faixas(spec: RuleSpec, achados: list[Achado], perguntas: list[Pergunta]) -> None:
         por_medida: dict[str, list[Segmento]] = {}
         for s in spec.segmentos:
-            if _faixa(s) and not s.nao_agendar:
+            if _faixa(s):  # "acima de 180 dias: não ligar" também cobre a faixa
                 por_medida.setdefault(s.faixa.medida, []).append(s)
         tem_fallback = any(s.fallback or (not s.criterio.strip() and not s.faixa and not s.nao_agendar)
                            for s in spec.segmentos)
@@ -172,7 +204,7 @@ class AgenteAnalista:
             anterior = None
             for s in sorted(segmentos, key=lambda s: _faixa(s)):
                 inicio, fim = _faixa(s)
-                if inicio > coberto:
+                if inicio > coberto + 1:  # "até 30" e "de 31 a 60" são vizinhas
                     achados.append(Achado(
                         codigo="buraco_faixa", severidade="erro", segmento=s.nome,
                         mensagem=f"Clientes com {coberto} a {inicio} dias sem {alvo} não se encaixam em nenhum "
